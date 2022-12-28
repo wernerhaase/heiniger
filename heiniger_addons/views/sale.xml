@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		
+		<record id="view_order_form_inher" model="ir.ui.view">
+			<field name="name">sale.order.inher</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='qty_delivered']" position="after">
+		        	<field name="od_free_qty" sum="total" readonly="0"/>
+		        	<field name="od_adjustment_qty" sum="total"/>
+		        	<field name="od_transaction_type"/>
+		        	<field name="od_gross_weight" invisible="1"/>
+		        </xpath>
+		        <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="od_gross_weight"/>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <field name="od_service"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="od_purchase_id"/>
+                </xpath>
+                <field name="client_order_ref" position="after">
+                	<field name="od_transaction_type" attrs="{'readonly': [('state', '!=','draft')]}"/>
+                </field>
+			</field>
+		</record>
+
+		<record id="view_order_form_inherit_sale_stock_orchid" model="ir.ui.view">
+			<field name="name">sale.order.form.sale.stock</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='picking_policy']" position="after">
+                    <field name="od_transportation"/>
+                </xpath>
+            </field>
+        </record>
+
+	</data>
+</odoo>
+	
