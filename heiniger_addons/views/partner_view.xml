@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="view_partner_form_inher" model="ir.ui.view">
+			<field name="name">res.partner.form.inher</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form"/>
+			<field name="arch" type="xml">
+				<data>
+					<field name="name" position="after">
+					 	<!-- <field name="od_arabic_name" default_focus="1" placeholder="Arabic Name" attrs="{'required' : [('type', '=', 'contact')]}"/> -->
+					 	<field name="ref" placeholder="BP Code"/>
+					</field>
+					<field name="industry_id" position="before">
+						<field name="od_commercial_identification"/>
+						<field name="od_ban_bp"/>
+						<field name="od_name_unamed"/>
+						<field name="od_credit_insurance_ref"/>
+                    	<field name="od_coverage_value"/>
+					</field>
+					<field name="vat" position="replace">
+						<field name="vat" placeholder="e.g. BE0477472701" attrs="{'readonly': [('parent_id','!=',False)]}" string="TRN"/>
+					</field>
+              
+
+					<!-- <field name="vat" position="before">
+						<label for="street" string="Arabic Address"/>
+                            <div class="o_address_format">
+                                <div class="oe_edit_only">
+                                    <button name="open_parent" type="object" string="(edit)" class="oe_link"
+                                        attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'contact')]}"/>
+                                </div>
+                                <field name="od_arabic_street" placeholder="العنوان الأول" class="o_address_street"
+                                    attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="od_arabic_street2" placeholder="العنوان الثاني" class="o_address_street"
+                                    attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="od_arabic_city" placeholder="المدينة" class="o_address_city"
+                                    attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="od_arabic_state_id" class="o_address_state" placeholder="دولة" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}" readonly="True"/>
+                                <field name="od_arabic_country_id" placeholder="البلد" class="o_address_country" options='{"no_open": True, "no_create": True}' readonly="True"/>
+                            </div>
+					</field> -->
+					<xpath expr="//page[@name='internal_notes']" position="after">
+						<page name='business_model' string="Business Model">
+							<group name="business_model_1">
+								<group>
+									<field name="od_bus_type"/>
+									<field name="od_license_no"/>
+									<field name="od_lic_expiry_date"/>
+									<field name="od_cc_no"/>
+									<field name="od_issue_authority" required="0"/>
+									
+								</group>
+								<group>
+									<field name="od_owner_name" required="0"/>
+									<field name="od_owner_national" required="0"/>
+									<field name="od_spons_name" required="0"/>
+									<field name="od_spons_national" required="0"/>
+								</group>
+							</group>
+						</page>
+						<page name='legal_status' string="Legal Status">
+							<group name="legal_status_1">
+								<group>
+									<field name="od_lne_buss_id" required="0"/>
+									<field name="od_distr_chanel_id" required="0"/>
+									<field name="od_license_no"/>
+									<field name="od_branch" required="0"/>
+									<field name="od_man_assem" required="0"/>
+									<field name="od_ttl_empl" required="0"/>
+									
+								</group>
+								<!-- <group>
+									<field name="od_ttl_mgt_staff" required="0"/>
+									<label for="od_tover_prd_1" string="Turnover Declaration" />
+		                            <div>
+		                                <div>
+		                                    <field name="od_tover_prd_1" class="oe_inline" required="0"/>
+		                                    <label string="-" class="oe_inline"/>
+		                                    <field name="od_tover_prd_2" class="oe_inline" required="0"/>
+		                                </div>
+		                            </div>
+									<label for="potential_tover_1" string="Potential / Expected Turnover with Somfy"/>
+		                            <div>
+		                                <div>
+		                                    <field name="potential_tover_1" class="oe_inline" required="0"/>
+		                                    <label string="-" class="oe_inline"/>
+		                                    <field name="potential_tover_2" class="oe_inline" required="0"/>
+		                                </div>
+		                            </div>
+								</group> -->
+							</group>
+						</page>
+					</xpath>
+				</data>
+			</field>
+		</record>
+		<!-- <record id="view_country_form_iher" model="ir.ui.view">
+			<field name="name">res.country.form.inher</field>
+			<field name="model">res.country</field>
+			<field name="inherit_id" ref="base.view_country_form"/>
+			<field name="arch" type="xml">
+				<data>
+					<field name="name" position="after">
+						<field name="od_arabic_name"/>
+					</field>
+				</data>
+			</field>
+		</record>
+
+		<record id="view_country_state_form_inher" model="ir.ui.view">
+			<field name="name">res.country.state.inher</field>
+			<field name="model">res.country.state</field>
+			<field name="inherit_id" ref="base.view_country_state_form"/>
+			<field name="arch" type="xml">
+				<data>
+					<field name="name" position="after">
+						<field name="od_arabic_name"/>
+					</field>
+				</data>
+			</field>
+		</record>
+		<record id="view_payment_term_form_inher" model="ir.ui.view">
+			<field name="name">account.payment.term.inher</field>
+			<field name="model">account.payment.term</field>
+			<field name="inherit_id" ref="account.view_payment_term_form"/>
+			<field name="arch" type="xml">
+				<data>
+					<field name="name" position="after">
+						<field name="od_arabic_name"/>
+					</field>
+					<field name="note" position="after">
+						<field name="od_arabic_note"/>
+						<label for="od_arabic_note"/>
+                    	<field name="od_arabic_note" placeholder="Payment terms Arabic explanation for the customer..."/>
+					</field>
+				</data>
+			</field>
+		</record> -->
+		
+		<!-- <record id="view_partner_property_form_inher" model="ir.ui.view">
+			<field name="name">res.partner.form.inher</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="account.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<data>
+					<field name="property_supplier_payment_term_id" position="after">
+						<field name="od_arabic_property_supplier_payment_term_id" readonly="True"/>
+					</field>
+					<field name="property_payment_term_id" position="after">
+						<field name="od_arabic_property_payment_term_id" readonly="True"/>
+						<field name="od_payment_behaviour"/>
+					</field>
+					<field name="trust" position="replace">
+						<field name="trust" groups="base.group_no_one" invisible ="1"/> 
+					</field>
+				</data>
+			</field>
+		</record> -->
+	</data>
+</odoo>
+   
