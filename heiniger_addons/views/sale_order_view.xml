@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+
+	<record id="hgr_view_order_form" model="ir.ui.view">
+        <field name="name">sale.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_term_id" position="after">
+                <field name="hgr_object_id" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
+                <field name="hgr_subject" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
+                <field name="hgr_case_of_insurance" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
+            </field>
+            <xpath expr="//page[3]" position="after">
+    			<page string="Insurance Details" attrs="{'invisible':[('hgr_case_of_insurance', '=', False)],'readonly': [('state', 'in', ('done','cancel'))]}">
+        			<group>
+		              <group>
+		                <field name="hgr_insurance_id"/>
+		                <field name="hgr_claim_person_id"/>
+		              </group>
+		              <group>
+		                <field name="hgr_insurance_policy_no"/>
+		                <field name="hgr_insurance_claim_no"/>
+		                <field name="hgr_insurance_record_date"/>
+		              </group>
+		            </group>
+    			</page>
+  			</xpath> 
+        </field>
+    </record>
+</odoo>

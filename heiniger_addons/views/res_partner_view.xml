@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo>
+  
+  <record id="hgr_view_partner_form" model="ir.ui.view">
+    <field name="name">res.partner.form.inherit</field>
+    <field name="model">res.partner</field>
+    <field name="type">form</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <field name="company_registry" position="after">
+        <field name="hgr_is_insurance"/>
+      </field>
+    </field>
+  </record>
+
+</odoo>
