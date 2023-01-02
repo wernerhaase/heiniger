@@ -3,7 +3,7 @@
 
 
 {
-    'name': 'Heiniger Customaztions',
+    'name': 'Heiniger Addons',
     'version': '1.0',
     'category': 'Customizations',
     'sequence': 6,
@@ -13,10 +13,11 @@
 This module added for additional fields & custom developments.
 
 """,
-    'depends': ['sale'],
+    'depends': ['sale','sale_crm'],
     'data': [
-        # 'views/res_config_settings_views.xml',
-        # 'views/pos_config_views.xml',
+        'views/crm_lead_view.xml',
+        'views/res_partner_view.xml',
+        'views/sale_order_view.xml',
         ],
     'installable': True,
     # 'assets': {
