@@ -12,7 +12,7 @@
       <field name="user_id" position="after">
         <field name="hgr_case_of_insurance"/>
       </field>
-      <xpath expr="//page[2]" position="after">
+      <xpath expr="//page[3]" position="after">
         <page string="Insurance Details" attrs="{'invisible':[('hgr_case_of_insurance','=',False)]}">
             <group>
               <group>
