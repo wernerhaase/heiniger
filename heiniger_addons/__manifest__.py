@@ -15,9 +15,9 @@ This module added for additional fields & custom developments.
 """,
     'depends': ['sale','sale_crm'],
     'data': [
-        'views/crm_lead_view.xml',
         'views/res_partner_view.xml',
         'views/sale_order_view.xml',
+        'views/crm_lead_view.xml',
         ],
     'installable': True,
     # 'assets': {
