@@ -16,6 +16,36 @@ class Saleorder(models.Model):
 	hgr_insurance_claim_no = fields.Char(string="Claim No",related="opportunity_id.hgr_insurance_claim_no",store=True)
 	hgr_insurance_record_date = fields.Date(string="Date",related="opportunity_id.hgr_insurance_record_date",store=True)
 
+	def _compute_l10n_din5008_template_data(self):
+        for record in self:
+            record.l10n_din5008_template_data = data = []
+            if record.state in ('draft', 'sent'):
+                if record.name:
+                    data.append((_("Quotation No."), record.name))
+                if record.date_order:
+                    data.append((_("Quotation Date"), format_date(self.env, record.date_order)))
+                if record.validity_date:
+                    data.append((_("Expiration"), format_date(self.env, record.validity_date)))
+            else:
+                if record.name:
+                    data.append((_("Order No."), record.name))
+                if record.date_order:
+                    data.append((_("Order Date"), format_date(self.env, record.date_order)))
+            if record.client_order_ref:
+                data.append((_('Customer Reference'), record.client_order_ref))
+            if record.user_id:
+                data.append((_("Salesperson"), record.user_id.name))
+            if 'incoterm' in record._fields and record.incoterm:
+                data.append((_("Incoterm"), record.incoterm.code))
+            if record.hgr_insurance_id:
+                data.append((_("Insurance"), record.hgr_insurance_id.name))
+            if record.hgr_insurance_claim_no:
+                data.append((_("Insurance"), record.hgr_insurance_claim_no))
+            if record.hgr_insurance_record_date:
+                data.append((_("Insurance"), record.hgr_insurance_record_date))        
+
+
+
 	# @api.depends('order_line','order_line.od_gross_weight')
 	# def total_gross_weight(self):
 	# 	gross=0
