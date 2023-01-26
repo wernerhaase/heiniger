@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, tools, SUPERUSER_ID
+from odoo import api, fields, models, tools, SUPERUSER_ID, _
+from odoo.tools import format_date
 
 class Saleorder(models.Model):
 	_inherit = "sale.order"
@@ -38,13 +39,23 @@ class Saleorder(models.Model):
 			if 'incoterm' in record._fields and record.incoterm:
 				data.append((_("Incoterm"), record.incoterm.code))
 			if record.hgr_insurance_id:
-				data.append((_("Insurance"), record.hgr_insurance_id.name))
+				data.append((_("Insurance Person"), record.hgr_insurance_id.name))
 			if record.hgr_insurance_claim_no:
-				data.append((_("Insurance"), record.hgr_insurance_claim_no))
+				data.append((_("Insurance Nr"), record.hgr_insurance_claim_no))
 			if record.hgr_insurance_record_date:
-				data.append((_("Insurance"), record.hgr_insurance_record_date))        
+				data.append((_("Date"), record.hgr_insurance_record_date))        
 
-
+	def _compute_l10n_din5008_addresses(self):
+		for record in self:
+			record.l10n_din5008_addresses = data = []
+			data.append((_("Shipping Address:"), record.partner_shipping_id))
+			data.append((_("Invoicing Address:"), record.partner_invoice_id))
+			# data.append((_("Subject:"), record.hgr_subject))
+			# if record.partner_shipping_id == record.partner_invoice_id:
+			#     data.append((_("Invoicing and Shipping Address:"), record.partner_shipping_id))
+			# else:
+			#     data.append((_("Shipping Address:"), record.partner_shipping_id))
+			#     data.append((_("Invoicing Address:"), record.partner_invoice_id))
 
 	# @api.depends('order_line','order_line.od_gross_weight')
 	# def total_gross_weight(self):
