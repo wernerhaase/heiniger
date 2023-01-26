@@ -17,6 +17,13 @@ class Saleorder(models.Model):
 	hgr_insurance_claim_no = fields.Char(string="Claim No",related="opportunity_id.hgr_insurance_claim_no",store=True)
 	hgr_insurance_record_date = fields.Date(string="Date",related="opportunity_id.hgr_insurance_record_date",store=True)
 
+	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
+
+
+	def _compute_l10n_din5008_document_subject(self):
+		for record in self:
+			record.l10n_din5008_document_subject = record.hgr_subject
+
 	def _compute_l10n_din5008_template_data(self):
 		for record in self:
 			record.l10n_din5008_template_data = data = []
@@ -48,7 +55,7 @@ class Saleorder(models.Model):
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
 			record.l10n_din5008_addresses = data = []
-			data.append((_("Shipping Address:"), record.partner_shipping_id))
+			data.append((_("Object:"), record.partner_shipping_id))
 			data.append((_("Invoicing Address:"), record.partner_invoice_id))
 			# data.append((_("Subject:"), record.hgr_subject))
 			# if record.partner_shipping_id == record.partner_invoice_id:

@@ -3,5 +3,8 @@
 from . import crm_lead
 from . import res_partner
 from . import sale
+from . import base_layout
+from . import product
+
 
 

@@ -21,9 +21,8 @@ This module added for additional fields & custom developments.
         ],
     'installable': True,
     # 'assets': {
-    #     'point_of_sale.assets': [
-    #         'pos_discount/static/src/js/**/*',
-    #         'pos_discount/static/src/xml/**/*',
+    #     'web.report_assets_common': [
+    #         'heiniger_addons/static/src/**/*',
     #     ],
     # },
     'license': 'LGPL-3',
