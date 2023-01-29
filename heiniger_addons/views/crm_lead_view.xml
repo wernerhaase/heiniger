@@ -55,6 +55,7 @@
                 <field name="hgr_insurance_claim_no"/>
                 <field name="hgr_insurance_record_date"/>
               </group>
+              <field name="hgr_insurance_description" placeholder="Add an insurance description..." options="{'collaborative': true}" />
             </group>
         </page>
       </xpath> 

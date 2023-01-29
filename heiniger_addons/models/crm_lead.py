@@ -22,7 +22,7 @@ class Lead(models.Model):
 	project_use_documents = fields.Boolean("Use Documents", related='project_id.use_documents')
 	documents_folder_id = fields.Many2one('documents.folder', related='project_id.documents_folder_id')
 	document_count = fields.Integer(compute='_compute_attached_document_count', string="Number of documents", groups='documents.group_documents_user')
-
+	hgr_insurance_description = fields.Html('Insurance Notes')
 
 	@api.onchange('name')
 	def onchange_name(self):
