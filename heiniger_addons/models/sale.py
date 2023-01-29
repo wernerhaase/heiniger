@@ -16,6 +16,7 @@ class Saleorder(models.Model):
 	hgr_insurance_policy_no = fields.Char(string="Policy No",related="opportunity_id.hgr_insurance_policy_no",store=True)
 	hgr_insurance_claim_no = fields.Char(string="Claim No",related="opportunity_id.hgr_insurance_claim_no",store=True)
 	hgr_insurance_record_date = fields.Date(string="Date",related="opportunity_id.hgr_insurance_record_date",store=True)
+	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True)
 
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 
@@ -50,7 +51,8 @@ class Saleorder(models.Model):
 			if record.hgr_insurance_claim_no:
 				data.append((_("Insurance Nr"), record.hgr_insurance_claim_no))
 			if record.hgr_insurance_record_date:
-				data.append((_("Date"), record.hgr_insurance_record_date))        
+				data.append((_("Date"), format_date(self.env, record.hgr_insurance_record_date)))       
+
 
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
