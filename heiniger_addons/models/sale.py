@@ -19,7 +19,7 @@ class Saleorder(models.Model):
 	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True)
 
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
-
+	
 
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
@@ -47,17 +47,17 @@ class Saleorder(models.Model):
 			if 'incoterm' in record._fields and record.incoterm:
 				data.append((_("Incoterm"), record.incoterm.code))
 			if record.hgr_insurance_id:
-				data.append((_("Insurance Person"), record.hgr_insurance_id.name))
+				data.append((_("Sachbearbeiter"), record.hgr_insurance_id.name))
 			if record.hgr_insurance_claim_no:
-				data.append((_("Insurance Nr"), record.hgr_insurance_claim_no))
+				data.append((_("Schaden Nr"), record.hgr_insurance_claim_no))
 			if record.hgr_insurance_record_date:
-				data.append((_("Date"), format_date(self.env, record.hgr_insurance_record_date)))       
+				data.append((_("Annahme Datum"), format_date(self.env, record.hgr_insurance_record_date)))       
 
 
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
 			record.l10n_din5008_addresses = data = []
-			data.append((_("Object:"), record.partner_shipping_id))
+			data.append((_("Objekt:"), record.partner_shipping_id))
 			data.append((_("Invoicing Address:"), record.partner_invoice_id))
 			# data.append((_("Subject:"), record.hgr_subject))
 			# if record.partner_shipping_id == record.partner_invoice_id:
