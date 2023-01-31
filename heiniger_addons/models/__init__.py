@@ -6,6 +6,7 @@ from . import sale
 from . import base_layout
 from . import product
 from . import account_move
+# from . import timesheet
 
 
 
