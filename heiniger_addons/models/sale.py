@@ -19,7 +19,7 @@ class Saleorder(models.Model):
 	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True)
 
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
-	
+
 
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
@@ -47,7 +47,7 @@ class Saleorder(models.Model):
 			if 'incoterm' in record._fields and record.incoterm:
 				data.append((_("Incoterm"), record.incoterm.code))
 			if record.hgr_insurance_id:
-				data.append((_("Sachbearbeiter"), record.hgr_insurance_id.name))
+				data.append((_("Versicherung"), record.hgr_insurance_id.name))
 			if record.hgr_insurance_claim_no:
 				data.append((_("Schaden Nr"), record.hgr_insurance_claim_no))
 			if record.hgr_insurance_record_date:
@@ -77,13 +77,16 @@ class Saleorder(models.Model):
 # class Saleorderline(models.Model):
 # 	_inherit = "sale.order.line"
 
-# 	od_free_qty=fields.Float(string="Free quantity", digits=dp.get_precision('Product Unit of Measure'))
-# 	od_adjustment_qty=fields.Float(string="Adjustment quantity", digits=dp.get_precision('Product Unit of Measure'))
-# 	od_gross_weight = fields.Float(string='Gross Weight',compute="compute_gross_weight")
-# 	od_transaction_type = fields.Many2one('od.transaction.type', string="Transaction Type", default=lambda self: self.env['od.transaction.type'].search([('code','=','SALE')], limit=1).id)
 
-# 	@api.depends('product_uom_qty','od_free_qty','od_adjustment_qty')
-# 	def compute_gross_weight(self):
-# 		for line in self:
-# 			line.od_gross_weight=(line.product_uom_qty+line.od_free_qty+line.od_adjustment_qty)*line.product_id.od_ttl_weight
-# 	
+# 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
+# 	l10n_din5008_addresses = fields.Binary(compute='_compute_l10n_din5008_addresses')
+
+# 	def _compute_l10n_din5008_document_subject(self):
+# 		for record in self:
+# 			record.l10n_din5008_document_subject = record.order_id.hgr_subject
+
+# 	def _compute_l10n_din5008_addresses(self):
+# 		for record in self:
+# 			record.l10n_din5008_addresses = data = []
+# 			data.append((_("Objekt:"), record.order_id.partner_shipping_id))
+# 			# data.append((_("Invoicing Address:"), record.partner_id))
