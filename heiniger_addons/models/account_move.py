@@ -32,7 +32,7 @@ class AccountMove(models.Model):
 			if record.ref:
 				data.append((_("Reference"), record.ref))
 			if sale_order.hgr_insurance_id:
-				data.append((_("Sachbearbeiter"), sale_order.hgr_insurance_id.name))
+				data.append((_("Versicherung"), sale_order.hgr_insurance_id.name))
 			if sale_order.hgr_insurance_claim_no:
 				data.append((_("Schaden Nr"), sale_order.hgr_insurance_claim_no))
 			if sale_order.hgr_insurance_record_date:
