@@ -15,22 +15,22 @@ class AccountMove(models.Model):
 		for record in self:
 			record.l10n_din5008_addresses = data = []
 			data.append((_("Objekt:"), record.partner_shipping_id))
-			data.append((_("Invoicing Address:"), record.partner_id))
+			data.append((_("Rechnungsadresse:"), record.partner_id)) ##Invoicing Address:
 
 	def _compute_l10n_din5008_template_data(self):
 		for record in self:
 			record.l10n_din5008_template_data = data = []
 			sale_order = record.line_ids.sale_line_ids.order_id
 			if record.name:
-				data.append((_("Invoice No."), record.name))
+				data.append((_("Rechnungsnummer"), record.name)) ##Invoice No.
 			if record.invoice_date:
-				data.append((_("Invoice Date"), format_date(self.env, record.invoice_date)))
+				data.append((_("Rechnungsdatum"), format_date(self.env, record.invoice_date)))## Invoice Date
 			if record.invoice_date_due:
-				data.append((_("Due Date"), format_date(self.env, record.invoice_date_due)))
+				data.append((_("Fälligkeitsdatum"), format_date(self.env, record.invoice_date_due))) ##Due Date
 			if record.invoice_origin:
-				data.append((_("Source"), record.invoice_origin))
+				data.append((_("Quelle"), record.invoice_origin)) ##Source
 			if record.ref:
-				data.append((_("Reference"), record.ref))
+				data.append((_("Referenz"), record.ref)) ## Reference
 			if sale_order.hgr_insurance_id:
 				data.append((_("Versicherung"), sale_order.hgr_insurance_id.name))
 			if sale_order.hgr_insurance_claim_no:

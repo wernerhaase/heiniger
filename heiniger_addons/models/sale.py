@@ -30,18 +30,18 @@ class Saleorder(models.Model):
 			record.l10n_din5008_template_data = data = []
 			if record.state in ('draft', 'sent'):
 				if record.name:
-					data.append((_("Quotation No."), record.name))
+					data.append((_("Angebotsnummer."), record.name)) ## Quotation No
 				if record.date_order:
-					data.append((_("Quotation Date"), format_date(self.env, record.date_order)))
+					data.append((_("Angebotsdatum"), format_date(self.env, record.date_order))) ##Quotation Date
 				if record.validity_date:
-					data.append((_("Expiration"), format_date(self.env, record.validity_date)))
+					data.append((_("Ablauf"), format_date(self.env, record.validity_date))) ## Expiration
 			else:
 				if record.name:
-					data.append((_("Order No."), record.name))
+					data.append((_("Auftragsnummer"), record.name)) ##Order No.
 				if record.date_order:
-					data.append((_("Order Date"), format_date(self.env, record.date_order)))
+					data.append((_("Bestelldatum"), format_date(self.env, record.date_order)))  ##Order Date
 			if record.client_order_ref:
-				data.append((_('Customer Reference'), record.client_order_ref))
+				data.append((_('Kundenreferenz'), record.client_order_ref)) ## Customer Reference
 			if record.user_id:
 				data.append((_("Salesperson"), record.user_id.name))
 			if 'incoterm' in record._fields and record.incoterm:
@@ -58,7 +58,7 @@ class Saleorder(models.Model):
 		for record in self:
 			record.l10n_din5008_addresses = data = []
 			data.append((_("Objekt:"), record.partner_shipping_id))
-			data.append((_("Invoicing Address:"), record.partner_invoice_id))
+			data.append((_("Rechnungsadresse:"), record.partner_invoice_id)) ##Invoicing Address
 			# data.append((_("Subject:"), record.hgr_subject))
 			# if record.partner_shipping_id == record.partner_invoice_id:
 			#     data.append((_("Invoicing and Shipping Address:"), record.partner_shipping_id))
