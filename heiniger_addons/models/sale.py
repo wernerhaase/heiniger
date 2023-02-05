@@ -43,7 +43,7 @@ class Saleorder(models.Model):
 			if record.client_order_ref:
 				data.append((_('Kundenreferenz'), record.client_order_ref)) ## Customer Reference
 			if record.user_id:
-				data.append((_("Verkäufer"), record.user_id.name))
+				data.append((_("Verkäufer"), record.user_id.name))##Salesperson
 			if 'incoterm' in record._fields and record.incoterm:
 				data.append((_("Incoterm"), record.incoterm.code))
 			if record.hgr_insurance_id:
