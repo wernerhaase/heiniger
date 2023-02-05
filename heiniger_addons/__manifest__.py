@@ -13,7 +13,7 @@
 This module added for additional fields & custom developments.
 
 """,
-    'depends': ['sale','sale_crm'],
+    'depends': ['sale','sale_crm','sale_project'],
     'data': [
         'views/res_partner_view.xml',
         'views/sale_order_view.xml',

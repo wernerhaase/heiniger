@@ -66,27 +66,14 @@ class Saleorder(models.Model):
 			#     data.append((_("Shipping Address:"), record.partner_shipping_id))
 			#     data.append((_("Invoicing Address:"), record.partner_invoice_id))
 
-	# @api.depends('order_line','order_line.od_gross_weight')
-	# def total_gross_weight(self):
-	# 	gross=0
-	# 	for line in self.order_line:
-	# 		gross=gross+line.od_gross_weight
-	# 	self.od_gross_weight=gross
 
+class SaleOrderLine(models.Model):
+    _inherit = "sale.order.line"
 
-# class Saleorderline(models.Model):
-# 	_inherit = "sale.order.line"
-
-
-# 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
-# 	l10n_din5008_addresses = fields.Binary(compute='_compute_l10n_din5008_addresses')
-
-# 	def _compute_l10n_din5008_document_subject(self):
-# 		for record in self:
-# 			record.l10n_din5008_document_subject = record.order_id.hgr_subject
-
-# 	def _compute_l10n_din5008_addresses(self):
-# 		for record in self:
-# 			record.l10n_din5008_addresses = data = []
-# 			data.append((_("Objekt:"), record.order_id.partner_shipping_id))
-# 			# data.append((_("Invoicing Address:"), record.partner_id))
+    def _timesheet_create_task_prepare_values(self, project):
+        res = super(SaleOrderLine, self)._timesheet_create_task_prepare_values(project)
+        sale_line_name_parts = self.name.split('\n')
+        title =  self.product_id.name
+        description = '<br/>'.join(sale_line_name_parts)
+        res.update({'name': title,'description':description})
+        return res
