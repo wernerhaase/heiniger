@@ -14,7 +14,8 @@ class AccountMove(models.Model):
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
 			record.l10n_din5008_addresses = data = []
-			data.append((_("Objekt:"), record.partner_shipping_id))
+			sale_order = record.line_ids.sale_line_ids.order_id
+			data.append((_("Objekt:"), sale_order.hgr_object_id))
 			data.append((_("Rechnungsadresse:"), record.partner_id)) ##Invoicing Address:
 
 	def _compute_l10n_din5008_template_data(self):

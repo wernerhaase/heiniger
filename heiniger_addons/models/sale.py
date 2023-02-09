@@ -57,7 +57,7 @@ class Saleorder(models.Model):
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
 			record.l10n_din5008_addresses = data = []
-			data.append((_("Objekt:"), record.partner_shipping_id))
+			data.append((_("Objekt:"), record.hgr_object_id))
 			data.append((_("Rechnungsadresse:"), record.partner_invoice_id)) ##Invoicing Address
 			# data.append((_("Subject:"), record.hgr_subject))
 			# if record.partner_shipping_id == record.partner_invoice_id:
