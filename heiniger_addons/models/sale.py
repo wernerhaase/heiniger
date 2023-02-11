@@ -66,6 +66,14 @@ class Saleorder(models.Model):
 			#     data.append((_("Shipping Address:"), record.partner_shipping_id))
 			#     data.append((_("Invoicing Address:"), record.partner_invoice_id))
 
+	def _compute_l10n_din5008_document_title(self):
+        for record in self:
+            if self._context.get('proforma'):
+                record.l10n_din5008_document_title = _('Proformarechnung') ##Pro Forma Invoice
+            elif record.state in ('draft', 'sent'):
+                record.l10n_din5008_document_title = _('Offerte') ## Quotation
+            else:
+                record.l10n_din5008_document_title = _('Auftragsbestätigung') ## Sales Order
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
