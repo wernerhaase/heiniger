@@ -67,21 +67,21 @@ class Saleorder(models.Model):
 			#     data.append((_("Invoicing Address:"), record.partner_invoice_id))
 
 	def _compute_l10n_din5008_document_title(self):
-        for record in self:
-            if self._context.get('proforma'):
-                record.l10n_din5008_document_title = _('Proformarechnung') ##Pro Forma Invoice
-            elif record.state in ('draft', 'sent'):
-                record.l10n_din5008_document_title = _('Offerte') ## Quotation
-            else:
-                record.l10n_din5008_document_title = _('Auftragsbestätigung') ## Sales Order
+		for record in self:
+			if self._context.get('proforma'):
+				record.l10n_din5008_document_title = _('Proformarechnung') ##Pro Forma Invoice
+			elif record.state in ('draft', 'sent'):
+				record.l10n_din5008_document_title = _('Offerte') ## Quotation
+			else:
+				record.l10n_din5008_document_title = _('Auftragsbestätigung') ## Sales Order
 
 class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
+	_inherit = "sale.order.line"
 
-    def _timesheet_create_task_prepare_values(self, project):
-        res = super(SaleOrderLine, self)._timesheet_create_task_prepare_values(project)
-        sale_line_name_parts = self.name.split('\n')
-        title =  self.product_id.name
-        description = '<br/>'.join(sale_line_name_parts)
-        res.update({'name': title,'description':description})
-        return res
+	def _timesheet_create_task_prepare_values(self, project):
+		res = super(SaleOrderLine, self)._timesheet_create_task_prepare_values(project)
+		sale_line_name_parts = self.name.split('\n')
+		title =  self.product_id.name
+		description = '<br/>'.join(sale_line_name_parts)
+		res.update({'name': title,'description':description})
+		return res
