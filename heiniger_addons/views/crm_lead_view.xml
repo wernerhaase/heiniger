@@ -42,9 +42,10 @@
       </xpath>
       <field name="user_id" position="after">
         <field name="hgr_case_of_insurance"/>
+        <field name="multi_insurance" attrs="{'invisible':[('hgr_case_of_insurance','=',False)]}"/>
       </field>
       <xpath expr="//page[3]" position="after">
-        <page string="Insurance Details" attrs="{'invisible':[('hgr_case_of_insurance','=',False)]}">
+        <page string="Insurance Details" attrs="{'invisible':['|',('hgr_case_of_insurance','=',False),('multi_insurance','=',True)]}">
             <group>
               <group>
                 <field name="hgr_insurance_id"/>
@@ -57,6 +58,17 @@
               </group>
               <field name="hgr_insurance_description" placeholder="Add an insurance description..." options="{'collaborative': true}" />
             </group>
+        </page>
+        <page string="Insurance Details" attrs="{'invisible':['|',('hgr_case_of_insurance','=',False),('multi_insurance','=',False)]}">
+          <field name="insurance_line">
+            <tree editable="bottom">
+              <field name="hgr_insurance_id" />
+              <field name="hgr_claim_person_id" />
+              <field name="hgr_insurance_policy_no" />
+              <field name="hgr_insurance_claim_no" />
+              <field name="hgr_insurance_record_date" />
+            </tree>
+          </field>
         </page>
       </xpath> 
     </field>

@@ -11,16 +11,22 @@ class Saleorder(models.Model):
 	hgr_subject = fields.Char(string="Subject", related="opportunity_id.hgr_subject",store=True)
 	hgr_case_of_insurance = fields.Boolean(string="Insurance case",related="opportunity_id.hgr_case_of_insurance",store=True)
 
-	hgr_insurance_id = fields.Many2one(string="Insurance Company", related="opportunity_id.hgr_insurance_id",store=True)
-	hgr_claim_person_id = fields.Many2one(string="Claims Expert", related="opportunity_id.hgr_claim_person_id",store=True)
-	hgr_insurance_policy_no = fields.Char(string="Policy No",related="opportunity_id.hgr_insurance_policy_no",store=True)
-	hgr_insurance_claim_no = fields.Char(string="Claim No",related="opportunity_id.hgr_insurance_claim_no",store=True)
-	hgr_insurance_record_date = fields.Date(string="Date",related="opportunity_id.hgr_insurance_record_date",store=True)
-	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True)
-
+	hgr_insurance_id = fields.Many2one(string="Insurance Company", related="opportunity_id.hgr_insurance_id",store=True,readonly=False)
+	hgr_claim_person_id = fields.Many2one(string="Claims Expert", related="opportunity_id.hgr_claim_person_id",store=True,readonly=False)
+	hgr_insurance_policy_no = fields.Char(string="Policy No",related="opportunity_id.hgr_insurance_policy_no",store=True,readonly=False)
+	hgr_insurance_claim_no = fields.Char(string="Claim No",related="opportunity_id.hgr_insurance_claim_no",store=True,readonly=False)
+	hgr_insurance_record_date = fields.Date(string="Date",related="opportunity_id.hgr_insurance_record_date",store=True,readonly=False)
+	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True,readonly=False)
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 
-
+	@api.depends('state')
+	def _compute_type_name(self):
+		for record in self:
+			if record.state in ('draft', 'sent', 'cancel'):
+				record.type_name = _("Offerte") ## Quotation
+			else:
+				record.type_name = _("Auftragsbestätigung") ## Sales Order
+				
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
 			record.l10n_din5008_document_subject = record.hgr_subject

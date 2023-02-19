@@ -1,1 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+heiniger_addons.access_crm_lead_insurance,access_crm_lead_insurance,heiniger_addons.model_crm_lead_insurance,base.group_user,1,1,1,1

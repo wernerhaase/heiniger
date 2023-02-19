@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+	<template id="html_description_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+
+
+		<td name="td_name" position="replace">
+			<td name="td_name"><span t-field="line.html_description"/></td>
+		</td>
+		
+	</template>
+
+</odoo>
