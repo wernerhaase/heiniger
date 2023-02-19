@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+	<template id="heiniger_timesheet_report">
+        <!-- <t t-set="show_record" t-value="len(docs.ids) == 1"/> -->
+        <t t-set="title" t-value="docs._description"/>
+        <t t-set="company" t-value="docs.company_id if len(docs) == 1 else docs.env.company"/>
+        <t t-call="web.html_container">
+        	<t t-foreach="docs" t-as="doc">
+	            <template id="web_internal_layout_inherit_barcode_print" inherit_id="web.internal_layout">
+	            	<xpath expr="//div[@class='header']" position="replace">
+			            <div class="header">
+			            	<div class="row mb8">
+		                        <div class="col-6 ">
+		                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-height: 75px;"/>
+		                        </div>
+		                        <div class="col-6 text-end mb4">
+		                            <div class="mt0" style="color:white;" t-field="company.report_header"/>
+		                            <div name="company_address" class="mt0 h5">
+		                                <span t-if="company.company_details" t-field="company.company_details"/>
+		                            </div>
+			                    </div>
+			                </div> 
+			            </div>
+			        </xpath>
+		    	</template>
+			    <t t-call="web.internal_layout">	
+					<div class="page" style="font-size:8pt">
+						<div class="oe_structure"/>
+						<h3 class="mt-4 text-center" style="padding-top:0.5cm">
+			                <span>Work Report / Hourly Billing </span>
+			            </h3>
+						<div class="row mt8" style="padding-top:1cm;padding-left:0.5cm">
+						    <div class="col-12">
+					            <div class="row mt-4 mb-4">
+					                <div class="col-auto col-3 mw-100 mb-2">
+					                    <strong>Customer:</strong>
+					                    <p class="m-0" t-field="doc.partner_id"/>
+					                </div>
+					                <div class="col-auto col-3 mw-100 mb-2">
+					                    <strong>Object:</strong>
+					                    <p class="m-0" t-field="doc.sale_line_id.order_id.hgr_object_id"/>
+					                </div>
+					            </div>
+					            <div class="row mt-4 mb-4">
+					                <div class="col-auto col-3 mw-100 mb-2">
+					                    <strong>Task Description:</strong>
+					                    <p class="m-0" t-field="doc.description"/>
+					                </div>
+					                <div class="col-auto col-3 mw-100 mb-2">
+					                    <strong>Assignees:</strong>
+					                    <p class="m-0" t-field="doc.user_ids"/>
+					                </div>
+					            </div>
+					            <h5>
+					                <span>Timesheets for the <t t-out="doc.name"/> <t t-out="title"/></span>
+		            			</h5>
+		            			<t t-set='lines' t-value='doc.timesheet_ids'/>
+		            			<t t-call="hr_timesheet.timesheet_table"/>
+		            		</div>
+		            	</div>
+		            </div>
+	            </t>
+	        </t>
+    	</t>
+   	</template>
+
+    <!-- Sale Order Timesheet Report for given timesheets -->
+    <template id="heiniger_report_timesheet_project_task">
+        <!-- <t t-set="record_name">Sales Order Item</t> -->
+        <!-- <t t-set="with_order_id" t-value="true"/> -->
+        <!-- <t t-set="docs" t-value="docs.order_line"/> -->
+        <t t-call="heiniger_addons.heiniger_timesheet_report"/>
+    </template>
+
+    <record id="heiniger_timesheet_report_project_task" model="ir.actions.report">
+        <field name="name">Work sheet</field>
+        <field name="model">project.task</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">heiniger_addons.heiniger_report_timesheet_project_task</field>
+        <field name="binding_model_id" ref="hr_timesheet.model_project_task"/>
+    </record>
+
+</odoo>

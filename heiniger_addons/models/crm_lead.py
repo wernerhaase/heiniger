@@ -24,6 +24,9 @@ class Lead(models.Model):
 	document_count = fields.Integer(compute='_compute_attached_document_count', string="Number of documents", groups='documents.group_documents_user')
 	hgr_insurance_description = fields.Html('Insurance Notes')
 
+	insurance_line = fields.One2many('crm.lead.insurance','lead_id',string='Insurances For Quotation', copy=True)
+	multi_insurance = fields.Boolean(string="Multiple Insurance")
+
 	@api.onchange('name')
 	def onchange_name(self):
 		self.hgr_subject = self.name
@@ -174,4 +177,16 @@ class Lead(models.Model):
 			quotation_context['default_project_id'] = project_id.id
 			quotation_context['default_analytic_account_id'] = project_id.analytic_account_id.id
 		return quotation_context
-		
+
+class CrmLeadInsurance(models.Model):
+	_name = 'crm.lead.insurance'
+	_description = 'CRM Insurance Companies'
+	
+	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company")
+	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person")
+	hgr_insurance_policy_no = fields.Char(string="Policy No")
+	hgr_insurance_claim_no = fields.Char(string="Claim No")
+	hgr_insurance_record_date = fields.Date(string="Date")
+	lead_id = fields.Many2one('crm.lead',string="Lead")
+
+	
