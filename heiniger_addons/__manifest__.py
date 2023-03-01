@@ -19,6 +19,7 @@ This module added for additional fields & custom developments.
         'views/res_partner_view.xml',
         'views/sale_order_view.xml',
         'views/crm_lead_view.xml',
+        'views/project_view.xml',
         'report/timesheet_report.xml',
         ],
     'installable': True,

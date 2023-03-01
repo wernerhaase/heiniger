@@ -48,8 +48,8 @@
 					                    <p class="m-0" t-field="doc.description"/>
 					                </div>
 					                <div class="col-auto col-3 mw-100 mb-2">
-					                    <strong>Assignees:</strong>
-					                    <p class="m-0" t-field="doc.user_ids"/>
+					                    <strong>Employees:</strong>
+					                    <p class="m-0" t-field="doc.employee_ids"/>
 					                </div>
 					            </div>
 					            <h5>
