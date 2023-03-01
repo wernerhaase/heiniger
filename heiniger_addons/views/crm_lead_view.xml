@@ -60,8 +60,10 @@
             </group>
         </page>
         <page string="Insurance Details" attrs="{'invisible':['|',('hgr_case_of_insurance','=',False),('multi_insurance','=',False)]}">
+          <button name="action_view_insurance_details" class="btn btn-primary" type="object" string="Show Insurance Details"/>
           <field name="insurance_line">
             <tree editable="bottom">
+              <field name="order_id" options="{'no_open': True, 'no_quick_create': True}" domain="[('opportunity_id','=',parent.id)]"/>
               <field name="hgr_insurance_id" />
               <field name="hgr_claim_person_id" />
               <field name="hgr_insurance_policy_no" />

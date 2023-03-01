@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools, SUPERUSER_ID
+from odoo.osv import expression
 
 class Lead(models.Model):
 	_inherit = 'crm.lead'
@@ -178,15 +179,32 @@ class Lead(models.Model):
 			quotation_context['default_analytic_account_id'] = project_id.analytic_account_id.id
 		return quotation_context
 
+	def action_view_insurance_details(self):
+		self.ensure_one()
+		self.insurance_line.unlink()
+		for order in self.order_ids:
+			self.env['crm.lead.insurance'].create({
+            'order_id': order.id,
+            'hgr_insurance_id': order.hgr_insurance_id.id,
+            'hgr_claim_person_id': order.hgr_claim_person_id.id,
+            'hgr_insurance_policy_no': order.hgr_insurance_policy_no,
+            'hgr_insurance_record_date': order.hgr_insurance_record_date,
+            'lead_id': self.id,
+        })
+		
+
+	def _get_lead_order_domain(self):
+		return [('state', 'not in', ('cancel'))]
+
 class CrmLeadInsurance(models.Model):
 	_name = 'crm.lead.insurance'
 	_description = 'CRM Insurance Companies'
 	
-	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company")
-	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person")
-	hgr_insurance_policy_no = fields.Char(string="Policy No")
-	hgr_insurance_claim_no = fields.Char(string="Claim No")
-	hgr_insurance_record_date = fields.Date(string="Date")
+	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company",store=True,readonly=False,related='order_id.hgr_insurance_id')
+	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",store=True,readonly=False,related='order_id.hgr_claim_person_id')
+	hgr_insurance_policy_no = fields.Char(string="Policy No",related='order_id.hgr_insurance_policy_no',store=True,readonly=False)
+	hgr_insurance_claim_no = fields.Char(string="Claim No",related='order_id.hgr_insurance_claim_no',store=True,readonly=False)
+	hgr_insurance_record_date = fields.Date(string="Date",related='order_id.hgr_insurance_record_date',store=True,readonly=False)
 	lead_id = fields.Many2one('crm.lead',string="Lead")
-
+	order_id = fields.Many2one('sale.order',string="Order",readonly=False)
 	
