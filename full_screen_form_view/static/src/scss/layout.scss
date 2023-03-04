@@ -1,0 +1,49 @@
+
+.hide-right-panel {
+    width: 7px;
+    height: 23px;
+    position: absolute;
+    z-index: 999;
+    top: 40px;
+    display: block;
+    cursor: pointer;
+    outline: 0;
+    text-decoration: none;
+    background: url(toggle-button.png) no-repeat;
+
+    background-position: 0 -23px;
+    opacity: 0.5;
+    transition:opacity 0.5s;
+    right: 6px;
+}
+.hide-right-panel:hover {
+	opacity:1;
+	transition:opacity 0.5s;
+}
+
+.show-right-panel {
+    width: 7px;
+    height: 23px;
+    position: absolute;
+    z-index: 999;
+    top: 40px;
+    display: block;
+    cursor: pointer;
+    outline: 0;
+    text-decoration: none;
+    background: url(toggle-button.png) no-repeat;
+
+    background-position: 0 0;
+    right: 6px;
+    opacity: 0.5;
+    transition:opacity 0.5s
+}
+.show-right-panel:hover {
+	opacity:1;
+	transition:opacity 0.5s;
+}
+
+
+.full-screen-form {
+    max-width: 100% !important;
+}
