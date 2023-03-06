@@ -200,11 +200,11 @@ class CrmLeadInsurance(models.Model):
 	_name = 'crm.lead.insurance'
 	_description = 'CRM Insurance Companies'
 	
-	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company",store=True,readonly=False,related='order_id.hgr_insurance_id')
-	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",store=True,readonly=False,related='order_id.hgr_claim_person_id')
-	hgr_insurance_policy_no = fields.Char(string="Policy No",related='order_id.hgr_insurance_policy_no',store=True,readonly=False)
-	hgr_insurance_claim_no = fields.Char(string="Claim No",related='order_id.hgr_insurance_claim_no',store=True,readonly=False)
-	hgr_insurance_record_date = fields.Date(string="Date",related='order_id.hgr_insurance_record_date',store=True,readonly=False)
+	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company",readonly=True)
+	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",readonly=True)
+	hgr_insurance_policy_no = fields.Char(string="Policy No",related='order_id.hgr_insurance_policy_no',readonly=True)
+	hgr_insurance_claim_no = fields.Char(string="Claim No",related='order_id.hgr_insurance_claim_no',readonly=True)
+	hgr_insurance_record_date = fields.Date(string="Date",related='order_id.hgr_insurance_record_date',readonly=True)
 	lead_id = fields.Many2one('crm.lead',string="Lead")
-	order_id = fields.Many2one('sale.order',string="Order",readonly=False)
+	order_id = fields.Many2one('sale.order',string="Order",readonly=True)
 	

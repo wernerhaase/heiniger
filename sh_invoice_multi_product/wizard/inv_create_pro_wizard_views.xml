@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- PRODUCT.PRODUCT  WIZARD AND MULTI ACTIONS -->
+    <record id="sh_inv_create_pro_wizard" model="ir.ui.view">
+        <field name="name">Create Invoice</field>
+        <field name="model">inv.create.wizard.pro</field>
+        <field name="arch" type="xml">
+            <form string="Create Invoice">
+                <group>
+                    <group>
+                        <field name="invoice_type" widget="radio" />
+                        <field name="partner_id" />
+                    </group>
+                </group>
+
+                <footer>
+                    <button name="sh_create_inv" string="Create Invoice" type="object" class="oe_highlight" />
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="sh_create_invoice_form_pro_action" model="ir.actions.act_window">
+        <field name="name">Create Invoice</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">inv.create.wizard.pro</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="sh_inv_create_pro_wizard" />
+        <field name="binding_model_id" ref="product.model_product_product" />
+        <field name="target">new</field>
+    </record>
+</odoo>
