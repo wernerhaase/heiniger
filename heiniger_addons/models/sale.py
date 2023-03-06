@@ -19,6 +19,21 @@ class Saleorder(models.Model):
 	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True,readonly=False)
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 
+	# @api.model
+	# def create(self, vals):
+	# 	for order in self:
+	# 		if not order.oppurtunity_id.order_ids:
+	# 			self.env['crm.lead.insurance'].create({
+	#             'order_id': order.id,
+	#             # 'hgr_insurance_id': order.hgr_insurance_id.id,
+	#             # 'hgr_claim_person_id': order.hgr_claim_person_id.id,
+	#             # 'hgr_insurance_policy_no': order.hgr_insurance_policy_no,
+	#             # 'hgr_insurance_record_date': order.hgr_insurance_record_date,
+	#             'lead_id': self.id,
+	#         })
+	# 	return super().create(vals)
+
+
 	@api.depends('state')
 	def _compute_type_name(self):
 		for record in self:
