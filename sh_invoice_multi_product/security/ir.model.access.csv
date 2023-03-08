@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_inv_create_wizard_pro,access.inv.create.wizard.pro,model_inv_create_wizard_pro,,1,1,1,1
-access_inv_create_wizard_protmpl,access.inv.create.wizard.protmpl,model_inv_create_wizard_protmpl,,1,1,1,1
-access_multi_product_wizard_inv,access.multi.product.wizard.inv,model_multi_product_wizard_inv,,1,1,1,1
