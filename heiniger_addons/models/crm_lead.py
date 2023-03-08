@@ -193,8 +193,8 @@ class Lead(models.Model):
         })
 		
 
-	def _get_lead_order_domain(self):
-		return [('state', 'not in', ('cancel'))]
+	# def _get_lead_order_domain(self):
+	# 	return [('state', 'not in', ('cancel'))]
 
 class CrmLeadInsurance(models.Model):
 	_name = 'crm.lead.insurance'
@@ -202,9 +202,9 @@ class CrmLeadInsurance(models.Model):
 	
 	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company",readonly=True)
 	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",readonly=True)
-	hgr_insurance_policy_no = fields.Char(string="Policy No",related='order_id.hgr_insurance_policy_no',readonly=True)
-	hgr_insurance_claim_no = fields.Char(string="Claim No",related='order_id.hgr_insurance_claim_no',readonly=True)
-	hgr_insurance_record_date = fields.Date(string="Date",related='order_id.hgr_insurance_record_date',readonly=True)
+	hgr_insurance_policy_no = fields.Char(string="Policy No",readonly=True)
+	hgr_insurance_claim_no = fields.Char(string="Claim No",readonly=True)
+	hgr_insurance_record_date = fields.Date(string="Date",readonly=True)
 	lead_id = fields.Many2one('crm.lead',string="Lead")
 	order_id = fields.Many2one('sale.order',string="Order",readonly=True)
 	

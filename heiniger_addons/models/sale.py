@@ -42,13 +42,14 @@ class Saleorder(models.Model):
 			else:
 				record.type_name = _("Auftragsbestätigung") ## Sales Order
 	
-	@api.onchange('hgr_insurance_id')
-	def onchange_hgr_insurance_id(self):
-		if self.opportunity_id:
-			order = self.env['crm.lead.insurance'].search([('order_id', '=',self._origin.id)])
-			print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",order)
-			if order.hgr_insurance_id != self.hgr_insurance_id:
-				print("??????????????????????")
+	# @api.onchange('hgr_insurance_id')
+	# def onchange_hgr_insurance_id(self):
+	# 	if self.opportunity_id:
+	# 		order = self.env['crm.lead.insurance'].search([('order_id', '=',self._origin.id)])
+	# 		print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",order)
+	# 		if order.hgr_insurance_id != self.hgr_insurance_id:
+	# 			print("??????????????????????")
+	
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
 			record.l10n_din5008_document_subject = record.hgr_subject
