@@ -77,6 +77,8 @@ class Saleorder(models.Model):
 				data.append((_("Incoterm"), record.incoterm.code))
 			if record.hgr_insurance_id:
 				data.append((_("Versicherung"), record.hgr_insurance_id.name))
+			if record.hgr_claim_person_id:
+				data.append((_("Schadenexperte"), record.hgr_claim_person_id.name))
 			if record.hgr_insurance_claim_no:
 				data.append((_("Schaden Nr"), record.hgr_insurance_claim_no))
 			if record.hgr_insurance_record_date:
