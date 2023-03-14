@@ -16,7 +16,7 @@
         			<group>
 		              <group>
 		                <field name="hgr_insurance_id"/>
-		                <field name="hgr_claim_person_id"/>
+		                <field name="hgr_claim_person_id" options="{'no_create': True}"/>
 		              </group>
 		              <group>
 		                <field name="hgr_insurance_policy_no"/>
