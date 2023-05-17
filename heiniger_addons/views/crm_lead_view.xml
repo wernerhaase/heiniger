@@ -71,6 +71,7 @@
               <field name="hgr_insurance_policy_no" />
               <field name="hgr_insurance_claim_no" />
               <field name="hgr_insurance_record_date" />
+              <button name="update_sale_order_insurance" class="btn btn-primary" type="object" string="Update"/>
 
             </tree>
             

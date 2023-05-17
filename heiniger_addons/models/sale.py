@@ -11,11 +11,11 @@ class Saleorder(models.Model):
 	hgr_subject = fields.Char(string="Subject", related="opportunity_id.hgr_subject",store=True)
 	hgr_case_of_insurance = fields.Boolean(string="Insurance case",related="opportunity_id.hgr_case_of_insurance",store=True)
 
-	hgr_insurance_id = fields.Many2one(string="Insurance Company", related="opportunity_id.hgr_insurance_id",store=True,readonly=False)
-	hgr_claim_person_id = fields.Many2one(string="Claims Expert", related="opportunity_id.hgr_claim_person_id",store=True,readonly=False)
-	hgr_insurance_policy_no = fields.Char(string="Policy No",related="opportunity_id.hgr_insurance_policy_no",store=True,readonly=False)
-	hgr_insurance_claim_no = fields.Char(string="Claim No",related="opportunity_id.hgr_insurance_claim_no",store=True,readonly=False)
-	hgr_insurance_record_date = fields.Date(string="Date",related="opportunity_id.hgr_insurance_record_date",store=True,readonly=False)
+	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company")
+	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person")
+	hgr_insurance_policy_no = fields.Char(string="Policy No",)
+	hgr_insurance_claim_no = fields.Char(string="Claim No",)
+	hgr_insurance_record_date = fields.Date(string="Date")
 	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True,readonly=False)
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 
@@ -42,14 +42,7 @@ class Saleorder(models.Model):
 			else:
 				record.type_name = _("Auftragsbestätigung") ## Sales Order
 	
-	# @api.onchange('hgr_insurance_id')
-	# def onchange_hgr_insurance_id(self):
-	# 	if self.opportunity_id:
-	# 		order = self.env['crm.lead.insurance'].search([('order_id', '=',self._origin.id)])
-	# 		print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",order)
-	# 		if order.hgr_insurance_id != self.hgr_insurance_id:
-	# 			print("??????????????????????")
-	
+
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
 			record.l10n_din5008_document_subject = record.hgr_subject

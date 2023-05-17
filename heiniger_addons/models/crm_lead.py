@@ -32,7 +32,6 @@ class Lead(models.Model):
 	def onchange_name(self):
 		self.hgr_subject = self.name
 
-
 	@api.onchange('partner_id')
 	def onchange_partner(self):
 		self.hgr_object_id = self.partner_id.id
@@ -159,7 +158,12 @@ class Lead(models.Model):
 			'default_origin': self.name,
 			'default_source_id': self.source_id.id,
 			'default_company_id': self.company_id.id or self.env.company.id,
-			'default_tag_ids': [(6, 0, self.tag_ids.ids)]
+			'default_tag_ids': [(6, 0, self.tag_ids.ids)],
+			'default_hgr_insurance_id': self.hgr_insurance_id.id,
+			'default_hgr_claim_person_id': self.hgr_claim_person_id.id,
+			'default_hgr_insurance_policy_no': self.hgr_insurance_policy_no,
+			'default_hgr_insurance_claim_no': self.hgr_insurance_claim_no,
+			'default_hgr_insurance_record_date': self.hgr_insurance_record_date,
 		}
 		if self.team_id:
 			quotation_context['default_team_id'] = self.team_id.id
@@ -200,11 +204,19 @@ class CrmLeadInsurance(models.Model):
 	_name = 'crm.lead.insurance'
 	_description = 'CRM Insurance Companies'
 	
-	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company",readonly=True)
-	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",readonly=True)
-	hgr_insurance_policy_no = fields.Char(string="Policy No",readonly=True)
-	hgr_insurance_claim_no = fields.Char(string="Claim No",readonly=True)
-	hgr_insurance_record_date = fields.Date(string="Date",readonly=True)
+	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company",)
+	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",)
+	hgr_insurance_policy_no = fields.Char(string="Policy No",)
+	hgr_insurance_claim_no = fields.Char(string="Claim No")
+	hgr_insurance_record_date = fields.Date(string="Date")
 	lead_id = fields.Many2one('crm.lead',string="Lead")
 	order_id = fields.Many2one('sale.order',string="Order",readonly=True)
 	
+	def update_sale_order_insurance(self):
+		for rec in self:
+			rec.order_id.hgr_insurance_id = rec.hgr_insurance_id
+			rec.order_id.hgr_claim_person_id = rec.hgr_claim_person_id
+			rec.order_id.hgr_insurance_policy_no = rec.hgr_insurance_policy_no
+			rec.order_id.hgr_insurance_claim_no = rec.hgr_insurance_claim_no
+			rec.order_id.hgr_insurance_record_date = rec.hgr_insurance_record_date
+			rec.lead_id.action_view_insurance_details()
