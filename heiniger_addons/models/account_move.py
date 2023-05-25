@@ -6,6 +6,20 @@ class AccountMove(models.Model):
 
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 	l10n_din5008_addresses = fields.Binary(compute='_compute_l10n_din5008_addresses')
+	invoice_discount_date_due = fields.Date(
+		string='Due Date with discount',
+		compute='_compute_invoice_discount_date_due', store=True, readonly=False,
+		states={'draft': [('readonly', False)]},
+		index=True,
+		copy=False,
+	)
+
+
+	@api.depends('needed_terms')
+	def _compute_invoice_discount_date_due(self):
+		for invoice in self:
+			for line in invoice.line_ids.filtered(lambda l: l.display_type == 'payment_term').sorted('date_maturity'):
+				invoice.invoice_discount_date_due =  line.discount_date or invoice.invoice_date_due
 
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
