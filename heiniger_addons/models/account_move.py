@@ -6,6 +6,7 @@ class AccountMove(models.Model):
 
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 	l10n_din5008_addresses = fields.Binary(compute='_compute_l10n_din5008_addresses')
+	
 	invoice_discount_date_due = fields.Date(
 		string='Due Date with discount',
 		compute='_compute_invoice_discount_date_due', store=True, readonly=False,
