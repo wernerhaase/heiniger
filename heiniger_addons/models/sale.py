@@ -8,7 +8,7 @@ class Saleorder(models.Model):
 	_inherit = "sale.order"
 
 	hgr_object_id = fields.Many2one(related="opportunity_id.hgr_object_id",string="Object",store=True)
-	hgr_subject = fields.Char(string="Subject", related="opportunity_id.hgr_subject",store=True)
+	hgr_subject = fields.Char(string="Subject")
 	hgr_case_of_insurance = fields.Boolean(string="Insurance case",related="opportunity_id.hgr_case_of_insurance",store=True)
 
 	hgr_insurance_id = fields.Many2one('res.partner',string="Insurance Company", ondelete='restrict', domain="[('hgr_is_insurance','=',True)]",help="Insurance Company")
