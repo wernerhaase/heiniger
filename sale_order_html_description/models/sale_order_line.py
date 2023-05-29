@@ -10,7 +10,6 @@ class ProductTemplate(models.Model):
         'Sales Description', translate=True,
         help="A description of the Product that you want to communicate to your customers. "
              "This description will be copied to every Sales Order, Delivery Order and Customer Invoice/Credit Note")
-
 class ProjectMilestone(models.Model):
     _inherit = 'project.milestone'
     sale_line_name = fields.Html(related='sale_line_id.name')
@@ -33,3 +32,5 @@ class SaleOrderLine(models.Model):
         string="Description",
         compute='_compute_name',
         store=True, readonly=False, required=True, precompute=True)
+
+    sequence_no = fields.Integer('Sequence',related='sequence',store=False)

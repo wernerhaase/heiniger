@@ -10,6 +10,15 @@
 
             </xpath>
 
+             <xpath expr="//field[@name='order_line']/tree//field[@name='sequence']" position="after">
+                    <field name="sequence_no"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='sequence']" position="replace">
+                <group>
+                    <field name="sequence"/>
+                </group>
+            </xpath>
+
 
             <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="attributes">
                 <attribute name="widget">html</attribute>
