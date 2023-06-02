@@ -11,7 +11,7 @@
             </xpath>
 
              <xpath expr="//field[@name='order_line']/tree//field[@name='sequence']" position="after">
-                    <field name="sequence_no" optional="show"/>
+                    <field name="sequence_no" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='sequence']" position="replace">
                 <group>
