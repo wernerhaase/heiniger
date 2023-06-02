@@ -34,3 +34,27 @@ class SaleOrderLine(models.Model):
         store=True, readonly=False, required=True, precompute=True)
 
     sequence_no = fields.Integer('Sequence',related='sequence',store=False)
+
+    def has_duplicates(self,lst):
+        return len(lst) != len(set(lst))
+
+    def write(self,vals):
+        print("valssssssssssssssssss",vals)
+        print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        res = super(SaleOrderLine, self).write(vals)
+        dontcall_function = self.env.context.get('dontcall_function')
+        print(dontcall_function)
+        if not dontcall_function:
+            for rec in self:
+                order_id = rec.order_id
+                sequence_list = order_id.order_line.sorted('sequence').mapped('sequence')
+                lines = order_id.order_line.sorted('sequence')
+                print(sequence_list)
+                if self.has_duplicates(sequence_list):
+                    starting_seq = 10
+                    for line in lines:
+                        line.with_context({'dontcall_function': True}).write({'sequence':starting_seq})
+                        starting_seq += 1
+
+
+        return res
