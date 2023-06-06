@@ -48,11 +48,10 @@ class SaleOrder(models.Model):
             sequence_list = order.order_line.sorted('sequence').mapped('sequence')
             lines = order.order_line.sorted('sequence')
             print(sequence_list)
-            if self.has_duplicates(sequence_list):
-                starting_seq = 10
-                for line in lines:
-                    line.with_context({'dontcall_function': True}).write({'sequence': starting_seq})
-                    starting_seq += 1
+            starting_seq = 10
+            for line in lines:
+                line.with_context({'dontcall_function': True}).write({'sequence': starting_seq})
+                starting_seq += 1
 
         return orders
 
@@ -85,11 +84,10 @@ class SaleOrderLine(models.Model):
                 sequence_list = order_id.order_line.sorted('sequence').mapped('sequence')
                 lines = order_id.order_line.sorted('sequence')
                 print(sequence_list)
-                if self.has_duplicates(sequence_list):
-                    starting_seq = 10
-                    for line in lines:
-                        line.with_context({'dontcall_function': True}).write({'sequence':starting_seq})
-                        starting_seq += 1
+                starting_seq = 10
+                for line in lines:
+                    line.with_context({'dontcall_function': True}).write({'sequence':starting_seq})
+                    starting_seq += 1
 
 
         return res
