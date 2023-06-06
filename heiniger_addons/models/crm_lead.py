@@ -84,33 +84,45 @@ class Lead(models.Model):
 		return action
 	
 	def _compute_attached_document_count(self):
-		Task = self.env['project.task']
-		task_read_group = Task._read_group(
-			[('project_id', 'in', self.ids)],
-			['project_id', 'ids:array_agg(id)'],
-			['project_id'],
-		)
-		task_ids = []
-		task_ids_per_project_id = {}
-		for res in task_read_group:
-			task_ids += res['ids']
-			task_ids_per_project_id[res['project_id'][0]] = res['ids']
-		Document = self.env['documents.document']
-		project_document_read_group = Document._read_group(
-			[('res_model', '=', 'project.project'), ('res_id', 'in', self.ids)],
-			['res_id'],
-			['res_id'],
-		)
-		document_count_per_project_id = {res['res_id']: res['res_id_count'] for res in project_document_read_group}
-		document_count_per_task_id = Task.browse(task_ids)._get_task_document_data()
-		for project in self:
-			task_ids = task_ids_per_project_id.get(self.id, [])
-			project.document_count = document_count_per_project_id.get(self.id, 0) \
-				+ sum([
-					document_count
-					for task_id, document_count in document_count_per_task_id.items()
-					if task_id in task_ids
-				])	
+		folder_id = self.project_id.documents_folder_id.id
+		read_group_var = self.env['documents.document'].read_group(
+			[('folder_id', 'in', [folder_id])],
+			fields=['folder_id'],
+			groupby=['folder_id'])
+
+		document_count_dict = dict((d['folder_id'][0], d['folder_id_count']) for d in read_group_var)
+		for record in self:
+			for folder_id, document_count in document_count_dict.items():
+				record.document_count = document_count
+	
+	# def _compute_attached_document_count(self):
+	# 	Task = self.env['project.task']
+	# 	task_read_group = Task._read_group(
+	# 		[('project_id', 'in', self.ids)],
+	# 		['project_id', 'ids:array_agg(id)'],
+	# 		['project_id'],
+	# 	)
+	# 	task_ids = []
+	# 	task_ids_per_project_id = {}
+	# 	for res in task_read_group:
+	# 		task_ids += res['ids']
+	# 		task_ids_per_project_id[res['project_id'][0]] = res['ids']
+	# 	Document = self.env['documents.document']
+	# 	project_document_read_group = Document._read_group(
+	# 		[('res_model', '=', 'project.project'), ('res_id', 'in', self.ids)],
+	# 		['res_id'],
+	# 		['res_id'],
+	# 	)
+	# 	document_count_per_project_id = {res['res_id']: res['res_id_count'] for res in project_document_read_group}
+	# 	document_count_per_task_id = Task.browse(task_ids)._get_task_document_data()
+	# 	for project in self:
+	# 		task_ids = task_ids_per_project_id.get(self.id, [])
+	# 		project.document_count = document_count_per_project_id.get(self.id, 0) \
+	# 			+ sum([
+	# 				document_count
+	# 				for task_id, document_count in document_count_per_task_id.items()
+	# 				if task_id in task_ids
+	# 			])	
 
 	
 	def create_project(self,folder):
@@ -189,15 +201,15 @@ class Lead(models.Model):
 		self.insurance_line.unlink()
 		for order in self.order_ids:
 			self.env['crm.lead.insurance'].create({
-            'order_id': order.id,
-            'hgr_insurance_id': order.hgr_insurance_id.id,
-            'hgr_claim_person_id': order.hgr_claim_person_id.id,
-            'hgr_insurance_policy_no': order.hgr_insurance_policy_no,
-            'hgr_insurance_record_date': order.hgr_insurance_record_date,
-            'hgr_insurance_claim_no': order.hgr_insurance_claim_no,
-            'hgr_subject': order.hgr_subject,
-            'lead_id': self.id,
-        })
+			'order_id': order.id,
+			'hgr_insurance_id': order.hgr_insurance_id.id,
+			'hgr_claim_person_id': order.hgr_claim_person_id.id,
+			'hgr_insurance_policy_no': order.hgr_insurance_policy_no,
+			'hgr_insurance_record_date': order.hgr_insurance_record_date,
+			'hgr_insurance_claim_no': order.hgr_insurance_claim_no,
+			'hgr_subject': order.hgr_subject,
+			'lead_id': self.id,
+		})
 		
 
 	# def _get_lead_order_domain(self):

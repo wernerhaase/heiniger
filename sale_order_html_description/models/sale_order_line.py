@@ -23,6 +23,39 @@ class AccountMoveline(models.Model):
         compute='_compute_name', store=True, readonly=False, precompute=True,
         tracking=True,
     )
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    def has_duplicates(self,lst):
+        return len(lst) != len(set(lst))
+
+    def reorder_sequence(self):
+        for order in self:
+            sequence_list = order.order_line.sorted('sequence').mapped('sequence')
+            lines = order.order_line.sorted('sequence')
+            print(sequence_list)
+            # if self.has_duplicates(sequence_list):
+            starting_seq = 10
+            for line in lines:
+                line.with_context({'dontcall_function': True}).write({'sequence': starting_seq})
+                starting_seq += 1
+
+
+    @api.model_create_multi
+    def create(self, vals):
+        orders = super(SaleOrder, self).create(vals)
+        for order in orders:
+            sequence_list = order.order_line.sorted('sequence').mapped('sequence')
+            lines = order.order_line.sorted('sequence')
+            print(sequence_list)
+            if self.has_duplicates(sequence_list):
+                starting_seq = 10
+                for line in lines:
+                    line.with_context({'dontcall_function': True}).write({'sequence': starting_seq})
+                    starting_seq += 1
+
+        return orders
+
 
 
 class SaleOrderLine(models.Model):
@@ -38,9 +71,11 @@ class SaleOrderLine(models.Model):
     def has_duplicates(self,lst):
         return len(lst) != len(set(lst))
 
+
+
     def write(self,vals):
-        print("valssssssssssssssssss",vals)
-        print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(vals)
+
         res = super(SaleOrderLine, self).write(vals)
         dontcall_function = self.env.context.get('dontcall_function')
         print(dontcall_function)
