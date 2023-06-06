@@ -44,12 +44,12 @@ class SaleOrder(models.Model):
     @api.model_create_multi
     def create(self, vals):
         orders = super(SaleOrder, self).create(vals)
-        orders.reorder_sequence()
+        self.reorder_sequence()
         return orders
 
     def write(self,vals):
         orders = super(SaleOrder, self).write(vals)
-        orders.reorder_sequence()
+        self.reorder_sequence()
         return orders
 
 
