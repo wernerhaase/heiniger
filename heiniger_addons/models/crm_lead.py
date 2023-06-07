@@ -92,8 +92,11 @@ class Lead(models.Model):
 
 		document_count_dict = dict((d['folder_id'][0], d['folder_id_count']) for d in read_group_var)
 		for record in self:
-			for folder_id, document_count in document_count_dict.items():
-				record.document_count = document_count
+			if document_count_dict:
+				for folder_id, document_count in document_count_dict.items():
+					record.document_count = document_count
+			else:
+				record.document_count = 0	
 	
 	# def _compute_attached_document_count(self):
 	# 	Task = self.env['project.task']
