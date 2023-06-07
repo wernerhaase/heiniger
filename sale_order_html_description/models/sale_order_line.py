@@ -33,7 +33,7 @@ class SaleOrder(models.Model):
         for order in self:
             sequence_list = order.order_line.sorted('sequence').mapped('sequence')
             lines = order.order_line.sorted('sequence')
-            print(sequence_list)
+            # print(sequence_list)
             # if self.has_duplicates(sequence_list):
             starting_seq = 10
             for line in lines:
