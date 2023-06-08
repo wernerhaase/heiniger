@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="description_html_move_lineview_form" model="ir.ui.view">
+        <field name="name">desc.html.move.line.form</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+        </field>
+    </record>
+
+    <record id="description_html_move_lineview_tree" model="ir.ui.view">
+        <field name="name">desc.html.move.line.tree</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+        </field>
+    </record>
+    <record id="description_html_move_view_form" model="ir.ui.view">
+        <field name="name">desc.html.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+
+
+            <xpath expr="//field[@name='line_ids']/tree//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+
+            <xpath expr="//field[@name='line_ids']/form/group//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group[1]" position="attributes">
+                <attribute name="attrs">{'invisible': [('display_type', 'in', ('line_note', 'line_section'))]}
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group[2]" position="attributes">
+                <attribute name="attrs">{'invisible': [('display_type', 'in', ('line_note', 'line_section'))]}
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group[3]" position="attributes">
+                <attribute name="attrs">{'invisible': [('display_type', 'in', ('line_note', 'line_section'))]}
+                </attribute>
+
+
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
+                <attribute name="editable"></attribute>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>
