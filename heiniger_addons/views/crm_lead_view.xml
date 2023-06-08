@@ -66,6 +66,7 @@
             <tree editable="bottom">
               <!-- <field name="order_id" options="{'no_open': True, 'no_quick_create': True}" domain="[('opportunity_id','=',parent.id)]"/> -->
               <field name="order_id" options="{'no_quick_create': True}" domain="[('opportunity_id','=',parent.id)]"/>
+              <field name="hgr_subject"/>
               <field name="hgr_insurance_id" />
               <field name="hgr_claim_person_id" />
               <field name="hgr_insurance_policy_no" />

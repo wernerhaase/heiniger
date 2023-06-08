@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="description_html_order_view_form" model="ir.ui.view">
+        <field name="name">desc.html.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+
+             <xpath expr="//field[@name='order_line']/tree//field[@name='sequence']" position="after">
+                    <field name="sequence_no" optional="hide"/>
+            </xpath>
+                        <xpath expr="//field[@name='order_line']" position="before">
+     <button class="btn btn-sm btn-primary"
+                        name="reorder_sequence" string="Reorder" type="object"/>
+                        </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='sequence']" position="replace">
+                <group>
+                    <field name="sequence"/>
+                </group>
+            </xpath>
+
+
+            <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="attributes">
+                <attribute name="widget">html</attribute>
+
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                <attribute name="editable"></attribute>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>
