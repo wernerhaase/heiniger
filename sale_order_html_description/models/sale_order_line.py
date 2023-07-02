@@ -23,6 +23,25 @@ class AccountMoveline(models.Model):
         compute='_compute_name', store=True, readonly=False, precompute=True,
         tracking=True,
     )
+
+    def write(self, vals):
+        if vals.get('name'):
+            name = vals.get('name')
+            new_name = name.replace('&nbsp;','&#160;')
+            vals['name'] = new_name
+        move_lines = super(AccountMoveline, self).write(vals)
+        return move_lines
+
+
+    @api.model_create_multi
+    def create(self, vals):
+        if vals.get('name'):
+            name = vals.get('name')
+            new_name = name.replace('&nbsp;','&#160;')
+            vals['name'] = new_name
+        move_lines = super(AccountMoveline, self).write(vals)
+        return move_lines
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
