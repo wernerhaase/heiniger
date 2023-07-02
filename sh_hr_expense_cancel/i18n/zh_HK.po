@@ -1,0 +1,111 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sh_hr_expense_cancel
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-27 07:25+0000\n"
+"PO-Revision-Date: 2021-01-27 07:25+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields.selection,name:sh_hr_expense_cancel.selection__res_company__expense_operation_type__cancel
+#: model_terms:ir.ui.view,arch_db:sh_hr_expense_cancel.sh_hr_expense_inherit_form_view
+#: model_terms:ir.ui.view,arch_db:sh_hr_expense_cancel.sh_hr_expense_sheet_inherit_form_view
+msgid "Cancel"
+msgstr "取消"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.actions.server,name:sh_hr_expense_cancel.sh_expense_cancel_delete_multi_action
+#: model:ir.actions.server,name:sh_hr_expense_cancel.sh_expense_sheet_cancel_delete_multi_action
+msgid "Cancel & Delete"
+msgstr "取消和刪除"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.actions.server,name:sh_hr_expense_cancel.sh_expense_cancel_draft_multi_action
+#: model:ir.actions.server,name:sh_hr_expense_cancel.sh_expense_sheet_cancel_draft_multi_action
+msgid "Cancel & Reset Draft"
+msgstr "取消和重置草案"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.actions.server,name:sh_hr_expense_cancel.sh_expense_cancel_multi_action
+#: model:ir.actions.server,name:sh_hr_expense_cancel.sh_expense_sheet_cancel_multi_action
+msgid "Cancel Expense"
+msgstr "取消費用"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields.selection,name:sh_hr_expense_cancel.selection__res_company__expense_operation_type__cancel_delete
+msgid "Cancel and Delete"
+msgstr "取消和刪除"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields.selection,name:sh_hr_expense_cancel.selection__res_company__expense_operation_type__cancel_draft
+msgid "Cancel and Reset to Draft"
+msgstr "取消並重置為草稿"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model,name:sh_hr_expense_cancel.model_res_company
+msgid "Companies"
+msgstr "公司"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model,name:sh_hr_expense_cancel.model_res_config_settings
+msgid "Config Settings"
+msgstr "配置設置"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_hr_expense__display_name
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_hr_expense_sheet__display_name
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_company__display_name
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "顯示名稱"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model,name:sh_hr_expense_cancel.model_hr_expense
+msgid "Expense"
+msgstr "費用"
+
+#. module: sh_hr_expense_cancel
+#: model_terms:ir.ui.view,arch_db:sh_hr_expense_cancel.sh_expense_config_cancel_form_inherit
+msgid "Expense Cancel Configuration"
+msgstr "費用取消配置"
+
+#. module: sh_hr_expense_cancel
+#: model:res.groups,name:sh_hr_expense_cancel.group_sh_expense_cancel
+msgid "Expense Cancel Feature"
+msgstr "費用取消功能"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model,name:sh_hr_expense_cancel.model_hr_expense_sheet
+msgid "Expense Report"
+msgstr "費用報表"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_hr_expense__id
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_hr_expense_sheet__id
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_company__id
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_hr_expense____last_update
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_hr_expense_sheet____last_update
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_company____last_update
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_config_settings____last_update
+msgid "Last Modified on"
+msgstr "最後修改了"
+
+#. module: sh_hr_expense_cancel
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_company__expense_operation_type
+#: model:ir.model.fields,field_description:sh_hr_expense_cancel.field_res_config_settings__expense_operation_type
+msgid "Opration Type"
+msgstr "遷移類型"
