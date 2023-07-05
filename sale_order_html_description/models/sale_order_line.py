@@ -31,12 +31,11 @@ class AccountMoveline(models.Model):
 
     @api.model_create_multi
     def create(self, vals):
-
         move_lines = super(AccountMoveline, self).create(vals)
-
-        name = move_lines.name
-        new_name = name.replace('&nbsp;', '&#160;')
-        move_lines.name = new_name
+        for rec in move_lines:
+            name = rec.name
+            new_name = name.replace('&nbsp;', '&#160;')
+            rec.name = new_name
         return move_lines
 
 class SaleOrder(models.Model):
