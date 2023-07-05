@@ -36,7 +36,7 @@ class AccountMoveline(models.Model):
     @api.model_create_multi
     def create(self, vals):
 
-        move_lines = super(AccountMoveline, self).write(vals)
+        move_lines = super(AccountMoveline, self).create(vals)
 
         name = move_lines.name
         new_name = name.replace('&nbsp;', '&#160;')
