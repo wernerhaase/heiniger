@@ -50,7 +50,6 @@ class ExpenseSheet(models.Model):
         for rec in self:
             if rec.sudo().mapped('expense_line_ids'):
                 rec.mapped('expense_line_ids').sudo().write({'state': 'draft'})
-
             if rec.sudo().mapped('account_move_id'):
                 line_ids = rec.sudo().mapped('account_move_id').mapped('line_ids')
                 reconcile_ids = line_ids.sudo().mapped('id')
@@ -137,7 +136,9 @@ class ExpenseSheet(models.Model):
                 self.mapped('expense_line_ids').sudo().write(
                     {'state': 'refused'})
                 self.mapped('expense_line_ids').sudo().unlink()
-
+        move_id = self.sudo().mapped('account_move_id')
+        move_id.button_draft()
+        move_id.button_cancel()
         if self.sudo().mapped('account_move_id'):
 
             line_ids = self.sudo().mapped('account_move_id').mapped('line_ids')
