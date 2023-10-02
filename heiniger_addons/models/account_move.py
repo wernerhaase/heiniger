@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.tools import format_date
+import re
 
 class AccountMove(models.Model):
 	_inherit = "account.move"
@@ -15,6 +16,33 @@ class AccountMove(models.Model):
 		copy=False,
 	)
 
+	def _post(self, soft=True):
+		# OVERRIDE
+		posted = super()._post(soft)
+
+		# correct the nbsp issue in name
+		posted._correct_nbsp_issue()
+
+		# remove the html tags in label
+		posted._remove_html_tags()
+
+		return posted
+	
+	def _correct_nbsp_issue(self):
+		for move in self:
+			if move.move_type =='out_invoice':
+				move.env.cr.execute("UPDATE account_move_line SET name = REPLACE (name,'&nbsp;','&#160;')")
+
+	def _remove_html_tags(self):
+		for move in self:
+			if move.move_type not in ('out_invoice','in_invoice','out_refund','in_refund'):
+				clean = re.compile('<.*?>')
+				ref = re.sub(clean, '', move.ref)
+				move.write({'ref': ref})
+				# for line in move.line_ids:
+				# 	name = re.sub(clean, '', line.name)
+				# 	move.write({'name': name})
+						
 
 	@api.depends('needed_terms')
 	def _compute_invoice_discount_date_due(self):
@@ -57,6 +85,15 @@ class AccountMove(models.Model):
 
 	# class AccountInvoiceLine(models.Model):
 	# _inherit = "account.move.line"
+
+	# def _remove_html_tags(self):
+	# 		for move in self:
+	# 			if move.move_type not in ('out_invoice','in_invoice','out_refund','in_refund'):
+	# 			for line in move.line_ids:
+	# 				clean = re.compile('<.*?>')
+	# 				name = re.sub(clean, '', line.name)
+	# 				line.write({'name': name})
+
 
 	# od_gross_weight = fields.Float(string='Gross Weight',compute="compute_gross_weight")
 	# orchid_country_id = fields.Many2one('res.country', string='Country Of Origin')
