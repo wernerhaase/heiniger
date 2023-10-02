@@ -137,8 +137,10 @@ class ExpenseSheet(models.Model):
                     {'state': 'refused'})
                 self.mapped('expense_line_ids').sudo().unlink()
         move_id = self.sudo().mapped('account_move_id')
+       
         move_id.button_draft()
         move_id.button_cancel()
+
         if self.sudo().mapped('account_move_id'):
 
             line_ids = self.sudo().mapped('account_move_id').mapped('line_ids')
