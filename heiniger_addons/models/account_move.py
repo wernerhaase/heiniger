@@ -32,13 +32,15 @@ class AccountMove(models.Model):
 		for move in self:
 			if move.move_type =='out_invoice':
 				move.env.cr.execute("UPDATE account_move_line SET name = REPLACE (name,'&nbsp;','&#160;')")
+				move.env.cr.execute("UPDATE account_move_line SET name = REPLACE (name,'<br>','<br/>')")
 
 	def _remove_html_tags(self):
 		for move in self:
 			if move.move_type not in ('out_invoice','in_invoice','out_refund','in_refund'):
 				clean = re.compile('<.*?>')
-				ref = re.sub(clean, '', move.ref)
-				move.write({'ref': ref})
+				if move.ref:
+					ref = re.sub(clean, '', move.ref)
+					move.write({'ref': ref})
 				# for line in move.line_ids:
 				# 	name = re.sub(clean, '', line.name)
 				# 	move.write({'name': name})
