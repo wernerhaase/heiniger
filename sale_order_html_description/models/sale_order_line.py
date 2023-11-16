@@ -24,9 +24,9 @@ class AccountMoveline(models.Model):
         tracking=True,
     )
 
-    def write(self, vals):
-        move_lines = super(AccountMoveline, self).write(vals)
-        return move_lines
+    # def write(self, vals):
+    #     move_lines = super(AccountMoveline, self).write(vals)
+    #     return move_lines
 
 
     @api.model_create_multi
