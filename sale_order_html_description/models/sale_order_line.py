@@ -33,9 +33,10 @@ class AccountMoveline(models.Model):
     def create(self, vals):
         move_lines = super(AccountMoveline, self).create(vals)
         for rec in move_lines:
-            name = rec.name
-            new_name = name.replace('&nbsp;', '&#160;')
-            rec.name = new_name
+            if rec.name:
+                name = rec.name
+                new_name = name.replace('&nbsp;', '&#160;')
+                rec.name = new_name
         return move_lines
 
 class SaleOrder(models.Model):
