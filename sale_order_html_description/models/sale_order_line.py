@@ -24,18 +24,19 @@ class AccountMoveline(models.Model):
         tracking=True,
     )
 
-    def write(self, vals):
-        move_lines = super(AccountMoveline, self).write(vals)
-        return move_lines
+    # def write(self, vals):
+    #     move_lines = super(AccountMoveline, self).write(vals)
+    #     return move_lines
 
 
     @api.model_create_multi
     def create(self, vals):
         move_lines = super(AccountMoveline, self).create(vals)
         for rec in move_lines:
-            name = rec.name
-            new_name = name.replace('&nbsp;', '&#160;')
-            rec.name = new_name
+            if rec.name:
+                name = rec.name
+                new_name = name.replace('&nbsp;', '&#160;')
+                rec.name = new_name
         return move_lines
 
 class SaleOrder(models.Model):
