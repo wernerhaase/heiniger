@@ -7,12 +7,12 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <field name="payment_term_id" position="after">
-                <field name="hgr_object_id" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
-                <field name="hgr_subject" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
-                <field name="hgr_case_of_insurance" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
+                <field name="hgr_object_id" readonly="state in ('done','cancel')"/>
+                <field name="hgr_subject" readonly="state in ('done','cancel')"/>
+                <field name="hgr_case_of_insurance" readonly="state in ('done','cancel')"/>
             </field>
             <xpath expr="//page[3]" position="after">
-    			<page string="Insurance Details" attrs="{'invisible':[('hgr_case_of_insurance', '=', False)],'readonly': [('state', 'in', ('done','cancel'))]}">
+    			<page string="Insurance Details" invisible = "not hgr_case_of_insurance" readonly="state in ('done','cancel')">
         			<group>
 		              <group>
 		                <field name="hgr_insurance_id"/>
