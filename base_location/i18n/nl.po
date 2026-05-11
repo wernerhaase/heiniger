@@ -44,6 +44,7 @@ msgstr "Gemeentes"
 #: model:ir.model.fields,field_description:base_location.field_res_city_zip__city_id
 #: model:ir.model.fields,field_description:base_location.field_res_partner__city
 #: model:ir.model.fields,field_description:base_location.field_res_users__city
+#: model_terms:ir.ui.view,arch_db:base_location.view_company_form_city
 msgid "City"
 msgstr "Plaats"
 
@@ -64,6 +65,11 @@ msgstr "Gemeente aanvulling"
 #: model:ir.model,name:base_location.model_res_city_zip
 msgid "City/locations completion object"
 msgstr "Gemeente/locatie voltooiïngsobjects"
+
+#. module: base_location
+#: model:ir.model.fields,field_description:base_location.field_res_city__code
+msgid "Code"
+msgstr ""
 
 #. module: base_location
 #: model:ir.model,name:base_location.model_res_company
@@ -119,11 +125,6 @@ msgid "ID"
 msgstr "ID"
 
 #. module: base_location
-#: model:ir.model.fields,field_description:base_location.field_res_city_zip____last_update
-msgid "Last Modified on"
-msgstr "Laatst bijgewerkt op"
-
-#. module: base_location
 #: model:ir.model.fields,field_description:base_location.field_res_city_zip__write_uid
 msgid "Last Updated by"
 msgstr "Laatst bijgewerkt door"
@@ -158,7 +159,6 @@ msgstr ""
 #. module: base_location
 #. odoo-python
 #: code:addons/base_location/models/res_partner.py:0
-#, python-format
 msgid ""
 "The city of the partner %(partner)s differs from that in location "
 "%(location)s"
@@ -169,7 +169,6 @@ msgstr ""
 #. module: base_location
 #. odoo-python
 #: code:addons/base_location/models/res_partner.py:0
-#, python-format
 msgid ""
 "The country of the partner %(partner)s differs from that in location "
 "%(location)s"
@@ -180,7 +179,6 @@ msgstr ""
 #. module: base_location
 #. odoo-python
 #: code:addons/base_location/models/res_partner.py:0
-#, python-format
 msgid ""
 "The state of the partner %(partner)s differs from that in location "
 "%(location)s"
@@ -191,7 +189,6 @@ msgstr ""
 #. module: base_location
 #. odoo-python
 #: code:addons/base_location/models/res_partner.py:0
-#, python-format
 msgid ""
 "The zip of the partner %(partner)s differs from that in location %(location)s"
 msgstr ""
@@ -250,6 +247,9 @@ msgstr "Postcodes"
 #: model:ir.model.fields,field_description:base_location.field_res_city__zip_ids
 msgid "Zips in this city"
 msgstr "Postcodes in deze gemeente"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Laatst bijgewerkt op"
 
 #~ msgid "Group By"
 #~ msgstr "Groepeer op"

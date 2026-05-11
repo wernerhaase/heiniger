@@ -18,13 +18,12 @@
                 <field name="country_enforce_cities" invisible="1" />
                 <field
                     name='city_id'
-                    attrs="{'invisible': [('country_enforce_cities', '=', False)]}"
+                    placeholder="City"
+                    invisible="not country_enforce_cities"
                 />
             </field>
             <field name="city" position="attributes">
-                <attribute name="attrs">
-                    {'invisible': [('country_enforce_cities', '=', False)]}
-                </attribute>
+                <attribute name="invisible">country_enforce_cities</attribute>
             </field>
         </field>
     </record>

@@ -1,5 +1,4 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
 
 
 class PdfOrientation(models.TransientModel):
@@ -9,32 +8,32 @@ class PdfOrientation(models.TransientModel):
     def orientation_choices(self):
         return [('landscape', _('Landscape')), ('portrait', _('Portrait'))]
 
+    def get_default_caution_html(self):
+        return _("""
+        <div>
+            <span style='color: red'>Be careful</span>, it will execute the query <span style='color: red; text-decoration: underline'>one more time</span> on your database in order to get-back the datas used to print the result.
+            <br/>
+            For example, query with <span style='color: orange'>CREATE</span> or <span style='color: orange'>UPDATE</span> statement without any 'RETURNING' statement will not necessary print a table unlike <span style='color: blue'>SELECT</span> statement,
+            <br/>
+            <span style='text-decoration: underline'>but it will still be executed one time in the background during the attempt of printing process</span>.
+            <br/>
+            So when you want to print the result, use preferably 'SELECT' statement to be sure to not execute an unwanted query twice.
+        </div>
+        """)
+
     orientation = fields.Selection(string="PDF orientation", selection=orientation_choices, default='landscape')
-    query_name = fields.Text(string="Query")
+    name = fields.Text(string="Query")
+    query_id = fields.Many2one('querydeluxe', string="Query origin")
+    caution_html = fields.Html(string="CAUTION", default=get_default_caution_html)
+    understand = fields.Boolean(string="I understand")
 
     def print_pdf(self):
-        self = self.sudo()
-        try:
-            self.env.cr.execute(self.query_name)
-        except Exception as e:
-            raise UserError(e)
-
-        try:
-            if self.env.cr.description:
-                headers = [d[0] for d in self.env.cr.description]
-                bodies = self.env.cr.fetchall()
-        except Exception as e:
-            raise UserError(e)
-
-        action_print_pdf = self.env.ref('query_deluxe.action_print_pdf')
-        if self.orientation == 'landscape':
-            action_print_pdf.paperformat_id.orientation = "Landscape"
-        elif self.orientation == 'portrait':
-            action_print_pdf.paperformat_id.orientation = "Portrait"
-
-        append_data = {
-            'query_name': self.query_name,
-            'headers': headers,
-            'bodies': bodies
-        }
-        return action_print_pdf.report_action(self, data=append_data)
+        if self:
+            self = self.sudo()
+            first = self[0]
+            action_print_pdf = self.env.ref('query_deluxe.action_print_pdf')
+            if first.orientation == 'landscape':
+                action_print_pdf.paperformat_id.orientation = "Landscape"
+            elif first.orientation == 'portrait':
+                action_print_pdf.paperformat_id.orientation = "Portrait"
+            return action_print_pdf.report_action(first.query_id)
