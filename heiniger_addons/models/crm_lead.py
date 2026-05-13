@@ -36,21 +36,12 @@ class Lead(models.Model):
 	def onchange_partner(self):
 		self.hgr_object_id = self.partner_id.id
 
-	@api.model
-	def create(self, vals):
-		if 'hgr_subject' not in vals:
-			vals['hgr_subject'] = vals['name']
-		return super().create(vals)
-	
-	# @api.model_create_multi
-	# def create(self, vals_list):
-	# 	res = super().create(vals_list)
-	# 	if not self.project_id:
-	# 		# projects.filtered(lambda project: project.use_documents)._create_missing_folders()
-	# 		print ("??????????????????????????????????")
-	# 		project = self.create_project()
-	# 		self.write({'project_id': project.id})
-	# 	return res
+	@api.model_create_multi
+	def create(self, vals_list):
+		for vals in vals_list:
+			if 'hgr_subject' not in vals:
+				vals['hgr_subject'] = vals.get('name', '')
+		return super().create(vals_list)
 
 	def _get_employee_document_domain(self):
 		self.ensure_one()
@@ -84,48 +75,27 @@ class Lead(models.Model):
 		return action
 	
 	def _compute_attached_document_count(self):
-		folder_id = self.project_id.documents_folder_id.id
-		read_group_var = self.env['documents.document'].read_group(
-			[('folder_id', 'in', [folder_id])],
-			fields=['folder_id'],
-			groupby=['folder_id'])
-
-		document_count_dict = dict((d['folder_id'][0], d['folder_id_count']) for d in read_group_var)
+		folder_ids = []
 		for record in self:
-			if document_count_dict:
-				for folder_id, document_count in document_count_dict.items():
-					record.document_count = document_count
+			if record.project_id and record.project_id.documents_folder_id:
+				folder_ids.append(record.project_id.documents_folder_id.id)
+
+		if folder_ids:
+			groups = self.env['documents.document']._read_group(
+				[('folder_id', 'in', folder_ids)],
+				groupby=['folder_id'],
+				aggregates=['__count'],
+			)
+			document_count_dict = {folder.id: count for folder, count in groups}
+		else:
+			document_count_dict = {}
+
+		for record in self:
+			if record.project_id and record.project_id.documents_folder_id:
+				folder_id = record.project_id.documents_folder_id.id
+				record.document_count = document_count_dict.get(folder_id, 0)
 			else:
-				record.document_count = 0	
-	
-	# def _compute_attached_document_count(self):
-	# 	Task = self.env['project.task']
-	# 	task_read_group = Task._read_group(
-	# 		[('project_id', 'in', self.ids)],
-	# 		['project_id', 'ids:array_agg(id)'],
-	# 		['project_id'],
-	# 	)
-	# 	task_ids = []
-	# 	task_ids_per_project_id = {}
-	# 	for res in task_read_group:
-	# 		task_ids += res['ids']
-	# 		task_ids_per_project_id[res['project_id'][0]] = res['ids']
-	# 	Document = self.env['documents.document']
-	# 	project_document_read_group = Document._read_group(
-	# 		[('res_model', '=', 'project.project'), ('res_id', 'in', self.ids)],
-	# 		['res_id'],
-	# 		['res_id'],
-	# 	)
-	# 	document_count_per_project_id = {res['res_id']: res['res_id_count'] for res in project_document_read_group}
-	# 	document_count_per_task_id = Task.browse(task_ids)._get_task_document_data()
-	# 	for project in self:
-	# 		task_ids = task_ids_per_project_id.get(self.id, [])
-	# 		project.document_count = document_count_per_project_id.get(self.id, 0) \
-	# 			+ sum([
-	# 				document_count
-	# 				for task_id, document_count in document_count_per_task_id.items()
-	# 				if task_id in task_ids
-	# 			])	
+				record.document_count = 0
 
 	
 	def create_project(self,folder):
@@ -186,12 +156,10 @@ class Lead(models.Model):
 		if self.user_id:
 			quotation_context['default_user_id'] = self.user_id.id
 		
-		quotation_context['default_project_id'] = self.project_id.id
-		quotation_context['default_analytic_account_id'] = self.project_id.analytic_account_id.id
 		if self.project_id:
 			quotation_context['default_project_id'] = self.project_id.id
 			quotation_context['default_analytic_account_id'] = self.project_id.analytic_account_id.id
-		else:	
+		else:
 			folder = self.create_missing_folder()
 			project_id = self.create_project(folder)
 			self.write({'project_id': project_id.id})

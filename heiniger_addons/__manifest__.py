@@ -23,10 +23,10 @@ This module added for additional fields & custom developments.
         'report/timesheet_report.xml',
         ],
     'installable': True,
-    # 'assets': {
-    #     'web.report_assets_common': [
-    #         'heiniger_addons/static/src/**/*',
-    #     ],
-    # },
+    'assets': {
+        'web.report_assets_common': [
+            'heiniger_addons/static/src/css/report_pdf.css',
+        ],
+    },
     'license': 'LGPL-3',
 }

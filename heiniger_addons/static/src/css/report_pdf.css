@@ -1,0 +1,51 @@
+/* =============================================================
+   Heiniger Gebäude-Service — PDF Report Page-Break Fixes
+
+   Problem: Sale order / invoice lines with long HTML descriptions
+   (bullet lists) were causing entire sections to jump to the next
+   page even when partial content would have fit, leaving large
+   blank spaces at the bottom of pages.
+
+   Fix: Allow table rows that contain HTML to break naturally
+   across page boundaries. Section header rows still try to stay
+   attached to the first line below them. Individual list items
+   are kept together so a single bullet is never split mid-item.
+   ============================================================= */
+
+/* ── 1. Allow all order-line rows to break across pages ───── */
+.page table.table tbody tr {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+}
+
+/* ── 2. Section headers stay attached to the row below ───── */
+.page table.table tbody tr.o_line_section,
+.page table.table tbody tr[style*="font-weight:bold"],
+.page table.table tbody tr.font-weight-bold,
+.page table.table tbody tr.fw-bold {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+}
+
+/* ── 3. HTML lists inside cells can break between items ───── */
+.page table.table td ul,
+.page table.table td ol {
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
+/* ── 4. Keep each individual bullet item together ─────────── */
+.page table.table td li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+/* ── 5. Subtotals / totals rows: never split ──────────────── */
+.page table.table tfoot tr,
+.page table.table tbody tr.o_subtotal,
+.page table.table tbody tr.o_total {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+}

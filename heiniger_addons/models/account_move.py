@@ -11,7 +11,6 @@ class AccountMove(models.Model):
 	invoice_discount_date_due = fields.Date(
 		string='Due Date with discount',
 		compute='_compute_invoice_discount_date_due', store=True, readonly=False,
-		states={'draft': [('readonly', False)]},
 		index=True,
 		copy=False,
 	)

@@ -58,14 +58,16 @@ class SaleOrder(models.Model):
 
 
     @api.model_create_multi
-    def create(self, vals):
-        orders = super(SaleOrder, self).create(vals)
-        self.reorder_sequence()
+    def create(self, vals_list):
+        orders = super(SaleOrder, self).create(vals_list)
+        if not self.env.context.get('dontcall_function'):
+            orders.reorder_sequence()
         return orders
 
-    def write(self,vals):
+    def write(self, vals):
         orders = super(SaleOrder, self).write(vals)
-        self.reorder_sequence()
+        if not self.env.context.get('dontcall_function'):
+            self.reorder_sequence()
         return orders
 
 
