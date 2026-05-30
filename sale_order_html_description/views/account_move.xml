@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="account.view_move_line_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">text</attribute>
 
             </xpath>
         </field>
@@ -19,7 +19,7 @@
         <field name="inherit_id" ref="account.view_move_line_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">text</attribute>
 
             </xpath>
         </field>
@@ -30,24 +30,27 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']/list//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">text</attribute>
 
             </xpath>
 
             <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">text</attribute>
 
             </xpath>
 
 
             <xpath expr="//field[@name='line_ids']/list//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">text</attribute>
 
             </xpath>
 
             <xpath expr="//field[@name='line_ids']/form/group//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">text</attribute>
 
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='name']" position="after">
+                <field name="hgr_html_description" widget="html"/>
             </xpath>
             <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group[1]" position="attributes">
                 <attribute name="attrs">{'invisible': [('display_type', 'in', ('line_note', 'line_section'))]}
@@ -69,4 +72,19 @@
             </xpath>
         </field>
     </record>
+
+    <template id="report_invoice_document_html_description" inherit_id="account.report_invoice_document">
+        <xpath expr="//td[@name='account_invoice_line_name']/span[@t-field='line.name']" position="replace">
+            <span t-if="line.hgr_html_description" t-field="line.hgr_html_description" dir="auto"/>
+            <span t-elif="line.name" t-field="line.name" t-options="{'widget': 'text'}" dir="auto">Bacon Burger</span>
+        </xpath>
+        <xpath expr="//td[@name='line_name_td']/span[@t-field='line.name']" position="replace">
+            <span t-if="line.hgr_html_description" t-field="line.hgr_html_description" dir="auto"/>
+            <span t-elif="line.name" t-field="line.name" t-options="{'widget': 'text'}" dir="auto">A section title</span>
+        </xpath>
+        <xpath expr="//t[@t-elif='is_note']/td/span[@t-field='line.name']" position="replace">
+            <span t-if="line.hgr_html_description" t-field="line.hgr_html_description" dir="auto"/>
+            <span t-elif="line.name" t-field="line.name" t-options="{'widget': 'text'}" dir="auto">A note, whose content usually applies to the section or product above.</span>
+        </xpath>
+    </template>
 </odoo>

@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools, SUPERUSER_ID
-from odoo.osv import expression
+from odoo.fields import Domain
 
 class Lead(models.Model):
 	_inherit = 'crm.lead'
@@ -47,8 +47,10 @@ class Lead(models.Model):
 		self.ensure_one()
 		user_domain = [('res_model', '=', 'project.task')]
 		if self.user_id:
-			user_domain = expression.OR([user_domain,
-										[('owner_id', '=', self.user_id.id)]])
+			user_domain = Domain.OR([
+				Domain(user_domain),
+				Domain('owner_id', '=', self.user_id.id),
+			])
 		return user_domain	
 
 	def action_open_documents(self):

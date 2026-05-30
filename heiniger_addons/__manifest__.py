@@ -13,7 +13,17 @@
 This module added for additional fields & custom developments.
 
 """,
-    'depends': ['sale','sale_crm','sale_project','project','hr_timesheet','documents'],
+    'depends': [
+        'sale',
+        'sale_crm',
+        'sale_project',
+        'project',
+        'hr_timesheet',
+        'account',
+        'l10n_din5008',
+        'documents',
+        'documents_project',
+    ],
     'data': [
         'security/ir.model.access.csv',
         'views/res_partner_view.xml',

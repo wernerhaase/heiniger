@@ -45,50 +45,56 @@ class Saleorder(models.Model):
 
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
-			record.l10n_din5008_document_subject = record.hgr_subject
+			# Use the order's own subject first; fall back to the linked opportunity's subject
+			record.l10n_din5008_document_subject = (
+				record.hgr_subject
+				or (record.opportunity_id.hgr_subject if record.opportunity_id else '')
+			)
 
 	def _compute_l10n_din5008_template_data(self):
 		for record in self:
-			record.l10n_din5008_template_data = data = []
+			data = []
+			# ── Document reference numbers ────────────────────────────
 			if record.state in ('draft', 'sent'):
 				if record.name:
-					data.append((_("Angebotsnummer."), record.name)) ## Quotation No
+					data.append((_("Angebotsnummer"), record.name))
 				if record.date_order:
-					data.append((_("Angebotsdatum"), format_date(self.env, record.date_order))) ##Quotation Date
+					data.append((_("Angebotsdatum"), format_date(self.env, record.date_order)))
 				if record.validity_date:
-					data.append((_("Ablauf"), format_date(self.env, record.validity_date))) ## Expiration
+					data.append((_("Gültig bis"), format_date(self.env, record.validity_date)))
 			else:
 				if record.name:
-					data.append((_("Auftragsnummer"), record.name)) ##Order No.
+					data.append((_("Auftragsnummer"), record.name))
 				if record.date_order:
-					data.append((_("Bestelldatum"), format_date(self.env, record.date_order)))  ##Order Date
+					data.append((_("Auftragsdatum"), format_date(self.env, record.date_order)))
+			# ── Order metadata ────────────────────────────────────────
 			if record.client_order_ref:
-				data.append((_('Kundenreferenz'), record.client_order_ref)) ## Customer Reference
+				data.append((_("Ihre Referenz"), record.client_order_ref))
 			if record.user_id:
-				data.append((_("Sachbearbeiter"), record.user_id.name))##Salesperson
-			if 'incoterm' in record._fields and record.incoterm:
-				data.append((_("Incoterm"), record.incoterm.code))
+				data.append((_("Sachbearbeiter"), record.user_id.name))
+			# ── Object (property / site) ──────────────────────────────
+			if record.hgr_object_id:
+				data.append((_("Objekt"), record.hgr_object_id._get_name()))
+			# ── Insurance details (only when insurance case) ──────────
 			if record.hgr_insurance_id:
 				data.append((_("Versicherung"), record.hgr_insurance_id.name))
 			if record.hgr_claim_person_id:
 				data.append((_("Schadenexperte"), record.hgr_claim_person_id.name))
+			if record.hgr_insurance_policy_no:
+				data.append((_("Police Nr."), record.hgr_insurance_policy_no))
 			if record.hgr_insurance_claim_no:
-				data.append((_("Schaden Nr"), record.hgr_insurance_claim_no))
+				data.append((_("Schaden Nr."), record.hgr_insurance_claim_no))
 			if record.hgr_insurance_record_date:
-				data.append((_("Annahme Datum"), format_date(self.env, record.hgr_insurance_record_date)))       
-
+				data.append((_("Schadenaufnahme"), format_date(self.env, record.hgr_insurance_record_date)))
+			record.l10n_din5008_template_data = data
 
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
-			record.l10n_din5008_addresses = data = []
-			data.append((_("Objekt:"), record.hgr_object_id))
-			data.append((_("Rechnungsadresse:"), record.partner_invoice_id)) ##Invoicing Address
-			# data.append((_("Subject:"), record.hgr_subject))
-			# if record.partner_shipping_id == record.partner_invoice_id:
-			#     data.append((_("Invoicing and Shipping Address:"), record.partner_shipping_id))
-			# else:
-			#     data.append((_("Shipping Address:"), record.partner_shipping_id))
-			#     data.append((_("Invoicing Address:"), record.partner_invoice_id))
+			data = []
+			# Only show invoice address block when it differs from the main partner
+			if record.partner_invoice_id and record.partner_invoice_id != record.partner_id:
+				data.append((_("Rechnungsadresse:"), record.partner_invoice_id))
+			record.l10n_din5008_addresses = data
 
 	def _compute_l10n_din5008_document_title(self):
 		for record in self:

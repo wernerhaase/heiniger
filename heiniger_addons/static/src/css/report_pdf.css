@@ -12,6 +12,11 @@
    are kept together so a single bullet is never split mid-item.
    ============================================================= */
 
+.din_page,
+.din_page * {
+    font-family: Helvetica, Arial, sans-serif !important;
+}
+
 /* ── 1. Allow all order-line rows to break across pages ───── */
 .page table.table tbody tr {
     break-inside: auto !important;

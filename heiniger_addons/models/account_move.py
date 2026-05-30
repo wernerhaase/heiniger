@@ -17,10 +17,10 @@ class AccountMove(models.Model):
 
 	def _post(self, soft=True):
 		# OVERRIDE
-		posted = super()._post(soft)
-
 		# correct the nbsp issue in name
-		posted._correct_nbsp_issue()
+		self._correct_nbsp_issue()
+
+		posted = super()._post(soft)
 
 		# remove the html tags in label
 		posted._remove_html_tags()
@@ -29,9 +29,9 @@ class AccountMove(models.Model):
 	
 	def _correct_nbsp_issue(self):
 		for move in self:
-			if move.move_type =='out_invoice':
-				move.env.cr.execute("UPDATE account_move_line SET name = REPLACE (name,'&nbsp;','&#160;')")
-				move.env.cr.execute("UPDATE account_move_line SET name = REPLACE (name,'<br>','<br/>')")
+			if move.move_type == 'out_invoice':
+				for line in move.line_ids.filtered('name'):
+					line.name = line.name.replace('&nbsp;', '&#160;').replace('<br>', '<br/>')
 
 	def _remove_html_tags(self):
 		for move in self:
@@ -48,40 +48,51 @@ class AccountMove(models.Model):
 	@api.depends('needed_terms')
 	def _compute_invoice_discount_date_due(self):
 		for invoice in self:
+			invoice.invoice_discount_date_due = invoice.invoice_date_due
 			for line in invoice.line_ids.filtered(lambda l: l.display_type == 'payment_term').sorted('date_maturity'):
 				invoice.invoice_discount_date_due =  line.discount_date or invoice.invoice_date_due
 
 	def _compute_l10n_din5008_document_subject(self):
 		for record in self:
-			record.l10n_din5008_document_subject = record.line_ids.sale_line_ids.order_id.hgr_subject	
-	
+			sale_order = record.line_ids.sale_line_ids.order_id[:1]
+			record.l10n_din5008_document_subject = sale_order.hgr_subject or ''
+
 	def _compute_l10n_din5008_addresses(self):
 		for record in self:
-			record.l10n_din5008_addresses = data = []
-			sale_order = record.line_ids.sale_line_ids.order_id
-			data.append((_("Objekt:"), sale_order.hgr_object_id))
-			data.append((_("Rechnungsadresse:"), record.partner_id)) ##Invoicing Address:
+			data = []
+			# Only show invoice address block when it differs from the main partner
+			if record.partner_id and record.partner_shipping_id and record.partner_shipping_id != record.partner_id:
+				data.append((_("Lieferadresse:"), record.partner_shipping_id))
+			record.l10n_din5008_addresses = data
 
 	def _compute_l10n_din5008_template_data(self):
 		for record in self:
-			record.l10n_din5008_template_data = data = []
-			sale_order = record.line_ids.sale_line_ids.order_id
+			data = []
+			sale_order = record.line_ids.sale_line_ids.order_id[:1]
+			# ── Invoice reference ─────────────────────────────────────
 			if record.name:
-				data.append((_("Rechnungsnummer"), record.name)) ##Invoice No.
+				data.append((_("Rechnungsnummer"), record.name))
 			if record.invoice_date:
-				data.append((_("Rechnungsdatum"), format_date(self.env, record.invoice_date)))## Invoice Date
+				data.append((_("Rechnungsdatum"), format_date(self.env, record.invoice_date)))
 			if record.invoice_date_due:
-				data.append((_("Fälligkeitsdatum"), format_date(self.env, record.invoice_date_due))) ##Due Date
+				data.append((_("Fälligkeitsdatum"), format_date(self.env, record.invoice_date_due)))
+			if record.invoice_discount_date_due and record.invoice_discount_date_due != record.invoice_date_due:
+				data.append((_("Skontodatum"), format_date(self.env, record.invoice_discount_date_due)))
 			if record.invoice_origin:
-				data.append((_("Quelle"), record.invoice_origin)) ##Source
+				data.append((_("Auftragsnummer"), record.invoice_origin))
 			if record.ref:
-				data.append((_("Referenz"), record.ref)) ## Reference
-			if sale_order.hgr_insurance_id:
+				data.append((_("Ihre Referenz"), record.ref))
+			# ── Object (property / site) ──────────────────────────────
+			if sale_order and sale_order.hgr_object_id:
+				data.append((_("Objekt"), sale_order.hgr_object_id._get_name()))
+			# ── Insurance details (only when insurance case) ──────────
+			if sale_order and sale_order.hgr_insurance_id:
 				data.append((_("Versicherung"), sale_order.hgr_insurance_id.name))
-			if sale_order.hgr_insurance_claim_no:
-				data.append((_("Schaden Nr"), sale_order.hgr_insurance_claim_no))
-			if sale_order.hgr_insurance_record_date:
-				data.append((_("Annahme Datum"), format_date(self.env, sale_order.hgr_insurance_record_date)))       
+				if sale_order and sale_order.hgr_insurance_claim_no:
+					data.append((_("Schaden Nr."), sale_order.hgr_insurance_claim_no))
+				if sale_order and sale_order.hgr_insurance_record_date:
+					data.append((_("Schadenaufnahme"), format_date(self.env, sale_order.hgr_insurance_record_date)))
+				record.l10n_din5008_template_data = data
 	
 
 	# class AccountInvoiceLine(models.Model):
