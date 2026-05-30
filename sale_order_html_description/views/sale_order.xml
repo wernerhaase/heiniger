@@ -5,9 +5,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_line']/list//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
-
+            <xpath expr="//field[@name='order_line']/list//field[@name='name']" position="replace">
+                <field name="name" widget="hgr_sol_html_text" optional="show"/>
             </xpath>
 
              <xpath expr="//field[@name='order_line']/list//field[@name='sequence']" position="after">
@@ -25,7 +24,7 @@
 
 
             <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="attributes">
-                <attribute name="widget">html</attribute>
+                <attribute name="widget">hgr_sol_html_text</attribute>
 
             </xpath>
             <xpath expr="//field[@name='order_line']/list" position="attributes">

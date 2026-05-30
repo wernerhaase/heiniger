@@ -17,6 +17,20 @@
     font-family: Helvetica, Arial, sans-serif !important;
 }
 
+/* ── 0. Keep quantity and UoM on one line without compressing text ── */
+.page table.o_main_table td.o_td_quantity,
+.page table.o_main_table td.o_td_quantity span {
+    white-space: nowrap !important;
+}
+
+.page table.o_main_table td.o_td_quantity .text-muted.small {
+    display: none;
+}
+
+.page table.o_main_table td {
+    vertical-align: top;
+}
+
 /* ── 1. Allow all order-line rows to break across pages ───── */
 .page table.table tbody tr {
     break-inside: auto !important;
@@ -25,6 +39,7 @@
 
 /* ── 2. Section headers stay attached to the row below ───── */
 .page table.table tbody tr.o_line_section,
+.page table.table tbody tr.o_line_subsection,
 .page table.table tbody tr[style*="font-weight:bold"],
 .page table.table tbody tr.font-weight-bold,
 .page table.table tbody tr.fw-bold {
@@ -32,6 +47,23 @@
     page-break-after: avoid !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+}
+
+/* wkhtmltopdf often ignores "keep with next" for table rows. For quotes
+   with very long position bodies, start each major Position on a new page
+   so the header is not orphaned at the bottom of the previous page. */
+.page table.table tbody tr.o_line_section:not(:first-child) {
+    break-before: page !important;
+    page-break-before: always !important;
+}
+
+.page table.table tbody tr.o_line_section + tr,
+.page table.table tbody tr.o_line_subsection + tr,
+.page table.table tbody tr[style*="font-weight:bold"] + tr,
+.page table.table tbody tr.font-weight-bold + tr,
+.page table.table tbody tr.fw-bold + tr {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
 }
 
 /* ── 3. HTML lists inside cells can break between items ───── */

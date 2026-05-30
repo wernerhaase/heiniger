@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_saleorder_document_section_page_break" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//tr[@name='tr_section']" position="before">
+            <t t-if="is_section and line_index &gt; 0">
+                <tr class="hgr_section_page_break">
+                    <td colspan="99" style="padding: 0; border: 0; height: 0; line-height: 0;">
+                        <div style="page-break-before: always; height: 0; line-height: 0; font-size: 0;">&#8203;</div>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <xpath expr="//tr[@name='tr_note']/td[@name='td_note_name']/span" position="after">
+            <t t-if="not line_last and lines_to_report[line_index + 1].display_type == 'line_section'">
+                <div style="page-break-after: always; height: 0; line-height: 0; font-size: 0;">&#8203;</div>
+            </t>
+        </xpath>
+        <xpath expr="//tr[@name='tr_product']/td[@name='td_product_name']/span" position="after">
+            <t t-if="not line_last and lines_to_report[line_index + 1].display_type == 'line_section'">
+                <div style="page-break-after: always; height: 0; line-height: 0; font-size: 0;">&#8203;</div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

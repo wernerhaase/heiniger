@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="sale_order_html_description.SaleOrderLineHtmlText">
+        <t t-if="displayHtml">
+            <div class="o_hgr_sol_html" t-out="htmlValue"/>
+        </t>
+        <t t-else="">
+            <t t-component="componentToUse" t-props="props"/>
+        </t>
+    </t>
+
+    <t t-name="sale_order_html_description.SaleProductField"
+       t-inherit="sale.SaleProductField"
+       t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='isNote()']/textarea" position="replace">
+            <div
+                class="o_input d-print-none border-0 fst-italic o_hgr_sol_html"
+                t-att-class="sectionAndNoteClasses"
+                t-out="hgrHtmlLabel"
+            />
+        </xpath>
+        <xpath expr="//t[@t-elif='isSectionOrSubSection']/input" position="replace">
+            <div
+                class="o_input text-wrap border-0 w-100 o_hgr_sol_html"
+                t-att-class="sectionAndNoteClasses"
+                t-out="hgrHtmlLabel"
+            />
+        </xpath>
+        <xpath expr="//t[@t-else='']/div[@t-if='props.readonly']" position="replace">
+            <div
+                class="o_input d-print-none border-0 fst-italic o_hgr_sol_html"
+                t-att-class="{ ...sectionAndNoteClasses, 'd-none': !(columnIsProductAndLabel.value and label) }"
+                t-out="hgrHtmlLabel"
+            />
+        </xpath>
+        <xpath expr="//t[@t-else='']/textarea" position="replace">
+            <div
+                class="o_input d-print-none border-0 fst-italic o_hgr_sol_html"
+                t-att-class="{ ...sectionAndNoteClasses, 'd-none': !(columnIsProductAndLabel.value and (label or labelVisibility.value)) }"
+                t-out="hgrHtmlLabel"
+            />
+        </xpath>
+        <xpath expr="//t[@t-if='isPrintMode.value']/div" position="attributes">
+            <attribute name="t-out">hgrHtmlLabel</attribute>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_hgr_audit_accounting_html_tags" model="ir.actions.server">
+        <field name="name">Find Accounting HTML Tags</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="binding_model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = env['account.bank.statement.line'].hgr_action_audit_accounting_html_tags()
+        ]]></field>
+    </record>
+
+    <record id="action_hgr_cleanup_accounting_html_tags" model="ir.actions.server">
+        <field name="name">Fix Accounting HTML Tags</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="binding_model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = env['account.bank.statement.line'].hgr_action_cleanup_accounting_html_tags()
+        ]]></field>
+    </record>
+
+    <record id="action_hgr_cron_cleanup_accounting_html_tags" model="ir.actions.server">
+        <field name="name">Scheduled Fix Accounting HTML Tags</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="usage">ir_cron</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env['account.bank.statement.line'].hgr_cron_cleanup_accounting_html_tags()
+        ]]></field>
+    </record>
+
+    <record id="ir_cron_hgr_cleanup_accounting_html_tags" model="ir.cron">
+        <field name="name">Heiniger: Fix Accounting HTML Tags</field>
+        <field name="ir_actions_server_id" ref="action_hgr_cron_cleanup_accounting_html_tags"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="nextcall" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="active" eval="True"/>
+        <field name="priority">5</field>
+    </record>
+
+    <record id="action_hgr_check_html_invoice_labels" model="ir.actions.server">
+        <field name="name">Check HTML Invoice Labels</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="binding_model_id" ref="account.model_account_move_line"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = env['account.move.line'].hgr_action_check_html_invoice_labels()
+        ]]></field>
+    </record>
+
+    <record id="action_hgr_migrate_html_invoice_labels" model="ir.actions.server">
+        <field name="name">Migrate HTML Invoice Labels</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="binding_model_id" ref="account.model_account_move_line"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = env['account.move.line'].hgr_action_migrate_html_invoice_labels(limit=10000)
+        ]]></field>
+    </record>
+
+    <record id="action_hgr_cron_migrate_html_invoice_labels" model="ir.actions.server">
+        <field name="name">Scheduled Migrate HTML Invoice Labels</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="usage">ir_cron</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env['account.move.line'].hgr_cron_migrate_html_invoice_labels(limit=10000)
+        ]]></field>
+    </record>
+
+    <record id="ir_cron_hgr_migrate_html_invoice_labels" model="ir.cron">
+        <field name="name">Heiniger: Migrate HTML Invoice Labels</field>
+        <field name="ir_actions_server_id" ref="action_hgr_cron_migrate_html_invoice_labels"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="nextcall" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="active" eval="True"/>
+        <field name="priority">5</field>
+    </record>
+
+    <record id="action_hgr_cron_cleanup_sale_section_note_html" model="ir.actions.server">
+        <field name="name">Deprecated: Sale Section/Note HTML Cleanup</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="usage">ir_cron</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+        ]]></field>
+    </record>
+
+    <record id="ir_cron_hgr_cleanup_sale_section_note_html" model="ir.cron">
+        <field name="name">Deprecated: Sale Section/Note HTML Cleanup</field>
+        <field name="ir_actions_server_id" ref="action_hgr_cron_cleanup_sale_section_note_html"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="nextcall" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="active" eval="False"/>
+        <field name="priority">5</field>
+    </record>
+
+    <record id="action_hgr_restore_sale_line_html_grid" model="ir.actions.server">
+        <field name="name">Refresh Sales Grid HTML Rendering</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="binding_model_id" ref="sale.model_sale_order_line"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'title': 'Sales Grid HTML',
+        'message': 'HTML descriptions are preserved. Upgrade the module and refresh the browser assets to see bullets and formatting in the grid.',
+        'type': 'info',
+        'sticky': False,
+    },
+}
+        ]]></field>
+    </record>
+</odoo>

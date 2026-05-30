@@ -30,6 +30,7 @@ This module added for additional fields & custom developments.
         'views/sale_order_view.xml',
         'views/crm_lead_view.xml',
         'views/project_view.xml',
+        'report/sale_order_report.xml',
         'report/timesheet_report.xml',
         ],
     'installable': True,
