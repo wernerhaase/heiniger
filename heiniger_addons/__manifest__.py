@@ -15,6 +15,7 @@ This module added for additional fields & custom developments.
 """,
     'depends': [
         'sale',
+        'sale_timesheet',
         'sale_crm',
         'sale_project',
         'project',
@@ -28,9 +29,9 @@ This module added for additional fields & custom developments.
         'security/ir.model.access.csv',
         'views/res_partner_view.xml',
         'views/sale_order_view.xml',
+        'views/portal_view_fix.xml',
         'views/crm_lead_view.xml',
         'views/project_view.xml',
-        'report/sale_order_report.xml',
         'report/timesheet_report.xml',
         ],
     'installable': True,

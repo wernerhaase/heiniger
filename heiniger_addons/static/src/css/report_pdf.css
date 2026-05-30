@@ -49,14 +49,6 @@
     page-break-inside: avoid !important;
 }
 
-/* wkhtmltopdf often ignores "keep with next" for table rows. For quotes
-   with very long position bodies, start each major Position on a new page
-   so the header is not orphaned at the bottom of the previous page. */
-.page table.table tbody tr.o_line_section:not(:first-child) {
-    break-before: page !important;
-    page-break-before: always !important;
-}
-
 .page table.table tbody tr.o_line_section + tr,
 .page table.table tbody tr.o_line_subsection + tr,
 .page table.table tbody tr[style*="font-weight:bold"] + tr,

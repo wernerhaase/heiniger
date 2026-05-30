@@ -105,6 +105,14 @@ class Saleorder(models.Model):
 			else:
 				record.l10n_din5008_document_title = _('Auftragsbestätigung') ## Sales Order
 
+	def _has_to_be_signed(self, *args, **kwargs):
+		"""Keep customized portal templates compatible with Odoo 19."""
+		return super()._has_to_be_signed()
+
+	def _has_to_be_paid(self, *args, **kwargs):
+		"""Keep customized portal templates compatible with Odoo 19."""
+		return super()._has_to_be_paid()
+
 class SaleOrderLine(models.Model):
 	_inherit = "sale.order.line"
 
