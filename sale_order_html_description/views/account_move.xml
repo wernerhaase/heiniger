@@ -31,7 +31,16 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']/list//field[@name='name']" position="attributes">
                 <attribute name="widget">text</attribute>
+                <attribute name="optional">hide</attribute>
+                <attribute name="column_invisible">parent.move_type in ('out_invoice', 'out_refund')</attribute>
 
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list//field[@name='name']" position="after">
+                <field name="hgr_html_description"
+                       string="Description"
+                       widget="html"
+                       optional="show"
+                       column_invisible="parent.move_type not in ('out_invoice', 'out_refund')"/>
             </xpath>
 
             <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='name']" position="attributes">

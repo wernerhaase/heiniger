@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
+import re
+
 from odoo import models, api, fields
 from odoo.tools import html2plaintext
 
@@ -10,11 +12,20 @@ HTML_MARKERS = (
     '<li', '</li', '<strong', '</strong', '<b', '</b', '<em', '</em',
     '<i', '</i', '<span', '</span', '&nbsp;',
 )
+LI_RE = re.compile(r'<li[^>]*>(.*?)</li>', re.IGNORECASE | re.DOTALL)
 
 
 def _looks_like_html(value):
     value = value or ''
     return any(marker in value.lower() for marker in HTML_MARKERS)
+
+
+def _plain_description(value):
+    html_items = LI_RE.findall(value or '')
+    if html_items:
+        lines = [html2plaintext(item).strip() for item in html_items]
+        return '\n'.join(line for line in lines if line)
+    return html2plaintext(value or '').strip()
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -145,7 +156,7 @@ class SaleOrderLine(models.Model):
         vals = super()._prepare_invoice_line(**optional_values)
         if self.name:
             vals['hgr_html_description'] = self.name
-            vals['name'] = html2plaintext(self.name)
+            vals['name'] = _plain_description(self.name)
         return vals
 
 
