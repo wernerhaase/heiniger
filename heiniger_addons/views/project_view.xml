@@ -9,7 +9,7 @@
 	    	<xpath expr="//field[@name='user_ids']" position="after">
 	    		<field name="employee_ids" class="o_task_user_field"
                                 options="{'no_open': True, 'no_quick_create': True}"
-                                widget="many2many_avatar_user"
+                                widget="many2many_tags"
                                 domain="[('active', '=', True)]"/>
 	    	</xpath>
 	    </field>

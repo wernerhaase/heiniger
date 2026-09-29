@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="sale_timesheet.sale_order_portal_content_inherit" model="ir.ui.view">
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <data/>
+        </field>
+    </record>
+</odoo>
