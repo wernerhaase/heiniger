@@ -55,25 +55,24 @@ class Lead(models.Model):
 
 	def action_open_documents(self):
 		self.ensure_one()
-		# if not self.address_home_id:
-			# Prevent opening documents if the employee's address is not set or no user is linked.
-			# raise ValidationError(_('You must set an address on the employee to use Documents features.'))
-		# hr_folder = self._get_document_folder()
-		project_id = self.project_id
-		if not self.project_id:
-			folder = self.create_missing_folder()
-			project_id = self.create_project(folder)
-			self.write({'project_id': project_id.id})
-
-		prj_folder = project_id.documents_folder_id and project_id.documents_folder_id.id
+		project = self.project_id
+		if not project:
+			project = self.create_project(self.create_missing_folder())
+			self.project_id = project
+		if not project.documents_folder_id:
+			project._create_missing_folders()
+		folder = project.documents_folder_id
 		action = self.env['ir.actions.act_window']._for_xml_id('documents.document_action')
-		# Documents created within that action will be 'assigned' to the employee
-		# Also makes sure that the views starts on the hr_holder
+		# Keep navigation inside this case, including any nested folders.
+		action['domain'] = [('id', 'child_of', folder.id), ('id', '!=', folder.id)] if folder else [('id', '=', False)]
 		action['context'] = {
-			'default_partner_id': self.user_id.id,
-			'searchpanel_default_folder_id': prj_folder,
+			**self.env.context,
+			'default_partner_id': self.partner_id.id,
+			'default_folder_id': folder.id,
+			'searchpanel_default_user_folder_id': str(folder.id),
+			'active_model': 'project.project',
+			'active_id': project.id,
 		}
-		# action['domain'] = self._get_employee_document_domain()
 		return action
 	
 	def _compute_attached_document_count(self):
@@ -104,7 +103,7 @@ class Lead(models.Model):
 		account = self.create_analytic_account()
 		values = {
 			'name': '%s - %s' % (self.hgr_object_id.name, self.name) if self.hgr_object_id else self.name,
-			'analytic_account_id': account.id,
+			'account_id': account.id,
 			'partner_id': self.partner_id.id,
 			'documents_folder_id': folder.id,
 			# 'sale_line_id': self.id,
@@ -115,21 +114,22 @@ class Lead(models.Model):
 		return self.env['project.project'].with_context(no_create_folder=True).create(values)	
 
 	def create_analytic_account(self):
-		company_id = self.env.company
+		project_plan, _other_plans = self.env['account.analytic.plan']._get_all_plans()
 		analytic_account = self.env['account.analytic.account'].create({
 			'name': '%s - %s' % (self.hgr_object_id.name, self.name) if self.hgr_object_id else self.name,
 			'company_id': self.company_id.id,
 			'partner_id': self.partner_id.id,
-			'plan_id': self.company_id.analytic_plan_id.id,
+			'plan_id': project_plan.id,
 			'active': True,
 		})
 		return analytic_account
 
 	def create_missing_folder(self):
-		documents_project_folder_id = self.env.ref('documents_project.documents_project_folder').id
-		folder = self.env['documents.folder'].create({
+		documents_project_folder_id = (self.company_id or self.env.company).documents_project_folder_id.id
+		folder = self.env['documents.document'].create({
+			'type': 'folder',
 			'name': '%s - %s' % (self.hgr_object_id.name, self.name) if self.hgr_object_id else self.name,
-			'parent_folder_id': documents_project_folder_id,
+			'folder_id': documents_project_folder_id,
 			'company_id': self.company_id.id,
 		})
 		return folder
@@ -160,13 +160,11 @@ class Lead(models.Model):
 		
 		if self.project_id:
 			quotation_context['default_project_id'] = self.project_id.id
-			quotation_context['default_analytic_account_id'] = self.project_id.analytic_account_id.id
 		else:
 			folder = self.create_missing_folder()
 			project_id = self.create_project(folder)
 			self.write({'project_id': project_id.id})
 			quotation_context['default_project_id'] = project_id.id
-			quotation_context['default_analytic_account_id'] = project_id.analytic_account_id.id
 		return quotation_context
 
 	def action_view_insurance_details(self):

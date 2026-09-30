@@ -19,3 +19,8 @@
         margin-bottom: 0;
     }
 }
+
+// Older Odoo 19 builds have a separate native readonly label.
+.o_hgr_sale_product_cell > .o_input:not(.o_hgr_sol_html) {
+    display: none;
+}

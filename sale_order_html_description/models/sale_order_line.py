@@ -5,19 +5,12 @@ import re
 from html import unescape
 
 from odoo import models, api, fields
-from odoo.tools import html2plaintext
-
-
-HTML_MARKERS = (
-    '<p', '</p', '<br', '<div', '</div', '<ul', '</ul', '<ol', '</ol',
-    '<li', '</li', '<strong', '</strong', '<b', '</b', '<em', '</em',
-    '<i', '</i', '<span', '</span', '&nbsp;',
-)
+from odoo.tools import plaintext2html
 
 
 def _looks_like_html(value):
     value = value or ''
-    return any(marker in value.lower() for marker in HTML_MARKERS)
+    return bool(re.search(r'</?[A-Za-z][^>]*>', value))
 
 
 def _plain_description(value):
@@ -51,26 +44,53 @@ class AccountMoveline(models.Model):
 
     hgr_html_description = fields.Html(string='Print Description')
 
-    # def write(self, vals):
-    #     move_lines = super(AccountMoveline, self).write(vals)
-    #     return move_lines
-
+    @api.model
+    def _hgr_description_values(self, values):
+        values = dict(values)
+        if values.get('hgr_html_description') or ('hgr_html_description' in values and 'name' not in values):
+            # The rich editor is authoritative when both fields are submitted.
+            values['name'] = _plain_description(values['hgr_html_description'])
+        elif 'name' in values:
+            value = values['name'] or ''
+            values['hgr_html_description'] = value if _looks_like_html(value) else plaintext2html(value)
+            values['name'] = _plain_description(value)
+        return values
 
     @api.model_create_multi
     def create(self, vals_list):
-        for line_vals in vals_list:
-            if (
-                line_vals.get('name')
-                and not line_vals.get('hgr_html_description')
-                and _looks_like_html(line_vals['name'])
-            ):
-                line_vals['hgr_html_description'] = line_vals['name']
-                line_vals['name'] = html2plaintext(line_vals['name'])
-        move_lines = super(AccountMoveline, self).create(vals_list)
-        for rec in move_lines:
-            if rec.name:
-                rec.name = rec.name.replace('&nbsp;', '&#160;').replace('<br>', '<br/>')
-        return move_lines
+        lines = super().create([self._hgr_description_values(vals) for vals in vals_list])
+        for line in lines.filtered(lambda item: not item.hgr_html_description):
+            description = line.name or ''
+            if line.product_id and line.journal_id.type == 'sale':
+                product = line.product_id.with_context(lang=line.partner_id.lang or self.env.lang)
+                rich = '\n'.join(filter(None, [product.display_name, product.description_sale]))
+                if _plain_description(rich) == description:
+                    description = rich
+            line.hgr_html_description = description if _looks_like_html(description) else plaintext2html(description)
+        return lines
+
+    def write(self, vals):
+        if 'name' in vals and 'hgr_html_description' not in vals:
+            # Re-saving the generated plain label must not erase existing styling.
+            preserved = self.filtered(lambda line: line.hgr_html_description and
+                                       vals['name'] == _plain_description(line.hgr_html_description))
+            if preserved:
+                super(AccountMoveline, preserved).write(vals)
+                return super(AccountMoveline, self - preserved).write(self._hgr_description_values(vals)) if self - preserved else True
+        return super().write(self._hgr_description_values(vals))
+
+    @api.onchange('hgr_html_description')
+    def _onchange_hgr_html_description(self):
+        for line in self:
+            line.name = _plain_description(line.hgr_html_description)
+
+    @api.depends('product_id', 'move_id.ref', 'move_id.payment_reference')
+    def _compute_name(self):
+        super()._compute_name()
+        for line in self:
+            if _looks_like_html(line.name):
+                line.hgr_html_description = line.name
+                line.name = _plain_description(line.name)
 
     @api.model
     def hgr_count_html_names_without_print_description(self):
@@ -100,8 +120,7 @@ class AccountMoveline(models.Model):
         rows = self.env.cr.fetchall()
         updates = []
         for line_id, html_name in rows:
-            plain_name = html2plaintext(html_name or '')
-            plain_name = plain_name.replace('&nbsp;', '&#160;').replace('<br>', '<br/>').strip()
+            plain_name = _plain_description(html_name)
             updates.append((html_name, plain_name, line_id, html_name))
 
         if updates:
@@ -113,6 +132,7 @@ class AccountMoveline(models.Model):
                    AND hgr_html_description IS NULL
                    AND name = %s
             """, updates)
+        self.invalidate_model(['name', 'hgr_html_description'])
         return len(updates)
 
     @api.model

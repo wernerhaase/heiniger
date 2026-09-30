@@ -26,19 +26,17 @@
                 t-out="hgrHtmlLabel"
             />
         </xpath>
-        <xpath expr="//t[@t-else='']/div[@t-if='props.readonly']" position="replace">
-            <div
-                class="o_input d-print-none border-0 fst-italic o_hgr_sol_html"
-                t-att-class="{ ...sectionAndNoteClasses, 'd-none': !(columnIsProductAndLabel.value and label) }"
-                t-out="hgrHtmlLabel"
-            />
-        </xpath>
         <xpath expr="//t[@t-else='']/textarea" position="replace">
             <div
                 class="o_input d-print-none border-0 fst-italic o_hgr_sol_html"
                 t-att-class="{ ...sectionAndNoteClasses, 'd-none': !(columnIsProductAndLabel.value and (label or labelVisibility.value)) }"
                 t-out="hgrHtmlLabel"
             />
+        </xpath>
+        <!-- The native readonly label exists only in some Odoo 19 revisions.
+             Hide it through the cell class; the HTML label above handles both modes. -->
+        <xpath expr="//div[hasclass('o_field_product_label_section_and_note_cell')]" position="attributes">
+            <attribute name="class" add="o_hgr_sale_product_cell" separator=" "/>
         </xpath>
         <xpath expr="//t[@t-if='isPrintMode.value']/div" position="attributes">
             <attribute name="t-out">hgrHtmlLabel</attribute>

@@ -39,7 +39,7 @@ env['account.bank.statement.line'].hgr_cron_cleanup_accounting_html_tags()
         <field name="interval_number">1</field>
         <field name="interval_type">hours</field>
         <field name="nextcall" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
-        <field name="active" eval="True"/>
+        <field name="active" eval="False"/>
         <field name="priority">5</field>
     </record>
 
@@ -82,7 +82,7 @@ env['account.move.line'].hgr_cron_migrate_html_invoice_labels(limit=10000)
         <field name="interval_number">1</field>
         <field name="interval_type">hours</field>
         <field name="nextcall" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
-        <field name="active" eval="True"/>
+        <field name="active" eval="False"/>
         <field name="priority">5</field>
     </record>
 
