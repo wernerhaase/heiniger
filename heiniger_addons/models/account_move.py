@@ -1,5 +1,4 @@
 from odoo import api, fields, models, _
-from odoo.tools import format_date
 import re
 
 class AccountMove(models.Model):
@@ -62,38 +61,9 @@ class AccountMove(models.Model):
 			data = []
 			# Only show invoice address block when it differs from the main partner
 			if record.partner_id and record.partner_shipping_id and record.partner_shipping_id != record.partner_id:
-				data.append((_("Lieferadresse:"), record.partner_shipping_id))
+				data.append((_("Shipping Address:"), record.partner_shipping_id))
 			record.l10n_din5008_addresses = data
 
-	def _compute_l10n_din5008_template_data(self):
-		for record in self:
-			data = []
-			sale_order = record.line_ids.sale_line_ids.order_id[:1]
-			# ── Invoice reference ─────────────────────────────────────
-			if record.name:
-				data.append((_("Rechnungsnummer"), record.name))
-			if record.invoice_date:
-				data.append((_("Rechnungsdatum"), format_date(self.env, record.invoice_date)))
-			if record.invoice_date_due:
-				data.append((_("Fälligkeitsdatum"), format_date(self.env, record.invoice_date_due)))
-			if record.invoice_discount_date_due and record.invoice_discount_date_due != record.invoice_date_due:
-				data.append((_("Skontodatum"), format_date(self.env, record.invoice_discount_date_due)))
-			if record.invoice_origin:
-				data.append((_("Auftragsnummer"), record.invoice_origin))
-			if record.ref:
-				data.append((_("Ihre Referenz"), record.ref))
-			# ── Object (property / site) ──────────────────────────────
-			if sale_order and sale_order.hgr_object_id:
-				data.append((_("Objekt"), sale_order.hgr_object_id._get_name()))
-			# ── Insurance details (only when insurance case) ──────────
-			if sale_order and sale_order.hgr_insurance_id:
-				data.append((_("Versicherung"), sale_order.hgr_insurance_id.name))
-				if sale_order and sale_order.hgr_insurance_claim_no:
-					data.append((_("Schaden Nr."), sale_order.hgr_insurance_claim_no))
-				if sale_order and sale_order.hgr_insurance_record_date:
-					data.append((_("Schadenaufnahme"), format_date(self.env, sale_order.hgr_insurance_record_date)))
-				record.l10n_din5008_template_data = data
-	
 
 	# class AccountInvoiceLine(models.Model):
 	# _inherit = "account.move.line"

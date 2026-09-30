@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models
+from odoo import api, models, _
 from odoo.tools import html2plaintext
 
 
@@ -34,8 +34,8 @@ class AccountBankStatementLine(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Accounting HTML Tags Found',
-                'message': message or 'No HTML tags found in accounting cleanup fields.',
+                'title': _('Accounting HTML Tags Found'),
+                'message': message or _('No HTML tags found in accounting cleanup fields.'),
                 'type': 'warning' if any(counts.values()) else 'success',
                 'sticky': True,
             },
@@ -49,14 +49,15 @@ class AccountBankStatementLine(models.Model):
         lines = []
         for field_name in before:
             lines.append(
-                f'{field_name}: cleaned {cleaned.get(field_name, 0)} '
-                f'(before {before[field_name]}, after {after[field_name]})'
+                _('%(field)s: cleaned %(cleaned)s (before %(before)s, after %(after)s)',
+                  field=field_name, cleaned=cleaned.get(field_name, 0),
+                  before=before[field_name], after=after[field_name])
             )
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Accounting HTML Tags Cleanup',
+                'title': _('Accounting HTML Tags Cleanup'),
                 'message': '\n'.join(lines),
                 'type': 'success',
                 'sticky': True,

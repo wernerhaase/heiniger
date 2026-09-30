@@ -1,0 +1,222 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sale_order_html_description
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-30 10:43+0000\n"
+"PO-Revision-Date: 2026-09-30 10:43+0000\n"
+"Last-Translator: \n"
+"Language-Team: German (Switzerland)\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/account_bank_statement_line.py:0
+msgid "%(field)s: cleaned %(cleaned)s (before %(before)s, after %(after)s)"
+msgstr ""
+"%(field)s: %(cleaned)s bereinigt (vorher %(before)s, nachher %(after)s)"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,help:sale_order_html_description.field_product_product__description_sale
+#: model:ir.model.fields,help:sale_order_html_description.field_product_template__description_sale
+msgid ""
+"A description of the Product that you want to communicate to your customers."
+" This description will be copied to every Sales Order, Delivery Order and "
+"Customer Invoice/Credit Note"
+msgstr ""
+"Eine Beschreibung des Produkts, die Sie Ihren Kunden mitteilen möchten. "
+"Diese Beschreibung wird in jeden Verkaufsauftrag, Lieferauftrag und jede "
+"Kundenrechnung/Gutschrift kopiert."
+
+#. module: sale_order_html_description
+#: model_terms:ir.ui.view,arch_db:sale_order_html_description.report_invoice_document_html_description
+msgid "A note, whose content usually applies to the section or product above."
+msgstr ""
+"Eine Notiz, deren Inhalt sich normalerweise auf den vorherigen Abschnitt "
+"oder das vorherige Produkt bezieht."
+
+#. module: sale_order_html_description
+#: model_terms:ir.ui.view,arch_db:sale_order_html_description.report_invoice_document_html_description
+msgid "A section title"
+msgstr "Ein Abschnittstitel"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/account_bank_statement_line.py:0
+msgid "Accounting HTML Tags Cleanup"
+msgstr "HTML-Tags in der Buchhaltung bereinigen"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/account_bank_statement_line.py:0
+msgid "Accounting HTML Tags Found"
+msgstr "HTML-Tags in der Buchhaltung gefunden"
+
+#. module: sale_order_html_description
+#: model_terms:ir.ui.view,arch_db:sale_order_html_description.report_invoice_document_html_description
+msgid "Bacon Burger"
+msgstr "Bacon-Burger"
+
+#. module: sale_order_html_description
+#: model:ir.model,name:sale_order_html_description.model_account_bank_statement_line
+msgid "Bank Statement Line"
+msgstr "Kontoauszugszeile"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_check_html_invoice_labels
+msgid "Check HTML Invoice Labels"
+msgstr "Rechnungsbezeichnungen auf HTML prüfen"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_cron_cleanup_sale_section_note_html
+msgid "Deprecated: Sale Section/Note HTML Cleanup"
+msgstr "Veraltet: HTML-Bereinigung von Verkaufsabschnitten und Notizen"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_project_milestone__sale_line_name
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order_line__name
+msgid "Description"
+msgstr "Beschreibung"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_account_bank_statement_line__display_name
+#: model:ir.model.fields,field_description:sale_order_html_description.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:sale_order_html_description.field_product_template__display_name
+#: model:ir.model.fields,field_description:sale_order_html_description.field_project_milestone__display_name
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order__display_name
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order_line__display_name
+msgid "Display Name"
+msgstr "Anzeigename"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_audit_accounting_html_tags
+msgid "Find Accounting HTML Tags"
+msgstr "HTML-Tags in der Buchhaltung suchen"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_cleanup_accounting_html_tags
+msgid "Fix Accounting HTML Tags"
+msgstr "HTML-Tags in der Buchhaltung bereinigen"
+
+#. module: sale_order_html_description
+#: model_terms:ir.ui.view,arch_db:sale_order_html_description.description_html_move_view_form
+msgid "Formatted Description"
+msgstr "Formatierte Beschreibung"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/sale_order_line.py:0
+msgid "HTML Invoice Label Check"
+msgstr "Prüfung der HTML-Rechnungsbezeichnungen"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/sale_order_line.py:0
+msgid "HTML Invoice Label Cleanup"
+msgstr "Bereinigung der HTML-Rechnungsbezeichnungen"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_cron_cleanup_accounting_html_tags
+msgid "Heiniger: Fix Accounting HTML Tags"
+msgstr "Heiniger: HTML-Tags in der Buchhaltung bereinigen"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_cron_migrate_html_invoice_labels
+msgid "Heiniger: Migrate HTML Invoice Labels"
+msgstr "Heiniger: HTML-Rechnungsbezeichnungen migrieren"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_account_bank_statement_line__id
+#: model:ir.model.fields,field_description:sale_order_html_description.field_account_move_line__id
+#: model:ir.model.fields,field_description:sale_order_html_description.field_product_template__id
+#: model:ir.model.fields,field_description:sale_order_html_description.field_project_milestone__id
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order__id
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: sale_order_html_description
+#: model:ir.model,name:sale_order_html_description.model_account_move_line
+msgid "Journal Item"
+msgstr "Buchungszeile"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_migrate_html_invoice_labels
+msgid "Migrate HTML Invoice Labels"
+msgstr "HTML-Rechnungsbezeichnungen migrieren"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/sale_order_line.py:0
+msgid "Migrated %s journal items."
+msgstr "%s Buchungszeilen migriert."
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/account_bank_statement_line.py:0
+msgid "No HTML tags found in accounting cleanup fields."
+msgstr "Keine HTML-Tags in den zu prüfenden Buchhaltungsfeldern gefunden."
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order_line__hgr_plain_description
+msgid "Plain Description"
+msgstr "Beschreibung als Klartext"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_sale_order_line__sequence_no
+msgid "Position"
+msgstr "Position"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_account_move_line__hgr_html_description
+msgid "Print Description"
+msgstr "Druckbeschreibung"
+
+#. module: sale_order_html_description
+#: model:ir.model,name:sale_order_html_description.model_product_template
+msgid "Product"
+msgstr "Produkt"
+
+#. module: sale_order_html_description
+#: model:ir.model,name:sale_order_html_description.model_project_milestone
+msgid "Project Milestone"
+msgstr "Projekt Milestone"
+
+#. module: sale_order_html_description
+#: model:ir.actions.server,name:sale_order_html_description.action_hgr_restore_sale_line_html_grid
+msgid "Refresh Sales Grid HTML Rendering"
+msgstr "HTML-Darstellung der Verkaufszeilen aktualisieren"
+
+#. module: sale_order_html_description
+#. odoo-python
+#: code:addons/sale_order_html_description/models/sale_order_line.py:0
+msgid "Remaining HTML labels: %s"
+msgstr "Verbleibende HTML-Bezeichnungen: %s"
+
+#. module: sale_order_html_description
+#: model_terms:ir.ui.view,arch_db:sale_order_html_description.description_html_order_view_form
+msgid "Reorder"
+msgstr "Reihenfolge ändern"
+
+#. module: sale_order_html_description
+#: model:ir.model.fields,field_description:sale_order_html_description.field_product_product__description_sale
+#: model:ir.model.fields,field_description:sale_order_html_description.field_product_template__description_sale
+msgid "Sales Description"
+msgstr "Verkaufsbeschreibung"
+
+#. module: sale_order_html_description
+#: model:ir.model,name:sale_order_html_description.model_sale_order
+msgid "Sales Order"
+msgstr "Auftragsbestätigung"
+
+#. module: sale_order_html_description
+#: model:ir.model,name:sale_order_html_description.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Kundenauftragszeile"

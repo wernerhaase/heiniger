@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Odoo 19 renders DIN5008 metadata in QWeb, in the customer's language. -->
+    <template id="sale_document_information" inherit_id="l10n_din5008_sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='din5008_document_information']//table" position="inside">
+            <tr t-if="doc.hgr_object_id"><td>Object</td><td t-out="doc.hgr_object_id.display_name"/></tr>
+            <tr t-if="doc.hgr_insurance_id"><td>Insurance Company</td><td><span t-field="doc.hgr_insurance_id.name"/></td></tr>
+            <tr t-if="doc.hgr_claim_person_id"><td>Claims Expert</td><td><span t-field="doc.hgr_claim_person_id.name"/></td></tr>
+            <tr t-if="doc.hgr_insurance_policy_no"><td>Policy No</td><td><span t-field="doc.hgr_insurance_policy_no"/></td></tr>
+            <tr t-if="doc.hgr_insurance_claim_no"><td>Claim No</td><td><span t-field="doc.hgr_insurance_claim_no"/></td></tr>
+            <tr t-if="doc.hgr_insurance_record_date"><td>Claim Record Date</td><td><span t-field="doc.hgr_insurance_record_date"/></td></tr>
+        </xpath>
+        <xpath expr="//t[@t-set='din5008_document_title']" position="replace">
+            <t t-set="din5008_document_title">
+                <span t-if="doc.env.context.get('proforma')">Pro Forma Invoice</span>
+                <span t-elif="doc.state in ('draft', 'sent')">Quotation</span>
+                <span t-else="">Order Confirmation</span>
+                <div t-if="doc.l10n_din5008_document_subject" class="h5 mt-2" t-field="doc.l10n_din5008_document_subject"/>
+            </t>
+        </xpath>
+    </template>
+    <template id="invoice_document_information" inherit_id="l10n_din5008.report_invoice_document">
+        <xpath expr="//t[@t-set='din5008_document_information']//table" position="inside">
+            <t t-set="sale_order" t-value="o.invoice_line_ids.sale_line_ids.order_id[:1]"/>
+            <tr t-if="o.invoice_discount_date_due and o.invoice_discount_date_due != o.invoice_date_due">
+                <td>Discount Date</td><td><span t-field="o.invoice_discount_date_due"/></td>
+            </tr>
+            <tr t-if="sale_order.hgr_object_id"><td>Object</td><td t-out="sale_order.hgr_object_id.display_name"/></tr>
+            <tr t-if="sale_order.hgr_insurance_id"><td>Insurance Company</td><td><span t-field="sale_order.hgr_insurance_id.name"/></td></tr>
+            <tr t-if="sale_order.hgr_insurance_claim_no"><td>Claim No</td><td><span t-field="sale_order.hgr_insurance_claim_no"/></td></tr>
+            <tr t-if="sale_order.hgr_insurance_record_date"><td>Claim Record Date</td><td><span t-field="sale_order.hgr_insurance_record_date"/></td></tr>
+        </xpath>
+        <xpath expr="//t[@t-set='din5008_document_title']" position="inside">
+            <div t-if="o.l10n_din5008_document_subject" class="h5 mt-2" t-field="o.l10n_din5008_document_subject"/>
+        </xpath>
+    </template>
+</odoo>

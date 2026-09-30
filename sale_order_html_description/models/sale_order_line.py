@@ -4,7 +4,7 @@
 import re
 from html import unescape
 
-from odoo import models, api, fields
+from odoo import models, api, fields, _
 from odoo.tools import plaintext2html
 
 
@@ -142,8 +142,8 @@ class AccountMoveline(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'HTML Invoice Label Check',
-                'message': 'Remaining HTML labels: %s' % remaining,
+                'title': _('HTML Invoice Label Check'),
+                'message': _('Remaining HTML labels: %s', remaining),
                 'type': 'info',
                 'sticky': True,
             },
@@ -156,8 +156,8 @@ class AccountMoveline(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'HTML Invoice Label Cleanup',
-                'message': 'Migrated %s journal items.' % migrated,
+                'title': _('HTML Invoice Label Cleanup'),
+                'message': _('Migrated %s journal items.', migrated),
                 'type': 'success',
                 'sticky': True,
             },

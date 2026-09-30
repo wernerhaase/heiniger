@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
-from odoo.tools import format_date
 
 class Saleorder(models.Model):
 	_inherit = "sale.order"
@@ -35,12 +34,13 @@ class Saleorder(models.Model):
 
 
 	@api.depends('state')
+	@api.depends_context('lang')
 	def _compute_type_name(self):
 		for record in self:
 			if record.state in ('draft', 'sent', 'cancel'):
-				record.type_name = _("Offerte") ## Quotation
+				record.type_name = _("Quotation")
 			else:
-				record.type_name = _("Auftragsbestätigung") ## Sales Order
+				record.type_name = _("Order Confirmation")
 	
 
 	def _compute_l10n_din5008_document_subject(self):
@@ -50,60 +50,6 @@ class Saleorder(models.Model):
 				record.hgr_subject
 				or (record.opportunity_id.hgr_subject if record.opportunity_id else '')
 			)
-
-	def _compute_l10n_din5008_template_data(self):
-		for record in self:
-			data = []
-			# ── Document reference numbers ────────────────────────────
-			if record.state in ('draft', 'sent'):
-				if record.name:
-					data.append((_("Angebotsnummer"), record.name))
-				if record.date_order:
-					data.append((_("Angebotsdatum"), format_date(self.env, record.date_order)))
-				if record.validity_date:
-					data.append((_("Gültig bis"), format_date(self.env, record.validity_date)))
-			else:
-				if record.name:
-					data.append((_("Auftragsnummer"), record.name))
-				if record.date_order:
-					data.append((_("Auftragsdatum"), format_date(self.env, record.date_order)))
-			# ── Order metadata ────────────────────────────────────────
-			if record.client_order_ref:
-				data.append((_("Ihre Referenz"), record.client_order_ref))
-			if record.user_id:
-				data.append((_("Sachbearbeiter"), record.user_id.name))
-			# ── Object (property / site) ──────────────────────────────
-			if record.hgr_object_id:
-				data.append((_("Objekt"), record.hgr_object_id._get_name()))
-			# ── Insurance details (only when insurance case) ──────────
-			if record.hgr_insurance_id:
-				data.append((_("Versicherung"), record.hgr_insurance_id.name))
-			if record.hgr_claim_person_id:
-				data.append((_("Schadenexperte"), record.hgr_claim_person_id.name))
-			if record.hgr_insurance_policy_no:
-				data.append((_("Police Nr."), record.hgr_insurance_policy_no))
-			if record.hgr_insurance_claim_no:
-				data.append((_("Schaden Nr."), record.hgr_insurance_claim_no))
-			if record.hgr_insurance_record_date:
-				data.append((_("Schadenaufnahme"), format_date(self.env, record.hgr_insurance_record_date)))
-			record.l10n_din5008_template_data = data
-
-	def _compute_l10n_din5008_addresses(self):
-		for record in self:
-			data = []
-			# Only show invoice address block when it differs from the main partner
-			if record.partner_invoice_id and record.partner_invoice_id != record.partner_id:
-				data.append((_("Rechnungsadresse:"), record.partner_invoice_id))
-			record.l10n_din5008_addresses = data
-
-	def _compute_l10n_din5008_document_title(self):
-		for record in self:
-			if self._context.get('proforma'):
-				record.l10n_din5008_document_title = _('Proformarechnung') ##Pro Forma Invoice
-			elif record.state in ('draft', 'sent'):
-				record.l10n_din5008_document_title = _('Offerte') ## Quotation
-			else:
-				record.l10n_din5008_document_title = _('Auftragsbestätigung') ## Sales Order
 
 	def _has_to_be_signed(self, *args, **kwargs):
 		"""Keep customized portal templates compatible with Odoo 19."""
