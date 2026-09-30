@@ -78,3 +78,33 @@
     break-inside: avoid !important;
     page-break-inside: avoid !important;
 }
+
+/* Qt applies page-break rules to blocks more reliably than to table rows.
+   These PDF-only line tables retain shared widths and original rich text. */
+.din_page .page .hgr_paginated_lines {
+    margin-top: 8.46mm;
+    margin-bottom: 1rem;
+}
+.din_page .page .hgr_paginated_lines table.o_main_table {
+    table-layout: fixed;
+    width: 100%;
+    margin: 0 !important;
+}
+.hgr_paginated_lines .hgr_keep {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+.hgr_paginated_lines td.o_price_total,
+.hgr_paginated_lines td[name="td_product_priceunit"],
+.hgr_paginated_lines td[name="td_price_unit"] {
+    white-space: nowrap !important;
+}
+.hgr_paginated_lines td p,
+.hgr_paginated_lines td li {
+    page-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+}
+.din_page.footer.hgr_pagination_footer {
+    padding-top: 4mm;
+}

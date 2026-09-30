@@ -12,3 +12,4 @@ from . import project
 
 
 
+from . import ir_actions_report

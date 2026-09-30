@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <template id="saleorder_without_prices_document" inherit_id="sale.report_saleorder_document" primary="True">
+    <xpath expr="//div[@name='so_total_summary']" position="replace"/>
+    <xpath expr="//th[@name='th_priceunit']" position="replace"/>
+    <xpath expr="//th[@name='th_discount']" position="replace"/>
+    <xpath expr="//th[@name='th_taxes']" position="replace"/>
+    <xpath expr="//th[@name='th_subtotal']" position="replace"/>
+    <xpath expr="//td[@name='td_product_priceunit']" position="replace"/>
+    <xpath expr="//td[@name='td_product_discount']" position="replace"/>
+    <xpath expr="//td[@name='td_product_taxes']" position="replace"/>
+    <xpath expr="//td[@name='td_product_subtotal']" position="replace"/>
+    <xpath expr="//td[@name='td_section_price']" position="replace"/>
+    <xpath expr="//td[@name='td_combo_price']" position="replace"/>
+    <xpath expr="//td[@name='td_section_group_priceunit']" position="replace"/>
+    <xpath expr="//td[@name='td_section_group_discount']" position="replace"/>
+    <xpath expr="//td[@name='td_section_group_taxes']" position="replace"/>
+    <xpath expr="//td[@name='td_section_group_total']" position="replace"/>
+  </template>
+  <template id="saleorder_without_prices">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="doc">
+        <t t-call="heiniger_addons.saleorder_without_prices_document" t-lang="doc.partner_id.lang"/>
+      </t>
+    </t>
+  </template>
+  </odoo>
