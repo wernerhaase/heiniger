@@ -20,6 +20,12 @@
     }
 }
 
+// The native product label uses pre-wrap for plain text. Rich HTML already
+// carries its own paragraphs and lists; source indentation is not content.
+.o_field_product_label_section_and_note_cell div.o_input.o_hgr_sol_html {
+    white-space: normal;
+}
+
 // Older Odoo 19 builds have a separate native readonly label.
 .o_hgr_sale_product_cell > .o_input:not(.o_hgr_sol_html) {
     display: none;

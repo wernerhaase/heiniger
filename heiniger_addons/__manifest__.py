@@ -4,7 +4,7 @@
 
 {
     'name': 'Heiniger Addons',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.4.0',
     'category': 'Customizations',
     'sequence': 6,
     'summary': 'Custom changes for heiniger ',
@@ -30,7 +30,9 @@ This module added for additional fields & custom developments.
         'security/ir.model.access.csv',
         'views/res_partner_view.xml',
         'views/sale_order_view.xml',
+        'views/print_attachments.xml',
         'views/portal_view_fix.xml',
+        'views/portal_pdf_preview.xml',
         'views/crm_lead_view.xml',
         'views/project_view.xml',
         'report/timesheet_report.xml',

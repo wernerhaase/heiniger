@@ -38,16 +38,33 @@ def paginate_line_tables(content):
             block.set('id', table.get('id'))
         pending = etree.SubElement(block, 'div', {'class': 'hgr_keep'})
         heading = line_table()
+        heading.set('class', heading.get('class', '') + ' hgr_line_heading')
         heading.append(deepcopy(table.find('thead')))
         pending.append(heading)
         for row in rows:
             if pending is None:
                 pending = etree.SubElement(block, 'div', {'class': 'hgr_keep'})
+            classes = row.get('class', '').split()
+            if 'o_line_note' in classes and len(row) == 1:
+                # Qt may move a single table cell intact even when break-inside
+                # is auto. Full-width notes do not need table layout at all.
+                pending.set('class', 'hgr_keep hgr_flow_note')
+                note = etree.SubElement(pending, 'div', dict(row.attrib))
+                note.set('class', row.get('class', '') + ' hgr_note_content')
+                cell = deepcopy(row[0])
+                cell.tag = 'div'
+                cell.attrib.pop('colspan', None)
+                note.append(cell)
+                for item in note.xpath('.//li[not(.//ul or .//ol)]'):
+                    item.set('class', item.get('class', '') + ' hgr_note_leaf')
+                pending = None
+                continue
             line = line_table()
             body = etree.SubElement(line, 'tbody', dict(row.getparent().attrib))
             body.append(deepcopy(row))
             pending.append(line)
-            classes = row.get('class', '').split()
+            if {'o_line_section', 'o_line_subsection'}.intersection(classes):
+                line.set('class', line.get('class', '') + ' hgr_line_heading')
             # Keep section/subsection headings with the next content row.
             # Oversized notes may span pages; their paragraphs/bullets can flow.
             if not {'o_line_section', 'o_line_subsection'}.intersection(classes):

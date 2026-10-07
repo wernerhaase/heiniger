@@ -94,6 +94,13 @@
     page-break-inside: avoid;
     break-inside: avoid;
 }
+.hgr_paginated_lines .hgr_flow_note {
+    page-break-inside: auto;
+    break-inside: auto;
+}
+.hgr_paginated_lines .hgr_line_heading {
+    page-break-after: avoid;
+}
 .hgr_paginated_lines td.o_price_total,
 .hgr_paginated_lines td[name="td_product_priceunit"],
 .hgr_paginated_lines td[name="td_price_unit"] {
@@ -104,6 +111,22 @@
     page-break-inside: avoid;
     orphans: 2;
     widows: 2;
+}
+.hgr_paginated_lines .hgr_note_content {
+    padding: .5rem;
+}
+.hgr_paginated_lines .hgr_note_content ul,
+.hgr_paginated_lines .hgr_note_content ol,
+.hgr_paginated_lines .hgr_note_content li {
+    page-break-inside: auto;
+    break-inside: auto;
+    orphans: 2;
+    widows: 2;
+}
+.hgr_paginated_lines .hgr_note_content p,
+.hgr_paginated_lines .hgr_note_content .hgr_note_leaf {
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 .din_page.footer.hgr_pagination_footer {
     padding-top: 4mm;

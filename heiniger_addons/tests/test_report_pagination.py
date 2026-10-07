@@ -20,11 +20,17 @@ class TestReportPagination(BaseCase):
             <tr><td>Glas</td><td>1</td><td>CHF 1'234.50</td></tr>''')
         result = paginate_line_tables(source)
         original, updated = html.fromstring(source), html.fromstring(result)
-        self.assertEqual([html.tostring(r) for r in original.xpath('//tbody/tr')],
+        self.assertEqual([html.tostring(r) for r in original.xpath('//tbody/tr[not(contains(@class,"o_line_note"))]')],
                          [html.tostring(r) for r in updated.xpath('//tbody/tr')])
-        groups = updated.xpath('//div[@class="hgr_keep"]')
+        self.assertEqual(original.xpath('//tr[@class="o_line_note"]//strong/text()'),
+                         updated.xpath('//div[contains(@class,"hgr_note_content")]//strong/text()'))
+        self.assertEqual(original.xpath('//li/text()'), updated.xpath('//li/text()'))
+        groups = updated.xpath('//div[contains(concat(" ", @class, " "), " hgr_keep ")]')
         self.assertEqual(len(groups), 2)
-        self.assertEqual(len(groups[0].xpath('.//tbody/tr')), 2)
+        self.assertEqual(len(groups[0].xpath('.//tbody/tr')), 1)
+        self.assertEqual(len(groups[0].xpath('.//div[contains(@class,"hgr_note_content")]')), 1)
+        self.assertIn('hgr_flow_note', groups[0].get('class'))
+        self.assertNotIn('hgr_flow_note', groups[1].get('class'))
         self.assertEqual(len(updated.xpath('//*[@id="lines"]')), 1)
         self.assertEqual(paginate_line_tables(result), result)
 

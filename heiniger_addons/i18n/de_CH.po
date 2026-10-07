@@ -430,3 +430,10 @@ msgstr "Arbeitsrapport"
 #: model:ir.model.fields,help:heiniger_addons.field_res_users__hgr_is_insurance
 msgid "help to classify insurance comapny seperately"
 msgstr "Kennzeichnet diesen Kontakt als Versicherung."
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_note_pdf_mixin__hgr_print_with_attachments
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_print_with_attachments
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_print_with_attachments
+msgid "Print with attachments"
+msgstr "Mit Anhängen drucken"
