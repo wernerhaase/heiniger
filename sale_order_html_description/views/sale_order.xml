@@ -9,6 +9,9 @@
                 <field name="name" widget="hgr_sol_html_text" optional="show"/>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']/list//field[@name='sequence']" position="attributes">
+                <attribute name="width">64px</attribute>
+            </xpath>
              <xpath expr="//field[@name='order_line']/list//field[@name='sequence']" position="after">
                     <field name="sequence_no" optional="hide"/>
             </xpath>
@@ -18,7 +21,7 @@
                         </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='sequence']" position="replace">
                 <group>
-                    <field name="sequence"/>
+                    <field name="sequence" invisible="1"/>
                 </group>
             </xpath>
 
@@ -26,6 +29,9 @@
             <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="attributes">
                 <attribute name="widget">hgr_sol_html_text</attribute>
 
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="widget">hgr_sol_o2m</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/list" position="attributes">
                 <attribute name="editable"></attribute>

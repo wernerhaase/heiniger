@@ -437,3 +437,15 @@ msgstr "Kennzeichnet diesen Kontakt als Versicherung."
 #: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_print_with_attachments
 msgid "Print with attachments"
 msgstr "Mit Anhängen drucken"
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_hgr_note_pdf_mixin__hgr_print_with_attachments
+#: model:ir.model.fields,help:heiniger_addons.field_sale_order__hgr_print_with_attachments
+#: model:ir.model.fields,help:heiniger_addons.field_account_move__hgr_print_with_attachments
+msgid "Append PDFs inserted in the document notes after the formal report, in note order."
+msgstr "Fügt die in den Notizen eingefügten PDF-Dateien am Ende des offiziellen Dokuments in der Reihenfolge der Notizen an."
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_print_attachments
+msgid "Refresh invoice preview"
+msgstr "Rechnungsvorschau aktualisieren"

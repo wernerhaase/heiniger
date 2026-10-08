@@ -8,6 +8,7 @@ from lxml import html
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import html_sanitize
+from odoo.tools.safe_eval import safe_eval, time
 
 
 def note_attachment_ids(values, base_url):
@@ -188,6 +189,55 @@ class SaleOrder(models.Model):
     _name = 'sale.order'
     _inherit = ['sale.order', 'hgr.note.pdf.mixin']
 
+    def _hgr_chatter_attachment_order(self):
+        """Match visible chatter copies to the quotation's first references."""
+        self.ensure_one()
+        attachments = self._get_mail_thread_data_attachments()
+        by_source = {a.hgr_note_source_id.id: a.id for a in attachments if a.hgr_note_source_id}
+        visible_ids = set(attachments.ids)
+        ordered = []
+        for source_id in note_attachment_ids(self._hgr_note_html_values(), self.get_base_url()):
+            attachment_id = by_source.get(source_id, source_id)
+            if attachment_id in visible_ids and attachment_id not in ordered:
+                ordered.append(attachment_id)
+        return ordered
+
+    def _hgr_chatter_report_attachment_ids(self):
+        """Recognize standard quotation/order PDFs using configured report names.
+
+        Include both draft and confirmed names, since sending a quotation then
+        confirming the order must not move the earlier PDF back to the front.
+        Linked note PDFs always retain their authored position.
+        """
+        self.ensure_one()
+        report = self.env.ref('sale.action_report_saleorder')
+        names = set()
+        languages = set(self.env['res.lang'].get_installed())
+        for lang, _label in languages:
+            translated = report.with_context(lang=lang)
+            for state in ('draft', 'sale'):
+                document = self.with_context(lang=lang).new({'state': state}, origin=self)
+                expression = translated.print_report_name
+                name = safe_eval(expression, {'object': document, 'time': time}) if expression else _('Report')
+                if name:
+                    names.add(name if name.endswith('.pdf') else name + '.pdf')
+                names.add(document._get_report_base_filename() + '.pdf')
+        linked = set(self._hgr_chatter_attachment_order())
+        return self._get_mail_thread_data_attachments().filtered(
+            lambda attachment: attachment.id not in linked
+            and attachment.mimetype == 'application/pdf'
+            and attachment.name in names
+        ).ids
+
+    def _thread_to_store(self, store, fields, *, request_list=None):
+        super()._thread_to_store(store, fields, request_list=request_list)
+        if request_list is not None:
+            for order in self:
+                store.add(order, {
+                    'hgrQuotationAttachmentOrder': order._hgr_chatter_attachment_order(),
+                    'hgrQuotationReportAttachments': order._hgr_chatter_report_attachment_ids(),
+                }, as_thread=True)
+
     def _hgr_portal_pdf_links(self, value, access_token=None):
         """Render portal-only preview links without changing stored note HTML."""
         self.ensure_one()
@@ -234,6 +284,31 @@ class SaleOrder(models.Model):
 class AccountMove(models.Model):
     _name = 'account.move'
     _inherit = ['account.move', 'hgr.note.pdf.mixin']
+
+    hgr_invoice_preview_id = fields.Many2one('ir.attachment', copy=False, readonly=True,
+                                            ondelete='set null')
+
+    def action_hgr_refresh_invoice_preview(self):
+        self.ensure_one()
+        self.check_access('write')
+        if self.state != 'posted' or self.move_type not in ('out_invoice', 'out_refund', 'out_receipt'):
+            raise UserError(_('Invoice preview is available for posted customer documents.'))
+        report = self.env['account.move.send']._get_default_pdf_report_id(self)
+        content, kind = self.env['ir.actions.report']._render_qweb_pdf(report, res_ids=self.ids)
+        if kind != 'pdf':
+            raise UserError(_('The invoice report did not produce a PDF.'))
+        values = {'name': self._get_invoice_report_filename(report=report),
+                  'raw': content, 'mimetype': 'application/pdf',
+                  'res_model': self._name, 'res_id': self.id,
+                  'type': 'binary'}
+        preview = self.hgr_invoice_preview_id
+        if preview and preview.res_model == self._name and preview.res_id == self.id:
+            preview.write(values)
+        else:
+            preview = self.env['ir.attachment'].create(values)
+            self.hgr_invoice_preview_id = preview
+        self.message_main_attachment_id = preview
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
 
     @api.model_create_multi
     def create(self, vals_list):

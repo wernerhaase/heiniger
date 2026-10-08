@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hgr_sale_line_unit_selection" model="ir.ui.view">
+        <field name="name">sale.order.line.units.lump.sum</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <!-- Keep product-specific units and allow the single cleaned Lump sum
+                 unit under its English or Swiss German translated name. -->
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_id']" position="attributes">
+                <attribute name="domain">['|', ('id', 'in', allowed_uom_ids), '&amp;', ('active', '=', True), ('name', 'in', ['Lump sum', 'Psch.'])]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit': True, 'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='product_uom_id']" position="attributes">
+                <attribute name="domain">['|', ('id', 'in', allowed_uom_ids), '&amp;', ('active', '=', True), ('name', 'in', ['Lump sum', 'Psch.'])]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit': True, 'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//div[@name='invoice_lines']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

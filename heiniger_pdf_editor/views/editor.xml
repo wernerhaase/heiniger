@@ -1,0 +1,29 @@
+<odoo>
+    <template id="editor" name="Edit PDF">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title t-out="title"/>
+                <style>
+                    html, body { margin: 0; height: 100%; font-family: Arial, sans-serif; }
+                    header { box-sizing: border-box; height: 76px; padding: 12px 20px; background: #20303e; color: white; }
+                    header strong { display: block; margin-bottom: 6px; }
+                    #editor-shell { height: calc(100% - 76px); }
+                    #editor-error { padding: 24px; color: #9c2432; }
+                </style>
+            </head>
+            <body t-att-data-session="session_key">
+                <header>
+                    <strong t-out="title"/>
+                    <span id="save-status">Use Save in the editor. Wait for “Saved to Odoo” before closing this tab.</span>
+                </header>
+                <div id="editor-error" hidden="hidden"/>
+                <div id="editor-shell"><div id="pdf-editor"/></div>
+                <div id="editor-config" t-att-data-config="editor_config"/>
+                <script t-att-src="editor_script"/>
+                <script src="/heiniger_pdf_editor/static/src/editor_page.js"/>
+            </body>
+        </html>
+    </template>
+</odoo>

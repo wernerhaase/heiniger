@@ -76,3 +76,22 @@ token and restrict files to PDFs currently referenced in that order's notes. The
 serve the working chatter copy and use private/no-store responses. Unrelated IDs,
 invalid tokens, and missing binaries return 404. This does not install or launch a
 desktop PDF editor, and does not change invoice portal pages.
+
+The quotation/order chatter file area displays referenced attachments from left
+to right in quotation order: order-line sequence, link order within each line,
+then the document Notes. Repeated links appear once. Other chatter files follow
+in their existing order. The order is read from the saved quotation when chatter
+data refreshes, including existing orders and links to original source files.
+Deploy the backend code and upgrade `heiniger_addons` to load the new web asset;
+reload the browser afterward.
+
+Custom-field translations are repaired automatically during Odoo's normal module
+translation loading (install, upgrade, or translation reload). This covers field
+labels and help text referenced by `heiniger_addons` and
+`sale_order_html_description` catalogs for installed languages. PO files remain
+the source of truth. Missing, empty, and untranslated English fallback values are
+filled; different existing translations are preserved. Fuzzy/obsolete entries,
+unresolved XML IDs, and entries whose English source no longer matches are skipped.
+An older but non-English label cannot be distinguished safely from customer wording
+and requires an explicit migration if it must change. An explicitly requested Odoo
+translation overwrite retains its normal behavior. No accounting data is touched.

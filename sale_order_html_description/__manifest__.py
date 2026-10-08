@@ -11,7 +11,7 @@
     'author': 'Ashish Thomas',
     'maintainer': 'Ashish Thomas',
     'category': 'Sales',
-    'version': "19.0.1.2.0",
+    'version': "19.0.1.3.0",
     'license': 'AGPL-3',
     'depends': [
         'sale','sale_project','account','html_editor'
@@ -25,6 +25,9 @@
     ],
     'assets': {
         'web.assets_backend': [
+            'sale_order_html_description/static/src/js/line_insert.js',
+            'sale_order_html_description/static/src/xml/line_insert.xml',
+            'sale_order_html_description/static/src/scss/line_insert.scss',
             'sale_order_html_description/static/src/js/invoice_description.js',
             'sale_order_html_description/static/src/xml/invoice_description.xml',
             'sale_order_html_description/static/src/js/sale_order_line_html_text.js',

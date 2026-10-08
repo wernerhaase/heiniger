@@ -1,0 +1,75 @@
+<odoo>
+    <record id="connection_list" model="ir.ui.view">
+        <field name="name">hgr.pdf.editor.connection.list</field>
+        <field name="model">hgr.pdf.editor.connection</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/><field name="company_id" groups="base.group_multi_company"/>
+                <field name="odoo_url"/><field name="editor_url"/>
+                <field name="account_email"/><field name="trial_end_date"/><field name="active"/>
+            </list>
+        </field>
+    </record>
+    <record id="connection_form" model="ir.ui.view">
+        <field name="name">hgr.pdf.editor.connection.form</field>
+        <field name="model">hgr.pdf.editor.connection</field>
+        <field name="arch" type="xml">
+            <form string="PDF Editor Connection" duplicate="false" delete="false">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-warning" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title"><h1><field name="name" placeholder="ONLYOFFICE"/></h1></div>
+                    <div class="alert alert-info" role="alert">
+                        Create your trial account with ONLYOFFICE, then copy its service address and connection secret here.
+                        Your ONLYOFFICE login password is not needed. Use the address of this Odoo database: its staging address on staging, or its production address on production.
+                        <br/>
+                        <a href="https://www.onlyoffice.com/docs-registration" target="_blank" rel="noopener noreferrer">Start a free trial</a>
+                        · <a href="https://docscloud.onlyoffice.com/" target="_blank" rel="noopener noreferrer">Open ONLYOFFICE account</a>
+                    </div>
+                    <group>
+                        <group string="Connection">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="odoo_url" placeholder="https://your-odoo-address.odoo.com"/>
+                            <field name="editor_url" placeholder="https://your-instance.onlyoffice.com"/>
+                            <field name="jwt_secret" password="True"/>
+                        </group>
+                        <group string="Account reference">
+                            <field name="account_email" widget="email"/>
+                            <field name="trial_end_date"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">Use Actions → Archive to disable editing, or Unarchive to enable it again.
+                        Save any open PDF edits first. Existing attachments and backups are kept.</p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="connection_search" model="ir.ui.view">
+        <field name="name">hgr.pdf.editor.connection.search</field>
+        <field name="model">hgr.pdf.editor.connection</field>
+        <field name="arch" type="xml">
+            <search><field name="name"/><filter name="archived" string="Archived" domain="[('active', '=', False)]"/></search>
+        </field>
+    </record>
+    <record id="connection_action" model="ir.actions.act_window">
+        <field name="name">PDF Editor Connections</field>
+        <field name="res_model">hgr.pdf.editor.connection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="settings" model="ir.ui.view">
+        <field name="name">heiniger.pdf.editor.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app name="heiniger_pdf_editor" string="PDF Editing" groups="base.group_system">
+                    <block title="Edit quotation and sales-order PDF attachments">
+                        <setting string="PDF editor connections" help="Set up ONLYOFFICE for this company. Archive a connection to disable PDF editing without deleting files.">
+                            <button name="%(connection_action)d" type="action" string="Manage connections" class="btn-link" icon="oi-arrow-right"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

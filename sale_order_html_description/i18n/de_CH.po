@@ -220,3 +220,38 @@ msgstr "Auftragsbestätigung"
 #: model:ir.model,name:sale_order_html_description.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Kundenauftragszeile"
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Line actions"
+msgstr "Zeilenaktionen"
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Edit line"
+msgstr "Zeile bearbeiten"
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Insert product below"
+msgstr "Produkt darunter einfügen"
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Insert note below"
+msgstr "Notiz darunter einfügen"
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Insert section below"
+msgstr "Abschnitt darunter einfügen"

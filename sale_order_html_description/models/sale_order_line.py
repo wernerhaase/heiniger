@@ -170,19 +170,12 @@ class AccountMoveline(models.Model):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    def has_duplicates(self,lst):
-        return len(lst) != len(set(lst))
-
     def reorder_sequence(self):
         for order in self:
-            sequence_list = order.order_line.sorted('sequence').mapped('sequence')
-            lines = order.order_line.sorted('sequence')
-            # print(sequence_list)
-            # if self.has_duplicates(sequence_list):
-            starting_seq = 10
-            for line in lines:
-                line.with_context({'dontcall_function': True}).write({'sequence': starting_seq})
-                starting_seq += 1
+            lines = order.order_line.sorted(lambda line: (line.sequence, line.id))
+            for sequence, line in enumerate(lines, start=10):
+                if line.sequence != sequence:
+                    line.with_context(dontcall_function=True).write({'sequence': sequence})
 
 
     @api.model_create_multi
@@ -194,7 +187,9 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         orders = super(SaleOrder, self).write(vals)
-        if not self.env.context.get('dontcall_function'):
+        # A drag saves several line updates together. Normalize only after all
+        # commands have finished, never while an individual line is being saved.
+        if 'order_line' in vals and not self.env.context.get('dontcall_function'):
             self.reorder_sequence()
         return orders
 
@@ -220,15 +215,6 @@ class SaleOrderLine(models.Model):
     def _compute_hgr_plain_description(self):
         for line in self:
             line.hgr_plain_description = _plain_description(line.name)
-
-    def write(self, vals):
-        res = super().write(vals)
-        dontcall_function = self.env.context.get('dontcall_function')
-        if not dontcall_function:
-            for rec in self:
-                order_id = rec.order_id
-                order_id.reorder_sequence()
-        return res
 
     def _prepare_invoice_line(self, **optional_values):
         vals = super()._prepare_invoice_line(**optional_values)

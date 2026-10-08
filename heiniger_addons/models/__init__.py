@@ -14,3 +14,4 @@ from . import project
 
 from . import ir_actions_report
 from . import note_pdf_attachments
+from . import ir_module_module

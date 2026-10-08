@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="din5008_sender_address" inherit_id="l10n_din5008.external_layout_din5008">
+        <xpath expr="//div[@id='din5008_report_main_address']/div[@class='colored_address']" position="replace">
+            <div class="colored_address">
+                <span t-if="company.name" t-field="company.name"/>
+                <t t-if="company.street">
+                    <span t-if="company.name">|</span> <span t-field="company.street"/>
+                </t>
+                <t t-if="company.street2">
+                    <span t-if="company.name or company.street">|</span> <span t-field="company.street2"/>
+                </t>
+                <div t-if="company.zip or company.city or company.country_id">
+                    <span style="white-space: nowrap;">
+                        <span t-if="company.zip" t-field="company.zip"/><t t-if="company.zip and company.city">&#160;</t><span t-if="company.city" t-field="company.city"/>
+                    </span>
+                    <t t-if="company.country_id">
+                        <span t-if="company.zip or company.city">|</span> <span t-field="company.country_id.name"/>
+                    </t>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>
