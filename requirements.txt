@@ -1,1 +1,3 @@
--r heiniger_pdf_editor/requirements.txt
+# Odoo.sh installs this file outside the repository directory.
+# Keep dependencies here directly; do not use relative -r includes.
+PyJWT>=2.10,<3
