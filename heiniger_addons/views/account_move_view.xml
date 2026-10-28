@@ -28,4 +28,17 @@
             </xpath>
         </field>
     </record>
+
+    <record id="hgr_view_in_invoice_tree_discount_due" model="ir.ui.view">
+        <field name="name">account.in.invoice.list.discount.due</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_in_invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="invoice_date_due" position="before">
+                <field name="invoice_discount_date_due"
+                       optional="show"
+                       invisible="payment_state in ('paid', 'in_payment', 'reversed') or state == 'cancel'"/>
+            </field>
+        </field>
+    </record>
 </odoo>

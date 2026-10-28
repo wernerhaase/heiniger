@@ -8,6 +8,13 @@ term uses tax-included early-payment computation, so normal and cash-basis VAT a
 reduced proportionally. The migration is versioned and therefore runs on UAT and
 again on the later production upgrade.
 
+From `19.0.1.11.0`, the term's invoice description explicitly states both discount
+deadlines and the net deadline in English and Swiss German. The custom form labels
+are also validated in Swiss German during the upgrade. Existing invoices and bills
+using the upgraded term have their stored first-discount and net maturity dates
+repaired to 10 and 45 days respectively, and the vendor-bill list exposes the same
+discounted due-date column as the customer-invoice list.
+
 From `sale_order_html_description` `19.0.1.3.2`, its module upgrade also migrates
 legacy HTML invoice labels to their print-description field and removes HTML tags
 from the designated accounting text fields. The upgrade fails if any targeted

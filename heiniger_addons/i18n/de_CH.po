@@ -1614,6 +1614,16 @@ msgid "Second early-payment option"
 msgstr "Zweite Skontooption"
 
 #. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_account_payment_term_form_two_discounts
+msgid "if paid within"
+msgstr "bei Zahlung innerhalb von"
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_account_payment_term_form_two_discounts
+msgid "days"
+msgstr "Tagen"
+
+#. module: heiniger_addons
 #. odoo-python
 #: code:addons/heiniger_addons/models/payment_term.py:0
 msgid "Enable the first early discount before adding a second discount."

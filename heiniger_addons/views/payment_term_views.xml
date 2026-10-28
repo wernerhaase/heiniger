@@ -7,15 +7,17 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='early_pay_discount_computation']/ancestor::div[1]" position="after">
                 <div invisible="not early_discount" class="mt-2">
-                    <field name="hgr_second_early_discount"/>
-                    <span class="ms-2">Second early-payment option</span>
+                    <field name="hgr_second_early_discount" nolabel="1"/>
+                    <label for="hgr_second_early_discount"
+                           string="Second early-payment option" class="ms-2"/>
                     <div invisible="not hgr_second_early_discount" class="mt-1">
                         <field name="hgr_second_discount_percentage"
                                class="text-end o_field_highlight o_input oe_inline"/>
-                        <span> % if paid within </span>
+                        <span>%</span>
+                        <span class="mx-1">if paid within</span>
                         <field name="hgr_second_discount_days"
                                class="text-end o_field_highlight o_input oe_inline"/>
-                        <span> days</span>
+                        <span class="ms-1">days</span>
                     </div>
                 </div>
             </xpath>
