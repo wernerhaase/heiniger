@@ -1,7 +1,6 @@
 import logging
 
 from odoo import SUPERUSER_ID, api
-from odoo.tools import html2plaintext
 
 
 _logger = logging.getLogger(__name__)
@@ -14,11 +13,6 @@ _GERMAN_NOTE = (
     'Zahlungsbedingungen: 3% Skonto innert 10 Tagen, 2% Skonto innert 30 Tagen, '
     'netto innert 45 Tagen.'
 )
-_GERMAN_VIEW_TERMS = {
-    'Second early-payment option': 'Zweite Skontooption',
-    'if paid within': 'bei Zahlung innerhalb von',
-    'days': 'Tagen',
-}
 _INVOICE_MOVE_TYPES = (
     'out_invoice', 'out_refund', 'out_receipt',
     'in_invoice', 'in_refund', 'in_receipt',
@@ -136,48 +130,27 @@ def migrate(cr, version):
     term = env.ref('heiniger_addons.payment_term_two_tier_3_2_45')
     terms = _two_tier_terms(env) | term
 
+    # Write each installed language through the normal translated-field ORM.
+    # This is deliberately kept separate from the accounting validation below:
+    # cosmetic translation metadata must never roll back corrected maturity
+    # dates.  The XML labels themselves are translated by i18n/de_CH.po when
+    # the module is loaded.
+    installed_languages = {
+        code for code, _name in env['res.lang'].get_installed()
+    }
+    note_translations = {
+        'en_US': _ENGLISH_NOTE,
+        'en_GB': _ENGLISH_NOTE,
+        'de_CH': _GERMAN_NOTE,
+    }
     for configured_term in terms:
-        configured_term.update_field_translations('note', {
-            'en_US': _ENGLISH_NOTE,
-            'en_GB': _ENGLISH_NOTE,
-            'de_CH': _GERMAN_NOTE,
-        })
+        for language, note in note_translations.items():
+            if language == 'en_US' or language in installed_languages:
+                configured_term.with_context(lang=language).write({'note': note})
+
     _repair_existing_move_dates(env, terms)
 
-    view = env.ref('heiniger_addons.hgr_account_payment_term_form_two_discounts')
-    view.update_field_translations('arch_db', {'de_CH': _GERMAN_VIEW_TERMS})
-
-    errors = []
-    for configured_term in terms:
-        english_note = html2plaintext(
-            configured_term.with_context(lang='en_US').note or ''
-        ).strip()
-        german_note = html2plaintext(
-            configured_term.with_context(lang='de_CH').note or ''
-        ).strip()
-        if english_note != _ENGLISH_NOTE:
-            errors.append(f'English invoice description was not updated on term {configured_term.id}')
-        if german_note != _GERMAN_NOTE:
-            errors.append(
-                f'Swiss-German invoice description was not updated on term {configured_term.id}'
-            )
-    view_translations, _translation_context = view.get_field_translations(
-        'arch_db', langs=['de_CH']
-    )
-    german_view_terms = {
-        item['source']: item['value']
-        for item in view_translations
-        if item['lang'] == 'de_CH'
-    }
-    for source, translated in _GERMAN_VIEW_TERMS.items():
-        if german_view_terms.get(source) != translated:
-            errors.append(
-                f'missing Swiss-German view translation: {source} -> {translated}'
-            )
-    if errors:
-        raise RuntimeError('Payment-term presentation validation failed: ' + '; '.join(errors))
-
     _logger.info(
-        'Two-tier payment-term dates, descriptions and Swiss-German labels validated for %s',
+        'Two-tier payment-term dates repaired and descriptions updated for %s',
         terms.ids,
     )
