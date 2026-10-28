@@ -1,8 +1,22 @@
-# Local-tested language and legacy-report repair
+# Language, UoM, legacy-report and payment-term repair
 
-Upgrade `heiniger_addons` to 19.0.1.3.0 before this cleanup. This deliberately does
-not run automatically during deployment. Run it in an Odoo shell for the intended
-database only, after verifying the deployed revision and retaining a database backup.
+From `19.0.1.10.0`, the Odoo module upgrade automatically performs this cleanup,
+stores a timestamped metadata backup under
+`/home/odoo/data/hgr-migration-backups/languages`, and configures the legacy
+`3/30 Netto` term as 3% in 10 days, 2% in 30 days and net in 45 days. The payment
+term uses tax-included early-payment computation, so normal and cash-basis VAT are
+reduced proportionally. The migration is versioned and therefore runs on UAT and
+again on the later production upgrade.
+
+From `sale_order_html_description` `19.0.1.3.2`, its module upgrade also migrates
+legacy HTML invoice labels to their print-description field and removes HTML tags
+from the designated accounting text fields. The upgrade fails if any targeted
+legacy value remains.
+
+The manual shell command below remains available for an exceptional rerun.
+
+For a manual rerun, use an Odoo shell for the intended database only after verifying
+the deployed revision and retaining a database backup.
 
 ```python
 from odoo.addons.heiniger_addons.tools.repair_languages import repair
