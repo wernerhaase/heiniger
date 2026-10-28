@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hgr_view_move_form_analytic_distribution" model="ir.ui.view">
+        <field name="name">account.move.form.analytic.distribution</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_reference" position="after">
+                <field name="analytic_distribution"
+                       widget="analytic_distribution"
+                       groups="analytic.group_analytic_accounting"
+                       options="{'business_domain': 'bill', 'amount_field': 'amount_untaxed'}"
+                       invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt')"
+                       readonly="state != 'draft'"/>
+            </field>
+
+            <xpath expr="//div[@name='due_date']" position="after">
+                <field name="hgr_payment_discount_summary"
+                       widget="html"
+                       class="text-danger fw-bold"
+                       readonly="1"
+                       invisible="not hgr_payment_discount_summary"/>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='analytic_distribution']"
+                   position="attributes">
+                <attribute name="options">{'product_field': 'product_id', 'account_field': 'account_id', 'amount_field': 'price_subtotal'}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

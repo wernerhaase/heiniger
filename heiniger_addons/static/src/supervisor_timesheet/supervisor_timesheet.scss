@@ -1,0 +1,44 @@
+.o_hgr_supervisor_timesheet {
+    background: var(--o-view-background-color, #f8f9fa);
+
+    .card {
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: .75rem;
+    }
+
+    .card-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .form-control,
+    .form-select,
+    .o_record_selector {
+        min-height: 42px;
+    }
+
+    .o_hgr_hours_column {
+        width: 150px;
+    }
+
+    .o_hgr_remove_column {
+        width: 54px;
+    }
+
+    tbody td {
+        min-width: 230px;
+        padding-top: .8rem;
+        padding-bottom: .8rem;
+    }
+
+    tbody td:nth-child(2) {
+        min-width: 320px;
+    }
+
+    tbody td:nth-child(3) {
+        min-width: 140px;
+    }
+
+    tbody td:last-child {
+        min-width: 54px;
+    }
+}

@@ -6,6 +6,29 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+			<xpath expr="//div[@name='button_box']" position="inside">
+				<field name="hgr_has_timesheet_project" invisible="1"/>
+				<button name="action_open_hgr_supervisor_timesheet"
+						type="object"
+						class="oe_stat_button"
+						icon="fa-clock-o"
+						invisible="not hgr_has_timesheet_project"
+						groups="hr_timesheet.group_hr_timesheet_approver">
+					<div class="o_stat_info">
+						<span class="o_stat_text">Enter Timesheets</span>
+					</div>
+				</button>
+				<button name="action_open_hgr_profitability"
+						type="object"
+						class="oe_stat_button"
+						icon="fa-line-chart"
+						invisible="not hgr_has_timesheet_project"
+						groups="project.group_project_manager,account.group_account_invoice,account.group_account_readonly">
+					<div class="o_stat_info">
+						<span class="o_stat_text">Profitability</span>
+					</div>
+				</button>
+			</xpath>
             <field name="payment_term_id" position="after">
                 <field name="hgr_object_id" readonly="state in ('done','cancel')"/>
                 <field name="hgr_subject" readonly="state in ('done','cancel')"/>

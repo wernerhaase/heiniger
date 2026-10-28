@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="heiniger_addons.SupervisorTimesheet">
+        <div class="o_hgr_supervisor_timesheet h-100 overflow-auto">
+            <div class="container-xl py-3 py-lg-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                    <div>
+                        <h2 class="mb-1">Supervisor Timesheet</h2>
+                        <div class="text-muted">Enter the daily work for your team.</div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg px-4"
+                            t-att-disabled="state.saving" t-on-click="save">
+                        <i t-att-class="state.saving ? 'fa fa-spinner fa-spin me-2' : 'fa fa-check me-2'"/>
+                        <t t-if="state.saving">Saving...</t>
+                        <t t-else="">Save Timesheets</t>
+                    </button>
+                </div>
+
+                <section class="card shadow-sm mb-3">
+                    <div class="card-header bg-transparent fw-semibold">Header</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-semibold">Customer</label>
+                                <RecordSelector resId="state.partnerId" resModel="'res.partner'"
+                                    domain="[['customer_rank', '>', 0], ['active', '=', true]]"
+                                    fieldString="labels.customer" placeholder="labels.selectCustomer"
+                                    update="(id) => this.setCustomer(id)"/>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-semibold">Project</label>
+                                <RecordSelector resId="state.projectId" resModel="'project.project'"
+                                    domain="projectDomain" fieldString="labels.project"
+                                    context="{ hgr_show_quote_no: true }"
+                                    placeholder="state.partnerId ? labels.selectProject : labels.selectCustomerFirst"
+                                    update="(id) => this.setProject(id)"/>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-semibold">Supervisor</label>
+                                <RecordSelector resId="state.supervisorId" resModel="'hr.employee'"
+                                    domain="employeeDomain" fieldString="labels.supervisor"
+                                    placeholder="labels.selectSupervisor"
+                                    update="(id) => state.supervisorId = id"/>
+                            </div>
+                            <div class="col-12 col-lg-3">
+                                <label class="form-label fw-semibold">Date</label>
+                                <input type="date" class="form-control" t-model="state.date"/>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card shadow-sm mb-3">
+                    <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+                        <span class="fw-semibold">Worker Lines</span>
+                        <button type="button" class="btn btn-outline-primary" t-on-click="addLine">
+                            <i class="fa fa-plus me-1"/> Add Worker
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-3">Worker</th>
+                                    <th>Service</th>
+                                    <th class="o_hgr_hours_column">Time (Hours)</th>
+                                    <th>Work Description</th>
+                                    <th class="o_hgr_remove_column"/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="state.lines" t-as="line" t-key="line.key">
+                                    <td class="ps-3">
+                                        <RecordSelector resId="line.employeeId" resModel="'hr.employee'"
+                                            domain="employeeDomain" fieldString="labels.worker"
+                                            placeholder="labels.selectWorker"
+                                            update="(id) => this.setWorker(line, id)"/>
+                                    </td>
+                                    <td>
+                                        <select class="form-select" t-att-disabled="!line.employeeId || !state.projectId || state.loadingServices"
+                                                t-on-change="(event) => this.setService(line, event)">
+                                            <option value="" t-att-selected="!line.saleLineId &amp;&amp; !line.isManualService">
+                                                <t t-if="state.loadingServices">Loading services...</t>
+                                                <t t-elif="!state.projectId">Select a project first</t>
+                                                <t t-elif="!line.employeeId">Select a worker first</t>
+                                                <t t-elif="!state.serviceLines.length">No service items found on the linked sales orders</t>
+                                                <t t-else="">Select service...</t>
+                                            </option>
+                                            <option t-foreach="state.serviceLines" t-as="service" t-key="service.id"
+                                                    t-att-value="service.id" t-att-selected="line.saleLineId === service.id"
+                                                    t-out="service.name"/>
+                                            <option value="manual" t-att-selected="line.isManualService">Other / Manual service</option>
+                                        </select>
+                                        <input t-if="line.isManualService" type="text" class="form-control mt-2"
+                                            placeholder="Enter service name..." t-model="line.manualServiceName"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" min="0.01" max="24" step="0.25"
+                                            class="form-control" placeholder="0.00" t-model="line.hours"/>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control"
+                                            placeholder="What work was completed?" t-model="line.description"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-link text-danger"
+                                                title="Remove line" t-on-click="() => this.removeLine(line.key)">
+                                            <i class="fa fa-trash"/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button type="button" class="btn btn-outline-primary" t-on-click="addLine">
+                            <i class="fa fa-plus me-1"/> Add Another Worker
+                        </button>
+                    </div>
+                </section>
+
+                <section class="card shadow-sm">
+                    <div class="card-body">
+                        <label class="form-label fw-semibold">Overall Description</label>
+                        <textarea class="form-control" rows="4"
+                            placeholder="General notes about the workday..." t-model="state.description"/>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </t>
+</templates>

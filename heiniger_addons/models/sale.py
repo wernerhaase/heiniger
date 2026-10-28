@@ -17,6 +17,41 @@ class Saleorder(models.Model):
 	hgr_insurance_record_date = fields.Date(string="Date")
 	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True,readonly=False)
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
+	hgr_has_timesheet_project = fields.Boolean(
+		compute='_compute_hgr_has_timesheet_project', export_string_translation=False,
+	)
+
+	@api.depends('project_id', 'project_ids')
+	def _compute_hgr_has_timesheet_project(self):
+		for order in self:
+			order.hgr_has_timesheet_project = bool(
+				order.project_id or order.sudo().project_ids
+			)
+
+	def action_open_hgr_supervisor_timesheet(self):
+		self.ensure_one()
+		project = self.project_id or self.sudo().project_ids[:1]
+		action = self.env['ir.actions.actions']._for_xml_id(
+			'heiniger_addons.action_hgr_supervisor_timesheet'
+		)
+		action['context'] = {
+			'default_partner_id': self.partner_id.commercial_partner_id.id,
+			'default_project_id': project.id or False,
+			'default_company_id': (project.company_id or self.company_id).id,
+		}
+		return action
+
+	def action_open_hgr_profitability(self):
+		self.ensure_one()
+		project = self.project_id or self.sudo().project_ids[:1]
+		action = self.env['ir.actions.actions']._for_xml_id(
+			'heiniger_addons.action_hgr_project_profitability'
+		)
+		action['context'] = {
+			'default_project_id': project.id or False,
+			'default_sale_order_id': self.id,
+		}
+		return action
 
 	# @api.model
 	# def create(self, vals):

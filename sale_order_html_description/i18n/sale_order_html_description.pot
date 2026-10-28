@@ -213,3 +213,37 @@ msgstr ""
 #: model:ir.model,name:sale_order_html_description.model_sale_order_line
 msgid "Sales Order Line"
 msgstr ""
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Line actions"
+msgstr ""
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+msgid "Edit line"
+msgstr ""
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Insert product below"
+msgstr ""
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Insert note below"
+msgstr ""
+
+#. module: sale_order_html_description
+#. odoo-javascript
+#: code:addons/sale_order_html_description/static/src/xml/line_insert.xml:0
+#: code:addons/sale_order_html_description/static/src/js/line_insert.js:0
+msgid "Insert section below"
+msgstr ""

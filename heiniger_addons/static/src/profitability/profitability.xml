@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="heiniger_addons.ProjectProfitability">
+        <div class="o_hgr_profitability h-100 overflow-auto">
+            <div class="container-fluid py-3 py-lg-4 px-lg-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                    <div>
+                        <h2 class="mb-1">Project Profitability</h2>
+                        <div class="text-muted">Labour, vendor bills, revenue, and margin by analytic account.</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary" t-att-disabled="state.loading" t-on-click="openManualMode">
+                            <i class="fa fa-pencil me-2"/>Manual Mode
+                        </button>
+                        <button type="button" class="btn btn-primary" t-att-disabled="state.loading" t-on-click="load">
+                            <i t-att-class="state.loading ? 'fa fa-spinner fa-spin me-2' : 'fa fa-refresh me-2'"/>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <section class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-semibold">Project</label>
+                                <RecordSelector resId="state.projectId" resModel="'project.project'"
+                                    domain="projectDomain" fieldString="labels.project"
+                                    context="{ hgr_show_quote_no: true }" placeholder="labels.selectProject"
+                                    update="(id) => this.setProject(id)"/>
+                            </div>
+                            <div class="col-6 col-lg-2">
+                                <label class="form-label fw-semibold">From</label>
+                                <input type="date" class="form-control" t-model="state.dateFrom"/>
+                            </div>
+                            <div class="col-6 col-lg-2">
+                                <label class="form-label fw-semibold">To</label>
+                                <input type="date" class="form-control" t-model="state.dateTo"/>
+                            </div>
+                            <div class="col-12 col-lg-2 d-grid">
+                                <button type="button" class="btn btn-outline-primary" t-on-click="load">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section t-if="state.manualOpen" class="card shadow-sm mb-3 border-warning o_hgr_manual_entry">
+                    <div class="card-header bg-warning-subtle d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold">Manual Mode</div>
+                            <small>Automatic timesheets and vendor bills cannot be edited here.</small>
+                        </div>
+                        <button type="button" class="btn-close" aria-label="Close" t-on-click="closeManualMode"/>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning py-2">
+                            Manual entries require two validations. First validate against existing records, then confirm and save.
+                        </div>
+                        <div class="btn-group mb-3" role="group" aria-label="Manual entry type">
+                            <button type="button" t-att-class="state.manual.entryType === 'labour' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setManualType('labour')">Labour</button>
+                            <button type="button" t-att-class="state.manual.entryType === 'material' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setManualType('material')">Material Cost</button>
+                        </div>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label fw-semibold">Date</label>
+                                <input type="date" class="form-control" t-model="state.manual.date" t-on-input="resetManualValidation"/>
+                            </div>
+                            <t t-if="state.manual.entryType === 'labour'">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Employee</label>
+                                    <RecordSelector resId="state.manual.employeeId" resModel="'hr.employee'"
+                                        domain="manualEmployeeDomain" fieldString="labels.employee"
+                                        placeholder="labels.selectEmployee" update="(id) => this.setManualEmployee(id)"/>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label fw-semibold">Service</label>
+                                    <select class="form-select" t-on-change="setManualService">
+                                        <option value="" t-att-selected="!state.manual.saleLineId &amp;&amp; !state.manual.isManualService">Select service...</option>
+                                        <option t-foreach="state.manualOptions.services" t-as="service" t-key="service.id"
+                                                t-att-value="service.id" t-att-selected="state.manual.saleLineId === service.id" t-out="service.name"/>
+                                        <option value="manual" t-att-selected="state.manual.isManualService">Other / Manual service</option>
+                                    </select>
+                                    <input t-if="state.manual.isManualService" type="text" class="form-control mt-2"
+                                        placeholder="Enter service name..." t-model="state.manual.manualServiceName"
+                                        t-on-input="resetManualValidation"/>
+                                </div>
+                                <div class="col-12 col-md-2">
+                                    <label class="form-label fw-semibold">Hours</label>
+                                    <input type="number" min="0.01" max="24" step="0.25" class="form-control"
+                                        t-model="state.manual.hours" t-on-input="resetManualValidation"/>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Material Cost</label>
+                                    <input type="number" min="0.01" step="0.01" class="form-control"
+                                        t-model="state.manual.amount" t-on-input="resetManualValidation"/>
+                                </div>
+                            </t>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Description</label>
+                                <input type="text" class="form-control" t-model="state.manual.description"
+                                    t-on-input="resetManualValidation" placeholder="Reason and supporting reference..."/>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mt-3">
+                            <span t-if="state.manualValidated" class="badge text-bg-success me-auto"><i class="fa fa-check me-1"/>First validation passed</span>
+                            <button type="button" class="btn btn-outline-secondary" t-on-click="closeManualMode">Cancel</button>
+                            <button t-if="!state.manualValidated" type="button" class="btn btn-warning" t-on-click="validateManualEntry">1. Validate Entry</button>
+                            <button t-else="" type="button" class="btn btn-success" t-on-click="saveManualEntry">2. Confirm &amp; Save</button>
+                        </div>
+                    </div>
+                </section>
+
+                <div t-if="state.loading" class="o_hgr_loading text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-2x text-primary"/>
+                    <div class="text-muted mt-2">Loading profitability...</div>
+                </div>
+
+                <t t-elif="state.data">
+                    <nav class="o_hgr_report_tabs mb-3" aria-label="Profitability report sections">
+                        <div class="nav nav-tabs flex-nowrap overflow-auto">
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'summary' }" t-on-click="() => this.setActiveTab('summary')">Cost Summary</button>
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'labour' }" t-on-click="() => this.setActiveTab('labour')">Labour</button>
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'material' }" t-on-click="() => this.setActiveTab('material')">Material</button>
+                        </div>
+                    </nav>
+
+                    <t t-if="state.activeTab === 'summary'">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Quoted Amount</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.quoted_amount)"/>
+                        </div></div></div>
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Invoiced Revenue</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.revenue_posted)"/>
+                        </div></div></div>
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Actual Hours</div><div class="fs-4 fw-semibold" t-out="formatNumber(state.data.totals.actual_hours)"/>
+                        </div></div></div>
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Total Cost</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.total_cost)"/>
+                        </div></div></div>
+                        <div class="col-12 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi" t-att-class="state.data.totals.margin &lt; 0 ? 'border-danger' : 'border-success'"><div class="card-body">
+                            <div class="text-muted">Margin</div>
+                            <div t-att-class="state.data.totals.margin &lt; 0 ? 'fs-4 fw-semibold text-danger' : 'fs-4 fw-semibold text-success'">
+                                <t t-out="formatMoney(state.data.totals.margin)"/> <small t-out="formatPercent(state.data.totals.margin_percent)"/>
+                            </div>
+                        </div></div></div>
+                    </div>
+
+                    <section class="card shadow-sm mb-3">
+                        <div class="card-header bg-transparent fw-semibold">Projects</div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr>
+                                    <th class="ps-3">Project</th><th>Analytic Account</th>
+                                    <th class="text-end">Quoted Hours</th><th class="text-end">Actual Hours</th>
+                                    <th class="text-end">Labour Cost</th><th class="text-end">Vendor Bill Cost</th>
+                                    <th class="text-end">Invoiced Revenue</th><th class="text-end">Margin</th>
+                                </tr></thead>
+                                <tbody>
+                                    <tr t-foreach="state.data.projects" t-as="project" t-key="project.id" t-on-click="() => this.selectProject(project.id)" class="o_hgr_project_row">
+                                        <td class="ps-3"><div class="fw-semibold" t-out="project.name"/><small class="text-muted" t-out="project.customer"/></td>
+                                        <td t-out="project.analytic_account"/>
+                                        <td class="text-end" t-out="formatNumber(project.quoted_hours)"/>
+                                        <td class="text-end" t-out="formatNumber(project.actual_hours)"/>
+                                        <td class="text-end" t-out="formatMoney(project.labor_cost, project.currency_id)"/>
+                                        <td class="text-end"><t t-out="formatMoney(project.vendor_cost_posted, project.currency_id)"/><small t-if="project.vendor_cost_draft" class="d-block text-muted">Draft: <t t-out="formatMoney(project.vendor_cost_draft, project.currency_id)"/></small><small t-if="project.manual_material_cost" class="d-block text-warning">Manual: <t t-out="formatMoney(project.manual_material_cost, project.currency_id)"/></small></td>
+                                        <td class="text-end" t-out="formatMoney(project.revenue_posted, project.currency_id)"/>
+                                        <td t-att-class="project.margin &lt; 0 ? 'text-end fw-semibold text-danger' : 'text-end fw-semibold text-success'" t-out="formatMoney(project.margin, project.currency_id)"/>
+                                    </tr>
+                                    <tr t-if="!state.data.projects.length"><td colspan="8" class="text-center text-muted py-4">No projects with an analytic account were found.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    </t>
+
+                    <t t-if="state.activeTab === 'labour'">
+                        <section class="card shadow-sm">
+                            <div class="card-header bg-transparent d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <div><div class="fw-semibold">Labour Effort</div><small class="text-muted">Detailed time entries corresponding to the Excel labour sheets.</small></div>
+                                <div class="d-flex gap-2">
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Labour view">
+                                        <button type="button" t-att-class="state.labourView === 'detail' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('detail')">Detailed</button>
+                                        <button type="button" t-att-class="state.labourView === 'service' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('service')">Group by Service</button>
+                                    </div>
+                                    <button t-if="timesheetLines.length" type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.openTimesheets()">Open Timesheets</button>
+                                </div>
+                            </div>
+                            <div t-if="state.labourView === 'detail'" class="table-responsive o_hgr_detail_table"><table class="table table-hover table-sm align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Date</th><th>Employee</th><th>Service</th><th>Task / Trade</th><th>Description</th><th class="text-end">Hours</th><th class="text-end">Cost</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="timesheetLines" t-as="line" t-key="line.id">
+                                        <td class="ps-3" t-out="line.project_name"/><td t-out="line.date"/><td t-out="line.employee"/><td t-out="line.service"/><td t-out="line.task"/><td t-out="line.description"/>
+                                        <td class="text-end" t-out="formatNumber(line.hours)"/><td class="text-end" t-out="formatMoney(line.cost, line.currency_id)"/>
+                                    </tr>
+                                    <tr t-if="!timesheetLines.length"><td colspan="8" class="text-center text-muted py-4">No timesheets.</td></tr>
+                                </tbody>
+                            </table></div>
+                            <div t-else="" class="table-responsive o_hgr_detail_table"><table class="table table-hover align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Service</th><th class="text-end">Entries</th><th class="text-end">Hours Spent</th><th class="text-end">Labour Cost</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="serviceSummary" t-as="service" t-key="service.key">
+                                        <td class="ps-3" t-out="service.project_name"/><td class="fw-semibold" t-out="service.service"/><td class="text-end" t-out="service.entries"/><td class="text-end" t-out="formatNumber(service.hours)"/><td class="text-end" t-out="formatMoney(service.cost, service.currency_id)"/>
+                                    </tr>
+                                    <tr t-if="!serviceSummary.length"><td colspan="5" class="text-center text-muted py-4">No service hours found.</td></tr>
+                                </tbody>
+                            </table></div>
+                        </section>
+                    </t>
+
+                    <t t-if="state.activeTab === 'material'">
+                        <section class="card shadow-sm">
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                                <div><div class="fw-semibold">Material Effort</div><small class="text-muted">Vendor bill lines allocated to the project analytic account.</small></div>
+                                <button t-if="materialLines.length" type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.openVendorBills()">Open Vendor Bills</button>
+                            </div>
+                            <div class="table-responsive o_hgr_detail_table"><table class="table table-hover table-sm align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Date</th><th>Vendor</th><th>Invoice</th><th>Product</th><th>Description</th><th class="text-end">Allocation</th><th class="text-end">Amount</th><th>State</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="materialLines" t-as="line" t-key="line.key">
+                                        <td class="ps-3" t-out="line.project_name"/><td t-out="line.date"/><td t-out="line.vendor"/><td t-out="line.invoice"/><td t-out="line.product"/><td t-out="line.description"/>
+                                        <td class="text-end" t-out="formatPercent(line.allocation_percent)"/><td class="text-end" t-out="formatMoney(line.allocated_amount, line.currency_id)"/>
+                                        <td><span t-att-class="line.state === 'posted' ? 'badge text-bg-success' : (line.state === 'manual' ? 'badge text-bg-warning' : 'badge text-bg-secondary')"><t t-if="line.state === 'posted'">Posted</t><t t-elif="line.state === 'manual'">Manual</t><t t-else="">Draft</t></span></td>
+                                    </tr>
+                                    <tr t-if="!materialLines.length"><td colspan="9" class="text-center text-muted py-4">No allocated vendor bill lines.</td></tr>
+                                </tbody>
+                            </table></div>
+                        </section>
+                    </t>
+
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

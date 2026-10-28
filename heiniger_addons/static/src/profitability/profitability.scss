@@ -1,0 +1,63 @@
+.o_hgr_profitability {
+    background: var(--o-view-background-color, #f8f9fa);
+
+    .card {
+        border-color: var(--border-color, #dee2e6);
+        border-radius: .75rem;
+    }
+
+    .o_hgr_kpi {
+        min-width: 190px;
+    }
+
+    .form-control,
+    .form-select,
+    .o_record_selector {
+        min-height: 42px;
+    }
+
+    .o_hgr_manual_entry {
+        border-width: 2px;
+    }
+
+    .o_hgr_project_row {
+        cursor: pointer;
+    }
+
+    .o_hgr_detail_table {
+        max-height: 520px;
+    }
+
+    .o_hgr_report_tabs {
+        border-bottom: 1px solid var(--border-color, #dee2e6);
+
+        .nav-tabs {
+            border-bottom: 0;
+            gap: .25rem;
+        }
+
+        .nav-link {
+            flex: 0 0 auto;
+            color: var(--o-main-text-color, #212529);
+            background: var(--o-view-background-color, #fff);
+            border: 1px solid var(--border-color, #dee2e6);
+            border-bottom: 0;
+            border-radius: .5rem .5rem 0 0;
+            padding: .65rem 1.15rem;
+        }
+
+        .nav-link.active {
+            color: var(--o-brand-primary, #714b67);
+            font-weight: 600;
+            box-shadow: inset 0 -3px 0 var(--o-brand-primary, #714b67);
+        }
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--o-view-background-color, #fff);
+        white-space: nowrap;
+    }
+}

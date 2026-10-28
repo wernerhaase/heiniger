@@ -7,7 +7,8 @@ from . import sale
 from . import base_layout
 from . import product
 from . import account_move
-# from . import timesheet
+from . import payment_term
+from . import timesheet
 from . import project
 
 
