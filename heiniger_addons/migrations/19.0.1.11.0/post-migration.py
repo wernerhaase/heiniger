@@ -1,6 +1,7 @@
 import logging
 
 from odoo import SUPERUSER_ID, api
+from odoo.tools import html2plaintext
 
 
 _logger = logging.getLogger(__name__)
@@ -135,9 +136,12 @@ def migrate(cr, version):
     term = env.ref('heiniger_addons.payment_term_two_tier_3_2_45')
     terms = _two_tier_terms(env) | term
 
-    terms.with_context(lang='en_US').write({'note': _ENGLISH_NOTE})
-    terms.with_context(lang='en_GB').write({'note': _ENGLISH_NOTE})
-    terms.with_context(lang='de_CH').write({'note': _GERMAN_NOTE})
+    for configured_term in terms:
+        configured_term.update_field_translations('note', {
+            'en_US': _ENGLISH_NOTE,
+            'en_GB': _ENGLISH_NOTE,
+            'de_CH': _GERMAN_NOTE,
+        })
     _repair_existing_move_dates(env, terms)
 
     view = env.ref('heiniger_addons.hgr_account_payment_term_form_two_discounts')
@@ -145,16 +149,31 @@ def migrate(cr, version):
 
     errors = []
     for configured_term in terms:
-        if configured_term.with_context(lang='en_US').note != _ENGLISH_NOTE:
+        english_note = html2plaintext(
+            configured_term.with_context(lang='en_US').note or ''
+        ).strip()
+        german_note = html2plaintext(
+            configured_term.with_context(lang='de_CH').note or ''
+        ).strip()
+        if english_note != _ENGLISH_NOTE:
             errors.append(f'English invoice description was not updated on term {configured_term.id}')
-        if configured_term.with_context(lang='de_CH').note != _GERMAN_NOTE:
+        if german_note != _GERMAN_NOTE:
             errors.append(
                 f'Swiss-German invoice description was not updated on term {configured_term.id}'
             )
-    german_arch = view.with_context(lang='de_CH').arch_db
-    for translated in _GERMAN_VIEW_TERMS.values():
-        if translated not in german_arch:
-            errors.append(f'missing Swiss-German view translation: {translated}')
+    view_translations, _translation_context = view.get_field_translations(
+        'arch_db', langs=['de_CH']
+    )
+    german_view_terms = {
+        item['source']: item['value']
+        for item in view_translations
+        if item['lang'] == 'de_CH'
+    }
+    for source, translated in _GERMAN_VIEW_TERMS.items():
+        if german_view_terms.get(source) != translated:
+            errors.append(
+                f'missing Swiss-German view translation: {source} -> {translated}'
+            )
     if errors:
         raise RuntimeError('Payment-term presentation validation failed: ' + '; '.join(errors))
 
