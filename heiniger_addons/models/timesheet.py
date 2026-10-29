@@ -122,10 +122,9 @@ class HgrSupervisorTimesheet(models.Model):
                 or (not sale_line and not manual_service_name)
                 or not work_category
                 or hours <= 0
-                or not description
             ):
                 raise ValidationError(_(
-                    'Every line needs a worker, service, work category, positive hours, and a work description.'
+                    'Every line needs a worker, service, work category, and positive hours.'
                 ))
             if sale_line and sale_line not in allowed_sale_lines:
                 raise ValidationError(_(
@@ -160,6 +159,13 @@ class HgrSupervisorTimesheet(models.Model):
             'line_ids': line_commands,
         })
         for line in sheet.line_ids:
+            timesheet_description = (
+                line.name
+                or line.work_category_id.display_name
+                or line.manual_service_name
+                or line.sale_line_id.display_name
+                or _('Timesheet')
+            )
             line.timesheet_id = self.env['account.analytic.line'].create({
                 'date': sheet.date,
                 'project_id': sheet.project_id.id,
@@ -169,7 +175,7 @@ class HgrSupervisorTimesheet(models.Model):
                 'hgr_manual_service_name': line.manual_service_name,
                 'hgr_work_category_id': line.work_category_id.id,
                 'unit_amount': line.unit_amount,
-                'name': line.name,
+                'name': timesheet_description,
                 'hgr_supervisor_sheet_id': sheet.id,
             })
         return {'id': sheet.id, 'count': len(sheet.line_ids)}
@@ -191,7 +197,7 @@ class HgrSupervisorTimesheetLine(models.Model):
         ondelete='restrict', index=True,
     )
     unit_amount = fields.Float(string='Time (Hours)', required=True)
-    name = fields.Char(string='Work Description', required=True)
+    name = fields.Char(string='Work Description')
     timesheet_id = fields.Many2one('account.analytic.line', readonly=True, ondelete='set null')
 
 class AccountAnalyticLine(models.Model):

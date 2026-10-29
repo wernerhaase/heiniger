@@ -556,6 +556,10 @@ class Project(models.Model):
             } | set(draft_vendor_lines.move_id.ids)),
             'timesheet_count': len(timesheets),
             'invoice_count': len(revenue_lines.move_id),
+            'sale_order_ids': orders.ids,
+            'invoice_ids': revenue_lines.filtered_domain([
+                ('parent_state', '=', 'posted'),
+            ]).move_id.ids,
             'vendor_details': vendor_details,
             'manual_material_details': manual_material_details,
             'timesheet_details': timesheet_details,

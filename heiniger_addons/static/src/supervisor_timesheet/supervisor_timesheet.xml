@@ -65,7 +65,7 @@
                                     <th>Service</th>
                                     <th>Work Category</th>
                                     <th class="o_hgr_hours_column">Time (Hours)</th>
-                                    <th>Work Description</th>
+                                    <th>Work Description (Optional)</th>
                                     <th class="o_hgr_remove_column"/>
                                 </tr>
                             </thead>
@@ -96,10 +96,16 @@
                                             placeholder="Enter service name..." t-model="line.manualServiceName"/>
                                     </td>
                                     <td>
-                                        <RecordSelector resId="line.workCategoryId" resModel="'hgr.work.category'"
-                                            domain="[['active', '=', true]]" fieldString="labels.workCategory"
-                                            placeholder="labels.selectWorkCategory"
-                                            update="(id) => line.workCategoryId = id"/>
+                                        <select class="form-select o_hgr_category_select"
+                                                t-att-class="selectedWorkCategoryClass(line.workCategoryId)"
+                                                t-on-change="(event) => this.setWorkCategory(line, event)">
+                                            <option value="" t-att-selected="!line.workCategoryId">Select work category...</option>
+                                            <option t-foreach="state.workCategories" t-as="category" t-key="category.id"
+                                                    t-att-value="category.id"
+                                                    t-att-selected="line.workCategoryId === category.id"
+                                                    t-att-class="workCategoryClass(category)"
+                                                    t-out="category.name"/>
+                                        </select>
                                     </td>
                                     <td>
                                         <input type="number" min="0.01" max="24" step="0.25"
@@ -107,7 +113,7 @@
                                     </td>
                                     <td>
                                         <input type="text" class="form-control"
-                                            placeholder="What work was completed?" t-model="line.description"/>
+                                            placeholder="Optional notes about the work..." t-model="line.description"/>
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-link text-danger"

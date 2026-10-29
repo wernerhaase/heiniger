@@ -188,3 +188,13 @@ class TestSupervisorTimesheet(TransactionCase):
 
         with self.assertRaises(ValidationError):
             self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
+
+    def test_work_description_is_optional(self):
+        payload = self.payload()
+        payload['lines'][0]['name'] = ''
+
+        result = self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
+        sheet = self.env['hgr.supervisor.timesheet'].browse(result['id'])
+
+        self.assertFalse(sheet.line_ids.name)
+        self.assertEqual(sheet.timesheet_ids.name, self.work_category.display_name)

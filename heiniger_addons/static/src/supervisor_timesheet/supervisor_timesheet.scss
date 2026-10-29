@@ -24,6 +24,33 @@
         width: 54px;
     }
 
+    .o_hgr_category_select {
+        border-width: 2px;
+        border-radius: 999px;
+        font-weight: 600;
+        transition: background-color .15s ease, border-color .15s ease;
+    }
+
+    @each $index, $color in (
+        1: #ef6f6c,
+        2: #f2a65a,
+        3: #e8c547,
+        4: #79c267,
+        5: #45b7a8,
+        6: #5eb5e6,
+        7: #6c8ae4,
+        8: #9474d1,
+        9: #c06cce,
+        10: #df6fa8,
+        11: #8b9aa8
+    ) {
+        .o_hgr_category_color_#{$index} {
+            border-color: $color;
+            background-color: color-mix(in srgb, $color 18%, white);
+            color: color-mix(in srgb, $color 65%, #1f2937);
+        }
+    }
+
     tbody td {
         min-width: 230px;
         padding-top: .8rem;

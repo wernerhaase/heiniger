@@ -486,10 +486,10 @@ msgstr "Einträge"
 #: code:addons/heiniger_addons/models/timesheet.py:0
 #: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
 msgid ""
-"Every line needs a worker, service, positive hours, and a work description."
+"Every line needs a worker, service, work category, and positive hours."
 msgstr ""
-"Jede Zeile benötigt einen Mitarbeiter, eine Dienstleistung, positive Stunden "
-"und eine Arbeitsbeschreibung."
+"Jede Zeile benötigt einen Mitarbeiter, eine Dienstleistung, eine "
+"Arbeitskategorie und positive Stunden."
 
 #. module: heiniger_addons
 #. odoo-javascript
@@ -1442,6 +1442,12 @@ msgid "Total Cost"
 msgstr "Gesamtkosten"
 
 #. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Total"
+msgstr "Total"
+
+#. module: heiniger_addons
 #: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_crm_lead_form
 msgid "Update"
 msgstr "Aktualisieren"
@@ -1538,8 +1544,8 @@ msgstr ""
 #. module: heiniger_addons
 #. odoo-javascript
 #: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
-msgid "What work was completed?"
-msgstr "Welche Arbeiten wurden ausgeführt?"
+msgid "Optional notes about the work..."
+msgstr "Optionale Bemerkungen zur Arbeit ..."
 
 #. module: heiniger_addons
 #. odoo-javascript
@@ -1547,6 +1553,12 @@ msgstr "Welche Arbeiten wurden ausgeführt?"
 #: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__name
 msgid "Work Description"
 msgstr "Arbeitsbeschreibung"
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Work Description (Optional)"
+msgstr "Arbeitsbeschreibung (optional)"
 
 #. module: heiniger_addons
 #: model:ir.actions.report,name:heiniger_addons.heiniger_timesheet_report_project_task

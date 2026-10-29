@@ -143,13 +143,25 @@
                     <t t-if="state.activeTab === 'summary'">
                     <div class="row g-3 mb-3">
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
-                            <div class="text-muted">Quoted Amount</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.quoted_amount)"/>
+                            <div class="text-muted">Quoted Amount</div>
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="openQuotedOrders">
+                                <span t-out="formatMoney(state.data.totals.quoted_amount)"/>
+                                <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
+                            </button>
                         </div></div></div>
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
-                            <div class="text-muted">Invoiced Revenue</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.revenue_posted)"/>
+                            <div class="text-muted">Invoiced Revenue</div>
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="openCustomerInvoices">
+                                <span t-out="formatMoney(state.data.totals.revenue_posted)"/>
+                                <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
+                            </button>
                         </div></div></div>
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
-                            <div class="text-muted">Actual Hours</div><div class="fs-4 fw-semibold" t-out="formatNumber(state.data.totals.actual_hours)"/>
+                            <div class="text-muted">Actual Hours</div>
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="openTimesheets">
+                                <span t-out="formatNumber(state.data.totals.actual_hours)"/>
+                                <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
+                            </button>
                         </div></div></div>
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
                             <div class="text-muted">Total Cost</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.total_cost)"/>
@@ -258,6 +270,11 @@
                                         <td class="text-end" t-out="formatNumber(line.hours)"/><td class="text-end" t-out="formatMoney(line.cost, line.currency_id)"/>
                                     </tr>
                                     <tr t-if="!timesheetLines.length"><td colspan="8" class="text-center text-muted py-4">No timesheets.</td></tr>
+                                    <tr class="o_hgr_table_total">
+                                        <td colspan="6" class="ps-3 fw-bold">Total</td>
+                                        <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.actual_hours)"/>
+                                        <td class="text-end fw-bold" t-out="formatMoney(state.data.totals.labor_cost)"/>
+                                    </tr>
                                 </tbody>
                             </table></div>
                             <div t-else="" class="table-responsive o_hgr_detail_table"><table class="table table-hover align-middle mb-0">
@@ -267,6 +284,13 @@
                                         <td class="ps-3" t-out="service.project_name"/><td class="fw-semibold" t-out="service.category"/><td class="text-end" t-out="formatNumber(service.quoted_hours)"/><td class="text-end" t-out="formatNumber(service.actual_hours)"/><td class="text-end" t-att-class="service.balance_hours &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatNumber(service.balance_hours)"/><td class="text-end" t-out="formatMoney(service.cost, service.currency_id)"/>
                                     </tr>
                                     <tr t-if="!serviceSummary.length"><td colspan="6" class="text-center text-muted py-4">No tagged labour found.</td></tr>
+                                    <tr class="o_hgr_table_total">
+                                        <td colspan="2" class="ps-3 fw-bold">Total</td>
+                                        <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.quoted_hours)"/>
+                                        <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.actual_hours)"/>
+                                        <td class="text-end fw-bold" t-att-class="state.data.totals.hours_variance &lt; 0 ? 'text-danger' : ''" t-out="formatNumber(state.data.totals.hours_variance)"/>
+                                        <td class="text-end fw-bold" t-out="formatMoney(state.data.totals.labor_cost)"/>
+                                    </tr>
                                 </tbody>
                             </table></div>
                         </section>

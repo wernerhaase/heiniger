@@ -44,19 +44,29 @@ export class HgrSupervisorTimesheet extends Component {
             date: "",
             description: "",
             serviceLines: [],
+            workCategories: [],
             loadingServices: false,
             lines: [this.newLine()],
             saving: false,
         });
         onWillStart(async () => {
-            const defaults = await this.orm.call(
-                "hgr.supervisor.timesheet",
-                "get_entry_defaults",
-                []
-            );
+            const [defaults, workCategories] = await Promise.all([
+                this.orm.call(
+                    "hgr.supervisor.timesheet",
+                    "get_entry_defaults",
+                    []
+                ),
+                this.orm.searchRead(
+                    "hgr.work.category",
+                    [["active", "=", true]],
+                    ["name", "color"],
+                    { order: "name" }
+                ),
+            ]);
             this.state.supervisorId = defaults.supervisor_id;
             this.state.companyId ||= defaults.company_id;
             this.state.date = defaults.date;
+            this.state.workCategories = workCategories;
             if (this.state.projectId) {
                 await this.loadServiceLines();
             }
@@ -157,6 +167,27 @@ export class HgrSupervisorTimesheet extends Component {
         }
     }
 
+    setWorkCategory(line, event) {
+        line.workCategoryId = Number(event.target.value) || false;
+    }
+
+    workCategoryColor(category) {
+        if (!category) {
+            return 0;
+        }
+        return category.color || ((category.id - 1) % 11) + 1;
+    }
+
+    workCategoryClass(category) {
+        const color = this.workCategoryColor(category);
+        return color ? `o_hgr_category_color_${color}` : "";
+    }
+
+    selectedWorkCategoryClass(categoryId) {
+        const category = this.state.workCategories.find((item) => item.id === categoryId);
+        return this.workCategoryClass(category);
+    }
+
     addLine() {
         this.state.lines.push(this.newLine());
     }
@@ -180,10 +211,10 @@ export class HgrSupervisorTimesheet extends Component {
             (line) => !line.employeeId
                 || (!line.saleLineId && !line.manualServiceName.trim())
                 || !line.workCategoryId
-                || Number(line.hours) <= 0 || !line.description.trim()
+                || Number(line.hours) <= 0
         );
         if (invalidLine) {
-            return _t("Every line needs a worker, service, work category, positive hours, and a work description.");
+            return _t("Every line needs a worker, service, work category, and positive hours.");
         }
         return false;
     }

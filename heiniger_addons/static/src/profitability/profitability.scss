@@ -10,6 +10,19 @@
         min-width: 190px;
     }
 
+    .o_hgr_kpi_link {
+        color: inherit;
+        line-height: inherit;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: .2rem;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--o-brand-primary, #714b67);
+        }
+    }
+
     .form-control,
     .form-select,
     .o_record_selector {
@@ -46,6 +59,14 @@
 
     .o_hgr_detail_table {
         max-height: 520px;
+    }
+
+    .o_hgr_table_total {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        background: color-mix(in srgb, var(--o-brand-primary, #714b67) 12%, var(--o-view-background-color, #fff));
+        border-top: 2px solid var(--o-brand-primary, #714b67);
     }
 
     .o_hgr_report_tabs {

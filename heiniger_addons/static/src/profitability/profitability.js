@@ -319,6 +319,32 @@ export class HgrProjectProfitability extends Component {
         });
     }
 
+    openQuotedOrders(project = false) {
+        const projects = project ? [project] : (this.state.data?.projects || []);
+        const ids = [...new Set(projects.flatMap((item) => item.sale_order_ids || []))];
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: _t("Quoted Sales Orders"),
+            res_model: "sale.order",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["id", "in", ids]],
+            context: { create: false },
+        });
+    }
+
+    openCustomerInvoices(project = false) {
+        const projects = project ? [project] : (this.state.data?.projects || []);
+        const ids = [...new Set(projects.flatMap((item) => item.invoice_ids || []))];
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: _t("Customer Invoices"),
+            res_model: "account.move",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["id", "in", ids]],
+            context: { create: false },
+        });
+    }
+
     openTimesheets(project = false) {
         const projects = project ? [project] : (this.state.data?.projects || []);
         const ids = projects.flatMap((item) => item.timesheet_details.map((line) => line.id));
