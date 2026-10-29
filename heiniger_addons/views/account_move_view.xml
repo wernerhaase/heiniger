@@ -68,4 +68,12 @@
             </field>
         </field>
     </record>
+
+    <!-- Load a practical number of customer invoices before pagination. -->
+    <record id="account.action_move_out_invoice_type" model="ir.actions.act_window">
+        <field name="limit">150</field>
+    </record>
+    <record id="account.action_move_out_invoice" model="ir.actions.act_window">
+        <field name="limit">150</field>
+    </record>
 </odoo>
