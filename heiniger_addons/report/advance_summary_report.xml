@@ -21,6 +21,19 @@
     </template>
 
     <template id="hgr_report_invoice_advance_summary" inherit_id="account.report_invoice_document">
+        <!--
+            The standard invoice report floats the totals block.  On long
+            invoices Qt can then render the payment terms beside the totals
+            and even put the terms on the preceding page.  Keep the totals
+            right-aligned, but make them a normal block so everything that
+            follows starts below the complete totals table.
+        -->
+        <xpath expr="//div[@id='right-elements']" position="attributes">
+            <attribute name="t-attf-class">#{'col-5 mt-5' if report_type == 'pdf' else 'col-12 col-md-5'} ms-auto hgr_invoice_totals</attribute>
+        </xpath>
+        <xpath expr="//div[@id='payment_term']" position="attributes">
+            <attribute name="class" add="hgr_invoice_terms" separator=" "/>
+        </xpath>
         <xpath expr="//div[@id='right-elements']//table/t[@t-if='o.tax_totals'][@t-call='account.document_tax_totals']" position="after">
             <t t-if="o.hgr_has_advance_summary">
                 <tr class="hgr_advance_summary_row">

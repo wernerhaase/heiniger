@@ -44,6 +44,21 @@
     text-align: right;
 }
 
+/* Totals must finish before payment terms and contractual text begin. */
+.din_page .page .hgr_invoice_totals {
+    display: block !important;
+    float: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.din_page .page .hgr_invoice_terms {
+    display: block;
+    clear: both;
+    break-before: auto;
+    page-break-before: auto;
+}
+
 /* ── 1. Allow all order-line rows to break across pages ───── */
 .page table.table tbody tr {
     break-inside: auto !important;

@@ -98,3 +98,9 @@ class TestAdvanceSummary(AccountTestInvoicingCommon):
         self.assertIn(b'Invoiced advances', invoice_html)
         self.assertIn(b'hgr_advance_summary_label', invoice_html)
         self.assertIn(b'hgr_advance_summary_value', invoice_html)
+        self.assertIn(b'hgr_invoice_totals', invoice_html)
+        self.assertIn(b'hgr_invoice_terms', invoice_html)
+        self.assertLess(
+            invoice_html.index(b'hgr_invoice_totals'),
+            invoice_html.index(b'hgr_invoice_terms'),
+        )
