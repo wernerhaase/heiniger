@@ -1,5 +1,6 @@
 .o_hgr_profitability {
-    background: var(--o-view-background-color, #f8f9fa);
+    background: $o-webclient-background-color;
+    color: $o-main-text-color;
 
     .card {
         border-color: var(--border-color, #dee2e6);
@@ -65,7 +66,7 @@
         position: sticky;
         bottom: 0;
         z-index: 1;
-        background: color-mix(in srgb, var(--o-brand-primary, #714b67) 12%, var(--o-view-background-color, #fff));
+        background: color-mix(in srgb, var(--o-brand-primary, #714b67) 12%, $o-view-background-color);
         border-top: 2px solid var(--o-brand-primary, #714b67);
     }
 
@@ -79,8 +80,8 @@
 
         .nav-link {
             flex: 0 0 auto;
-            color: var(--o-main-text-color, #212529);
-            background: var(--o-view-background-color, #fff);
+            color: $o-main-text-color;
+            background: $o-view-background-color;
             border: 1px solid var(--border-color, #dee2e6);
             border-bottom: 0;
             border-radius: .5rem .5rem 0 0;
@@ -98,7 +99,12 @@
         position: sticky;
         top: 0;
         z-index: 1;
-        background: var(--o-view-background-color, #fff);
+        background: $o-view-background-color;
+        color: $o-main-text-color;
         white-space: nowrap;
+    }
+
+    .o_hgr_quoted_material_column {
+        min-width: 260px;
     }
 }

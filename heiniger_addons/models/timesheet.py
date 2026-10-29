@@ -1,8 +1,5 @@
-import re
-
 from odoo import api, fields, models, Command, _
 from odoo.exceptions import AccessError, ValidationError
-from odoo.tools import html2plaintext
 
 
 class HgrWorkCategory(models.Model):
@@ -84,48 +81,16 @@ class HgrSupervisorTimesheet(models.Model):
         if project.company_id and project.company_id != self.env.company:
             return []
         sale_lines = self._get_project_service_sale_lines(project)
-        multiple_orders = len(sale_lines.order_id) > 1
-        result = []
-        for line in sale_lines:
-            section = self._get_sale_line_section_text(line)
-            description = (
-                self._first_plain_line(line.name)
-                or line.product_id.display_name
-                or line.display_name
-            )
-            # "Pos. 2 / Freilegearbeiten ..." -> "Pos. 2"
-            position = section.split(' / ', 1)[0] if section else ''
-            label = f"{position} – {description}" if position else description
-            if multiple_orders:
-                label = f"{line.order_id.name} – {label}"
-            result.append({
+        with_order = len(sale_lines.order_id) > 1
+        return [
+            {
                 'id': line.id,
-                'name': label,
-                'section': section,
+                'name': line._hgr_service_label(with_order=with_order),
+                'section': line._hgr_section_text(),
                 'work_category_id': line.hgr_work_category_id.id or False,
-            })
-        return result
-
-    @api.model
-    def _first_plain_line(self, value):
-        # html2plaintext joins <li> items on one line; break on block ends first
-        html = re.sub(r'(?i)</(li|p|div|h\d)>|<br\s*/?>', '\n', value or '')
-        for part in html2plaintext(html).splitlines():
-            part = part.replace('\xa0', ' ').strip(' -*•\t')
-            if part:
-                return part
-        return ''
-
-    @api.model
-    def _get_sale_line_section_text(self, sale_line):
-        """Return the title of the section the SO line sits in, as plain text."""
-        section = False
-        for line in sale_line.order_id.order_line.sorted(lambda l: (l.sequence, l.id)):
-            if line == sale_line:
-                break
-            if line.display_type == 'line_section':
-                section = line
-        return self._first_plain_line(section.name) if section else ''
+            }
+            for line in sale_lines
+        ]
 
     @api.model
     def create_from_ui(self, payload):

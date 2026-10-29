@@ -26,6 +26,22 @@
                    position="attributes">
                 <attribute name="options">{'product_field': 'product_id', 'account_field': 'account_id', 'amount_field': 'price_subtotal'}</attribute>
             </xpath>
+            <!-- Quoted Material is picked inside the analytic distribution popup -->
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='analytic_distribution']" position="after">
+                <field name="hgr_sale_line_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='analytic_distribution']" position="after">
+                <field name="hgr_sale_line_id" column_invisible="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="class" add="hgr_document_line_table" separator=" "/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_subtotal'] | //field[@name='invoice_line_ids']/list/field[@name='price_total']"
+                   position="attributes">
+                <attribute name="class" add="hgr_document_line_amount" separator=" "/>
+                <attribute name="width">150px</attribute>
+            </xpath>
 
             <xpath expr="//group[hasclass('oe_subtotal_footer')]/field[@name='tax_totals']" position="after">
                 <field name="hgr_has_advance_summary" invisible="1"/>

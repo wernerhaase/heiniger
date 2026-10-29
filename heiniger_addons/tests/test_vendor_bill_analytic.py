@@ -107,3 +107,102 @@ class TestVendorBillAnalyticDistribution(TransactionCase):
         )
 
         self.assertIn(analytic_account.id, dict(results))
+
+    def test_analytic_distribution_can_be_searched_by_direct_sale_order(self):
+        customer = self.env['res.partner'].create({
+            'name': 'Sale Order Search Customer',
+            'customer_rank': 1,
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'Direct Sale Order Project Account',
+            'plan_id': self.plan.id,
+        })
+        project = self.env['project.project'].create({
+            'name': 'Direct Sale Order Search Project',
+            'partner_id': customer.id,
+            'account_id': analytic_account.id,
+            'allow_billable': True,
+        })
+        self.env['sale.order'].create({
+            'name': '2026-AN-SEARCH-DIRECT',
+            'partner_id': customer.id,
+            'project_id': project.id,
+        })
+
+        results = self.env['account.analytic.account'].name_search(
+            name='AN-SEARCH-DIRECT',
+        )
+
+        self.assertIn(analytic_account.id, dict(results))
+        self.assertEqual(analytic_account.code, '2026-AN-SEARCH-DIRECT')
+
+    def test_analytic_distribution_can_be_searched_by_project_sale_order(self):
+        customer = self.env['res.partner'].create({
+            'name': 'Project Sale Order Search Customer',
+            'customer_rank': 1,
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'Project Sale Order Account',
+            'plan_id': self.plan.id,
+        })
+        order = self.env['sale.order'].create({
+            'name': '2026-AN-SEARCH-STANDARD',
+            'partner_id': customer.id,
+        })
+        service = self.env['product.product'].create({
+            'name': 'Sale Order Search Service',
+            'type': 'service',
+        })
+        sale_line = self.env['sale.order.line'].create({
+            'order_id': order.id,
+            'product_id': service.id,
+            'product_uom_qty': 1,
+            'price_unit': 100,
+        })
+        self.env['project.project'].create({
+            'name': 'Standard Sale Order Search Project',
+            'partner_id': customer.id,
+            'account_id': analytic_account.id,
+            'allow_billable': True,
+            'sale_line_id': sale_line.id,
+        })
+
+        results = self.env['account.analytic.account'].name_search(
+            name='AN-SEARCH-STANDARD',
+        )
+
+        self.assertIn(analytic_account.id, dict(results))
+        self.assertEqual(analytic_account.code, '2026-AN-SEARCH-STANDARD')
+
+    def test_primary_quotation_reference_tracks_latest_direct_order(self):
+        customer = self.env['res.partner'].create({
+            'name': 'Stable Quotation Customer',
+            'customer_rank': 1,
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'Stable Quotation Project',
+            'plan_id': self.plan.id,
+        })
+        project = self.env['project.project'].create({
+            'name': 'Stable Quotation Project',
+            'partner_id': customer.id,
+            'account_id': analytic_account.id,
+            'allow_billable': True,
+        })
+        for name in ('2026-AN9001', '2026-AN9002'):
+            self.env['sale.order'].create({
+                'name': name,
+                'partner_id': customer.id,
+                'project_id': project.id,
+            })
+
+        self.assertEqual(analytic_account.code, '2026-AN9002')
+
+    def test_quotation_reference_is_not_duplicated_in_display_name(self):
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': '2026-AN-DISPLAY',
+            'code': '2026-AN-DISPLAY',
+            'plan_id': self.plan.id,
+        })
+
+        self.assertEqual(analytic_account.display_name, '2026-AN-DISPLAY')

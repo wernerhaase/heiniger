@@ -3,6 +3,7 @@
     <t t-name="heiniger_addons.SupervisorTimesheet">
         <div class="o_hgr_supervisor_timesheet h-100 overflow-auto">
             <div class="container-xl py-3 py-lg-4">
+                <t t-call="heiniger_addons.HgrBreadcrumbs"/>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                     <div>
                         <h2 class="mb-1">Supervisor Timesheet</h2>

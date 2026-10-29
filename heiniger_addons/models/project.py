@@ -34,6 +34,26 @@ class Task(models.Model):
 class Project(models.Model):
     _inherit = 'project.project'
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        projects = super().create(vals_list)
+        projects._hgr_sync_analytic_quotation_codes()
+        projects._hgr_sync_sale_line_analytic_distributions()
+        return projects
+
+    def write(self, vals):
+        result = super().write(vals)
+        if {'account_id', 'sale_line_id', 'reinvoiced_sale_order_id'} & vals.keys():
+            self._hgr_sync_analytic_quotation_codes()
+            self._hgr_sync_sale_line_analytic_distributions()
+        return result
+
+    def _hgr_sync_sale_line_analytic_distributions(self):
+        orders = self.env['sale.order']
+        for project in self:
+            orders |= project._hgr_profitability_sale_orders()
+        return orders._hgr_sync_line_analytic_distributions()
+
     def _hgr_check_profitability_access(self):
         if not (
             self.env.user.has_group('account.group_account_invoice')
@@ -60,6 +80,50 @@ class Project(models.Model):
             ('state', '!=', 'cancel'),
         ])
         return orders.filtered(lambda order: order.state != 'cancel')
+
+    def _hgr_primary_sale_order(self):
+        """Return the quotation to show as this project's current reference."""
+        self.ensure_one()
+        orders = self._hgr_profitability_sale_orders()
+        if not orders:
+            return self.env['sale.order']
+        if self.sale_order_id in orders:
+            return self.sale_order_id
+        direct_order = orders.filtered(
+            lambda order: order.project_id == self
+        ).sorted('id', reverse=True)[:1]
+        return direct_order or self.reinvoiced_sale_order_id or orders.sorted('id')[:1]
+
+    def _hgr_sync_analytic_quotation_codes(self):
+        """Set each project analytic account's Reference to its quotation.
+
+        A project can have several quotations. The current quotation is shown
+        in Reference, while analytic name_search still covers every linked
+        quotation. Non-project and not-yet-quoted accounts are left untouched.
+        """
+        updated_accounts = self.env['account.analytic.account']
+        for account in self.sudo().mapped('account_id'):
+            projects = account.project_ids
+            linked_orders = self.env['sale.order']
+            for project in projects:
+                linked_orders |= project._hgr_profitability_sale_orders()
+            if not linked_orders:
+                continue
+
+            primary_orders = self.env['sale.order']
+            for project in projects:
+                primary_orders |= project._hgr_primary_sale_order()
+            primary_order = primary_orders.sorted('id', reverse=True)[:1]
+            if not primary_order or account.code == primary_order.name:
+                continue
+
+            # Preserve unrelated, manually assigned analytic references.
+            if account.code and not re.fullmatch(r'\d{4}-AN\d+', account.code):
+                continue
+
+            account.with_context(tracking_disable=True).code = primary_order.name
+            updated_accounts |= account
+        return updated_accounts
 
     def _hgr_profitability_service_lines(self):
         self.ensure_one()
@@ -332,6 +396,8 @@ class Project(models.Model):
             'description': line.name or '',
             'product': line.product_id.display_name or '',
             'product_id': line.product_id.id or False,
+            'move_line_id': line.move_line_id.id or False,
+            'sale_line_id': line.move_line_id.hgr_sale_line_id.id or False,
             'quantity': line.unit_amount or 0.0,
             'allocation_percent': 100.0,
             'allocated_amount': currency.round(-line.amount),
@@ -352,6 +418,8 @@ class Project(models.Model):
                 'description': line.name or '',
                 'product': line.product_id.display_name or '',
                 'product_id': line.product_id.id or False,
+                'move_line_id': line.id,
+                'sale_line_id': line.hgr_sale_line_id.id or False,
                 'quantity': (line.quantity or 0.0) * share,
                 'allocation_percent': share * 100.0,
                 'allocated_amount': currency.round(allocated_amount),
@@ -438,12 +506,15 @@ class Project(models.Model):
                 'entries': 0,
             })
 
+        with_order = len(quoted_lines.order_id | timesheets.so_line.order_id) > 1
         for line in quoted_lines:
             if not self._hgr_is_time_uom(line.product_uom_id, hour_uom):
                 continue
             category = line.hgr_work_category_id
             key = f'category-{category.id}' if category else f'service-{line.id}'
-            label = category.display_name if category else line.display_name
+            label = category.display_name if category else line._hgr_service_label(
+                with_order=with_order
+            )
             labour_group(key, label)['quoted_hours'] += line.product_uom_id._compute_quantity(
                 line.product_uom_qty, hour_uom
             )
@@ -455,7 +526,7 @@ class Project(models.Model):
                 label = category.display_name
             elif line.so_line:
                 key = f'service-{line.so_line.id}'
-                label = line.so_line.display_name
+                label = line.so_line._hgr_service_label(with_order=with_order)
             else:
                 label = line.hgr_manual_service_name or _('Uncategorised Labour')
                 key = f'manual-{label}'
@@ -510,7 +581,7 @@ class Project(models.Model):
             )
 
         for line in material_lines:
-            product = line.product_id
+            product = line.move_line_id.hgr_sale_line_id.product_id or line.product_id
             key = f'product-{product.id}' if product else 'unmatched-material'
             label = product.display_name if product else _('Unmatched Material')
             group = material_group(key, label)
@@ -537,6 +608,28 @@ class Project(models.Model):
             )
             material_comparison.append(group)
         material_comparison.sort(key=lambda item: item['product'])
+
+        quoted_material_lines = quoted_lines.filtered(
+            lambda item: item.product_id
+            and not self._hgr_is_time_uom(item.product_uom_id, hour_uom)
+        )
+        quoted_product_ids = set(quoted_material_lines.product_id.ids)
+        sale_line_products = {
+            line.id: line.product_id.id for line in quoted_material_lines
+        }
+        for detail in vendor_details + manual_material_details:
+            product_id = (
+                sale_line_products.get(detail.get('sale_line_id'))
+                or detail['product_id']
+            )
+            detail['matched'] = product_id in quoted_product_ids
+        quoted_material_options = [{
+            'id': line.id,
+            'name': line._hgr_service_label(
+                with_order=len(quoted_material_lines.order_id) > 1,
+                prefer_product=True,
+            ),
+        } for line in quoted_material_lines]
         quoted_material_amount = currency.round(sum(
             item['quoted_amount'] for item in material_comparison
         ))
@@ -551,7 +644,9 @@ class Project(models.Model):
             'id': line.id,
             'date': fields.Date.to_string(line.date),
             'employee': line.employee_id.name or '',
-            'service': line.hgr_manual_service_name or line.so_line.display_name or '',
+            'service': line.hgr_manual_service_name or (
+                line.so_line._hgr_service_label(with_order=with_order) if line.so_line else ''
+            ),
             'work_category': (
                 line.hgr_work_category_id.display_name
                 or line.so_line.hgr_work_category_id.display_name
@@ -602,6 +697,7 @@ class Project(models.Model):
             ]).move_id.ids,
             'vendor_details': vendor_details,
             'manual_material_details': manual_material_details,
+            'quoted_material_options': quoted_material_options,
             'timesheet_details': timesheet_details,
             'labour_comparison': labour_comparison,
             'material_comparison': material_comparison,
@@ -655,6 +751,40 @@ class Project(models.Model):
             'date_from': date_from or False,
             'date_to': date_to or False,
         }
+
+    def hgr_assign_quoted_material(self, sale_line_id, move_line_id=False, manual_cost_id=False):
+        """Link an unmatched material cost to a quoted material line."""
+        self.ensure_one()
+        self._hgr_check_profitability_access()
+        if not (
+            self.env.user.has_group('account.group_account_invoice')
+            or self.env.user.has_group('project.group_project_manager')
+        ):
+            raise AccessError(_('You are not allowed to change material costs.'))
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        quoted_lines = self._hgr_profitability_sale_orders().order_line.filtered(
+            lambda line: not line.display_type
+            and line.product_id
+            and not self._hgr_is_time_uom(line.product_uom_id, hour_uom)
+        )
+        sale_line = quoted_lines.filtered(lambda line: line.id == sale_line_id)
+        if sale_line_id and not sale_line:
+            raise ValidationError(_('The selected material is not quoted on this project.'))
+        if manual_cost_id:
+            cost = self.env['hgr.profitability.manual.cost'].sudo().browse(manual_cost_id).exists()
+            if not cost or cost.project_id != self:
+                raise ValidationError(_('The manual cost does not belong to this project.'))
+            cost.product_id = sale_line.product_id
+            return True
+        move_line = self.env['account.move.line'].sudo().browse(move_line_id).exists()
+        if (
+            not move_line
+            or not self.account_id
+            or not self._hgr_analytic_share(move_line.analytic_distribution, self.account_id)
+        ):
+            raise ValidationError(_('The vendor cost does not belong to this project.'))
+        move_line.hgr_sale_line_id = sale_line
+        return True
 
     @api.depends('name', 'sale_order_id.name', 'reinvoiced_sale_order_id.name')
     @api.depends_context('hgr_show_quote_no')

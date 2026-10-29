@@ -3,6 +3,7 @@
     <t t-name="heiniger_addons.ProjectProfitability">
         <div class="o_hgr_profitability h-100 overflow-auto">
             <div class="container-fluid py-3 py-lg-4 px-lg-4">
+                <t t-call="heiniger_addons.HgrBreadcrumbs"/>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                     <div>
                         <h2 class="mb-1">Project Profitability</h2>
@@ -137,6 +138,10 @@
                             <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'summary' }" t-on-click="() => this.setActiveTab('summary')">Cost Summary</button>
                             <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'labour' }" t-on-click="() => this.setActiveTab('labour')">Labour</button>
                             <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'material' }" t-on-click="() => this.setActiveTab('material')">Material</button>
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'unmatched' }" t-on-click="() => this.setActiveTab('unmatched')">
+                                Unmatched Material
+                                <span t-if="unmatchedMaterialLines.length" class="badge rounded-pill text-bg-danger ms-1" t-out="unmatchedMaterialLines.length"/>
+                            </button>
                         </div>
                     </nav>
 
@@ -144,21 +149,21 @@
                     <div class="row g-3 mb-3">
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
                             <div class="text-muted">Quoted Amount</div>
-                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="openQuotedOrders">
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="() => this.openQuotedOrders()">
                                 <span t-out="formatMoney(state.data.totals.quoted_amount)"/>
                                 <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
                             </button>
                         </div></div></div>
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
                             <div class="text-muted">Invoiced Revenue</div>
-                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="openCustomerInvoices">
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="() => this.openCustomerInvoices()">
                                 <span t-out="formatMoney(state.data.totals.revenue_posted)"/>
                                 <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
                             </button>
                         </div></div></div>
                         <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
                             <div class="text-muted">Actual Hours</div>
-                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="openTimesheets">
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="() => this.openTimesheets()">
                                 <span t-out="formatNumber(state.data.totals.actual_hours)"/>
                                 <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
                             </button>
@@ -216,11 +221,11 @@
                             <section class="card shadow-sm h-100 o_hgr_summary_table">
                                 <div class="card-header bg-transparent">
                                     <div class="fw-semibold">Material Summary</div>
-                                    <small class="text-muted">Quoted amount versus actual posted cost, grouped by product.</small>
+                                    <small class="text-muted">Quoted amount versus posted cost and profit, grouped by product.</small>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover table-sm align-middle mb-0">
-                                        <thead><tr><th class="ps-3">Product</th><th class="text-end">Quoted</th><th class="text-end">Actual</th><th class="text-end pe-3">Balance</th></tr></thead>
+                                        <thead><tr><th class="ps-3">Product</th><th class="text-end">Quoted</th><th class="text-end">Cost</th><th class="text-end pe-3">Profit</th></tr></thead>
                                         <tbody>
                                             <t t-foreach="costSummaryProjects" t-as="summary" t-key="summary.project.id">
                                                 <tr t-if="state.data.projects.length &gt; 1" class="o_hgr_project_heading" t-on-click="() => this.selectProject(summary.project.id)">
@@ -316,6 +321,41 @@
                                         <td><span t-att-class="line.state === 'posted' ? 'badge text-bg-success' : (line.state === 'manual' ? 'badge text-bg-warning' : 'badge text-bg-secondary')"><t t-if="line.state === 'posted'">Posted</t><t t-elif="line.state === 'manual'">Manual</t><t t-else="">Draft</t></span></td>
                                     </tr>
                                     <tr t-if="!materialLines.length"><td colspan="9" class="text-center text-muted py-4">No non-timesheet analytic costs.</td></tr>
+                                </tbody>
+                            </table></div>
+                        </section>
+                    </t>
+
+                    <t t-if="state.activeTab === 'unmatched'">
+                        <section class="card shadow-sm">
+                            <div class="card-header bg-transparent">
+                                <div class="fw-semibold">Unmatched Material</div>
+                                <small class="text-muted">Costs that are not linked to a quoted material. Pick the quoted material to include them in the Material Summary.</small>
+                            </div>
+                            <div class="table-responsive o_hgr_detail_table"><table class="table table-hover table-sm align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Date</th><th>Vendor</th><th>Invoice</th><th>Description</th><th>Product</th><th class="text-end">Amount</th><th>State</th><th class="o_hgr_quoted_material_column">Quoted Material</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="unmatchedMaterialLines" t-as="line" t-key="line.key">
+                                        <td class="ps-3" t-out="line.project_name"/><td t-out="line.date"/><td t-out="line.vendor"/>
+                                        <td>
+                                            <a t-if="line.move_id" t-att-href="'/odoo/vendor-bills/' + line.move_id" class="fw-semibold" t-out="line.invoice"/>
+                                            <t t-else="" t-out="line.invoice"/>
+                                        </td>
+                                        <td t-out="line.description"/><td t-out="line.product"/>
+                                        <td class="text-end" t-out="formatMoney(line.allocated_amount, line.currency_id)"/>
+                                        <td><span t-att-class="line.state === 'posted' ? 'badge text-bg-success' : (line.state === 'manual' ? 'badge text-bg-warning' : 'badge text-bg-secondary')"><t t-if="line.state === 'posted'">Posted</t><t t-elif="line.state === 'manual'">Manual</t><t t-else="">Draft</t></span></td>
+                                        <td>
+                                            <select t-if="line.assignable and line.options.length" class="form-select form-select-sm"
+                                                    t-on-change="(event) => this.assignQuotedMaterial(line, event)">
+                                                <option value="">Select quoted material...</option>
+                                                <option t-foreach="line.options" t-as="option" t-key="option.id"
+                                                        t-att-value="option.id" t-out="option.name"/>
+                                            </select>
+                                            <span t-elif="!line.options.length" class="text-muted">No quoted material</span>
+                                            <span t-else="" class="text-muted">Not linked to a bill line</span>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="!unmatchedMaterialLines.length"><td colspan="9" class="text-center text-muted py-4">All material costs are matched to the quotation.</td></tr>
                                 </tbody>
                             </table></div>
                         </section>

@@ -1,5 +1,6 @@
 .o_hgr_supervisor_timesheet {
-    background: var(--o-view-background-color, #f8f9fa);
+    background: $o-webclient-background-color;
+    color: $o-main-text-color;
 
     .card {
         border: 1px solid var(--border-color, #dee2e6);

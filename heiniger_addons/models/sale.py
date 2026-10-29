@@ -1,10 +1,46 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import re
+
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
+from odoo.tools import html2plaintext
 
 class Saleorder(models.Model):
 	_inherit = "sale.order"
+
+	@api.model_create_multi
+	def create(self, vals_list):
+		orders = super().create(vals_list)
+		orders.sudo().project_id._hgr_sync_analytic_quotation_codes()
+		orders._hgr_sync_line_analytic_distributions()
+		return orders
+
+	def write(self, vals):
+		projects = self.sudo().project_id
+		result = super().write(vals)
+		if {'name', 'project_id', 'state'} & vals.keys():
+			projects |= self.sudo().project_id
+			projects._hgr_sync_analytic_quotation_codes()
+		if 'project_id' in vals:
+			self._hgr_sync_line_analytic_distributions()
+		return result
+
+	def _hgr_project_analytic_account(self):
+		"""Return the single project account that applies to this order."""
+		self.ensure_one()
+		projects = self.sudo().project_id | self.sudo().project_ids
+		accounts = projects.mapped('account_id')
+		return accounts if len(accounts) == 1 else self.env['account.analytic.account']
+
+	def _hgr_sync_line_analytic_distributions(self):
+		"""Keep every commercial order line allocated to its linked project."""
+		updated_lines = self.env['sale.order.line']
+		for order in self:
+			account = order._hgr_project_analytic_account()
+			if account:
+				updated_lines |= order.order_line._hgr_apply_project_analytic_account(account)
+		return updated_lines
 
 	hgr_has_advance_invoices = fields.Boolean(
 		string="Has invoiced advances",
@@ -143,10 +179,107 @@ class Saleorder(models.Model):
 class SaleOrderLine(models.Model):
 	_inherit = "sale.order.line"
 
+	@api.model_create_multi
+	def create(self, vals_list):
+		lines = super().create(vals_list)
+		if not self.env.context.get('hgr_skip_analytic_sync'):
+			lines._hgr_sync_project_analytic_distribution()
+		return lines
+
+	def write(self, vals):
+		result = super().write(vals)
+		if (
+			not self.env.context.get('hgr_skip_analytic_sync')
+			and {'order_id', 'analytic_distribution', 'display_type'} & vals.keys()
+		):
+			self._hgr_sync_project_analytic_distribution()
+		return result
+
+	def _hgr_sync_project_analytic_distribution(self):
+		updated_lines = self.env['sale.order.line']
+		for line in self.filtered(lambda item: not item.display_type):
+			account = line.order_id._hgr_project_analytic_account()
+			if account:
+				updated_lines |= line._hgr_apply_project_analytic_account(account)
+		return updated_lines
+
+	def _hgr_apply_project_analytic_account(self, account):
+		"""Replace only the project-plan component of the distribution."""
+		updated_lines = self.env['sale.order.line']
+		for line in self.filtered(lambda item: not item.display_type):
+			distribution = dict(line.analytic_distribution or {})
+			if any(
+				str(account.id) in str(key).split(',')
+				for key in distribution
+			):
+				continue
+
+			if not distribution:
+				new_distribution = {str(account.id): 100.0}
+			else:
+				new_distribution = {}
+				for key, percentage in distribution.items():
+					key_accounts = self.env['account.analytic.account'].browse([
+						int(account_id)
+						for account_id in str(key).split(',')
+						if account_id
+					]).exists()
+					other_plan_ids = key_accounts.filtered(
+						lambda key_account: key_account.plan_id != account.plan_id
+					).ids
+					new_key = ','.join(map(str, [*other_plan_ids, account.id]))
+					new_distribution[new_key] = (
+						new_distribution.get(new_key, 0.0) + percentage
+					)
+
+			line.with_context(hgr_skip_analytic_sync=True).analytic_distribution = new_distribution
+			updated_lines |= line
+		return updated_lines
+
 	hgr_work_category_id = fields.Many2one(
 		'hgr.work.category', string='Work Category', ondelete='restrict', index=True,
 		help='Groups quoted and actual labour in the project profitability report.',
 	)
+
+	@api.model
+	def _hgr_first_plain_line(self, value):
+		# html2plaintext joins <li> items on one line; break on block ends first
+		html = re.sub(r'(?i)</(li|p|div|h\d)>|<br\s*/?>', '\n', value or '')
+		for part in html2plaintext(html).splitlines():
+			part = part.replace('\xa0', ' ').strip(' -*•\t')
+			if part:
+				return part
+		return ''
+
+	def _hgr_section_text(self):
+		"""Return the title of the section this line sits in, as plain text."""
+		self.ensure_one()
+		section = False
+		for line in self.order_id.order_line.sorted(lambda l: (l.sequence, l.id)):
+			if line == self:
+				break
+			if line.display_type == 'line_section':
+				section = line
+		return self._hgr_first_plain_line(section.name) if section else ''
+
+	def _hgr_service_label(self, with_order=False, prefer_product=False):
+		"""Short label telling apart lines that share a product, e.g.
+		"Pos. 2 – Arbeitsaufwand Freilegearbeiten". Materials read better
+		with the product name ("Pos. 1 – Abdeckmaterial")."""
+		self.ensure_one()
+		description = (
+			(prefer_product and self.product_id.display_name)
+			or self._hgr_first_plain_line(self.name)
+			or self.product_id.display_name
+			or self.display_name
+		)
+		section = self._hgr_section_text()
+		# "Pos. 2 / Freilegearbeiten ..." -> "Pos. 2"
+		position = section.split(' / ', 1)[0] if section else ''
+		label = f"{position} – {description}" if position else description
+		if with_order:
+			label = f"{self.order_id.name} – {label}"
+		return label
 
 	def _timesheet_create_task_prepare_values(self, project):
 		res = super(SaleOrderLine, self)._timesheet_create_task_prepare_values(project)

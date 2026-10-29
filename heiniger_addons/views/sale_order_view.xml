@@ -35,6 +35,14 @@
 			<xpath expr="//field[@name='order_line']//form//label[@for='product_uom_qty']" position="before">
 				<field name="qty_delivered_method" readonly="0"/>
 			</xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="class" add="hgr_document_line_table" separator=" "/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_subtotal'] | //field[@name='order_line']/list/field[@name='price_total']"
+                   position="attributes">
+                <attribute name="class" add="hgr_document_line_amount" separator=" "/>
+                <attribute name="width">150px</attribute>
+            </xpath>
             <field name="payment_term_id" position="after">
                 <field name="hgr_object_id" readonly="state in ('done','cancel')"/>
                 <field name="hgr_subject" readonly="state in ('done','cancel')"/>
@@ -72,14 +80,6 @@
                 <field name="hgr_has_advance_invoices" invisible="1"/>
                 <div class="d-flex flex-column gap-1" colspan="2"
                      invisible="not hgr_has_advance_invoices">
-                    <div class="d-flex align-items-baseline">
-                        <label for="amount_untaxed"
-                               string="Auftragswert exkl. MwSt."
-                               class="mb-0 flex-grow-1 text-end pe-4"/>
-                        <div class="text-end text-nowrap">
-                            <field name="amount_untaxed" widget="monetary"/>
-                        </div>
-                    </div>
                     <div class="d-flex align-items-baseline">
                         <label for="hgr_advance_invoiced_total"
                                class="mb-0 flex-grow-1 text-end pe-4"/>

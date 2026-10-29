@@ -183,6 +183,34 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
 	_inherit = 'account.move.line'
 
+	hgr_sale_line_id = fields.Many2one(
+		'sale.order.line', string='Quoted Material', index='btree_not_null',
+		ondelete='set null', copy=False,
+		help='Quotation line this vendor cost belongs to. Used to match the cost '
+			 'against the quoted material in the project profitability report.',
+	)
+
+	@api.model
+	def hgr_quoted_material_options(self, account_ids):
+		"""Quoted material lines of the projects behind the given analytic
+		accounts, offered in the analytic distribution popup of vendor bills."""
+		hour_uom = self.env.ref('uom.product_uom_hour')
+		options = []
+		projects = self.env['project.project'].search([('account_id', 'in', account_ids or [])])
+		for project in projects:
+			lines = project.sudo()._hgr_profitability_sale_orders().order_line.filtered(
+				lambda item: not item.display_type
+				and item.product_id
+				and not project._hgr_is_time_uom(item.product_uom_id, hour_uom)
+			)
+			with_order = len(lines.order_id) > 1
+			options += [{
+				'id': line.id,
+				'name': line._hgr_service_label(with_order=with_order, prefer_product=True),
+				'account_id': project.account_id.id,
+			} for line in lines]
+		return options
+
 	@api.depends(
 		'account_id', 'partner_id', 'product_id',
 		'move_id.analytic_distribution',

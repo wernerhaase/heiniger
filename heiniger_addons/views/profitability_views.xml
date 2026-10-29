@@ -11,4 +11,25 @@
               action="action_hgr_project_profitability"
               groups="account.group_account_invoice,account.group_account_readonly"
               sequence="6"/>
+
+    <!-- Timesheets opened from the profitability report: the project is already
+         known there, so project, task and validation status are left out. -->
+    <record id="hgr_profitability_timesheet_list" model="ir.ui.view">
+        <field name="name">account.analytic.line.list.hgr.profitability</field>
+        <field name="model">account.analytic.line</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list string="Timesheets" create="false">
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="name"/>
+                <field name="so_line" optional="show"/>
+                <field name="hgr_work_category_id" optional="show"/>
+                <field name="unit_amount" widget="timesheet_uom" sum="Total"/>
+                <field name="amount" optional="hide" sum="Total"/>
+                <field name="company_id" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
 </odoo>

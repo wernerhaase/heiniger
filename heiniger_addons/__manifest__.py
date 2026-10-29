@@ -4,7 +4,7 @@
 
 {
     'name': 'Heiniger Addons',
-    'version': '19.0.1.17.3',
+    'version': '19.0.1.17.10',
     'category': 'Customizations',
     'sequence': 6,
     'summary': 'Custom changes for heiniger ',
@@ -58,6 +58,12 @@ This module added for additional fields & custom developments.
         'web.assets_backend': [
             'heiniger_addons/static/src/js/quotation_attachment_order.js',
             'heiniger_addons/static/src/js/invoice_extract_analytic_compat.js',
+            'heiniger_addons/static/src/js/hgr_breadcrumbs.xml',
+            'heiniger_addons/static/src/js/analytic_quoted_material.js',
+            'heiniger_addons/static/src/js/analytic_quoted_material.xml',
+            'heiniger_addons/static/src/js/analytic_quoted_material.scss',
+            'heiniger_addons/static/src/js/document_line_headers.js',
+            'heiniger_addons/static/src/scss/document_line_tables.scss',
             'heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js',
             'heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml',
             'heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.scss',

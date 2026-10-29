@@ -14,6 +14,10 @@ export class HgrProjectProfitability extends Component {
     static components = { RecordSelector };
     static props = { ...standardActionServiceProps };
 
+    get hgrBreadcrumbs() {
+        return this.env.config?.breadcrumbs || [];
+    }
+
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
@@ -147,6 +151,45 @@ export class HgrProjectProfitability extends Component {
                 state: "manual",
             })),
         ]);
+    }
+
+    get unmatchedMaterialLines() {
+        const options = Object.fromEntries(
+            (this.state.data?.projects || []).map((project) => [
+                project.id,
+                project.quoted_material_options || [],
+            ])
+        );
+        return this.materialLines
+            .filter((line) => !line.matched)
+            .map((line) => ({
+                ...line,
+                options: options[line.project_id] || [],
+                assignable: line.source === "manual" || Boolean(line.move_line_id),
+            }));
+    }
+
+    async assignQuotedMaterial(line, event) {
+        const saleLineId = Number(event.target.value) || false;
+        if (!saleLineId) {
+            return;
+        }
+        try {
+            await this.orm.call("project.project", "hgr_assign_quoted_material", [
+                [line.project_id],
+                saleLineId,
+            ], {
+                move_line_id: line.source === "manual" ? false : line.move_line_id,
+                manual_cost_id: line.source === "manual" ? line.id : false,
+            });
+            this.notification.add(_t("Material cost matched to the quotation."), { type: "success" });
+            await this.load();
+        } catch (error) {
+            event.target.value = "";
+            this.notification.add(error?.data?.message || _t("The material could not be matched."), {
+                type: "danger",
+            });
+        }
     }
 
     get serviceSummary() {
@@ -307,7 +350,7 @@ export class HgrProjectProfitability extends Component {
     openVendorBills(project = false) {
         const projects = project ? [project] : (this.state.data?.projects || []);
         const ids = [...new Set(projects.flatMap((item) =>
-            item.vendor_details.map((line) => line.move_id)
+            (item.vendor_details || []).map((line) => line.move_id)
         ).filter(Boolean))];
         this.actionService.doAction({
             type: "ir.actions.act_window",
@@ -347,14 +390,17 @@ export class HgrProjectProfitability extends Component {
 
     openTimesheets(project = false) {
         const projects = project ? [project] : (this.state.data?.projects || []);
-        const ids = projects.flatMap((item) => item.timesheet_details.map((line) => line.id));
+        const ids = projects.flatMap((item) => (item.timesheet_details || []).map((line) => line.id));
         this.actionService.doAction({
             type: "ir.actions.act_window",
             name: _t("Timesheets"),
             res_model: "account.analytic.line",
             views: [[false, "list"], [false, "form"]],
             domain: [["id", "in", ids]],
-            context: { create: false },
+            context: {
+                create: false,
+                list_view_ref: "heiniger_addons.hgr_profitability_timesheet_list",
+            },
         });
     }
 }

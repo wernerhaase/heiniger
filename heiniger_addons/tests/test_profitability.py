@@ -119,6 +119,46 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(action['context']['default_project_id'], self.project.id)
         self.assertEqual(action['context']['default_sale_order_id'], order.id)
 
+    def test_sale_order_line_receives_project_analytic_distribution(self):
+        self.assertEqual(
+            self.service_line.analytic_distribution,
+            {str(self.account.id): 100.0},
+        )
+
+        self.service_line.analytic_distribution = False
+
+        self.assertEqual(
+            self.service_line.analytic_distribution,
+            {str(self.account.id): 100.0},
+        )
+
+    def test_project_distribution_replaces_stale_plan_and_preserves_other_plan(self):
+        stale_account = self.env['account.analytic.account'].create({
+            'name': 'Stale Project Account',
+            'plan_id': self.plan.id,
+            'company_id': self.env.company.id,
+        })
+        other_plan = self.env['account.analytic.plan'].create({'name': 'Other Plan'})
+        other_account = self.env['account.analytic.account'].create({
+            'name': 'Other Plan Account',
+            'plan_id': other_plan.id,
+            'company_id': self.env.company.id,
+        })
+        self.service_line.with_context(hgr_skip_analytic_sync=True).analytic_distribution = {
+            f'{stale_account.id},{other_account.id}': 100.0,
+        }
+
+        self.service_line._hgr_sync_project_analytic_distribution()
+
+        key_accounts = set(next(iter(
+            self.service_line.analytic_distribution
+        )).split(','))
+        self.assertEqual(key_accounts, {str(self.account.id), str(other_account.id)})
+        self.assertEqual(
+            next(iter(self.service_line.analytic_distribution.values())),
+            100.0,
+        )
+
     def test_quoted_time_uom_is_converted_to_hours(self):
         day_uom = self.env.ref('uom.product_uom_day')
         service = self.env['product.product'].create({
@@ -474,3 +514,105 @@ class TestHgrProfitability(TransactionCase):
 
         with self.assertRaises(ValidationError):
             self.env['project.project'].check_hgr_manual_profitability_entry(payload)
+
+    def _quoted_material_line(self, name='Quoted Isolation Material'):
+        material = self.env['product.product'].create({
+            'name': name,
+            'type': 'consu',
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({
+                'product_id': material.id,
+                'product_uom_qty': 1.0,
+                'price_unit': 165.0,
+            })],
+        })
+        return order.order_line
+
+    def _posted_bill_without_product(self, amount=190.38):
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.vendor.id,
+            'invoice_date': '2026-10-28',
+            'invoice_line_ids': [Command.create({
+                'name': 'Vendor material without product',
+                'account_id': self.expense_account.id,
+                'quantity': 1,
+                'price_unit': amount,
+                'analytic_distribution': {str(self.account.id): 100.0},
+            })],
+        })
+        bill.action_post()
+        return bill
+
+    def test_bill_line_offers_quoted_material_of_its_project(self):
+        sale_line = self._quoted_material_line()
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        hourly_line = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({
+                'product_id': self.service.id,
+                'product_uom_qty': 4.0,
+                'product_uom_id': hour_uom.id,
+            })],
+        }).order_line
+        options = self.env['account.move.line'].hgr_quoted_material_options(
+            [self.account.id]
+        )
+        allowed = {option['id'] for option in options}
+        self.assertIn(sale_line.id, allowed)
+        self.assertEqual(
+            {option['account_id'] for option in options}, {self.account.id}
+        )
+        # time-based quotation lines are labour, not material
+        self.assertNotIn(hourly_line.id, allowed)
+
+    def test_unmatched_bill_line_can_be_assigned_to_quoted_material(self):
+        sale_line = self._quoted_material_line()
+        bill = self._posted_bill_without_product()
+
+        summary = self.project._hgr_profitability_summary()
+        detail = summary['vendor_details'][0]
+        self.assertFalse(detail['matched'])
+        self.assertIn(sale_line.id, [
+            option['id'] for option in summary['quoted_material_options']
+        ])
+
+        self.project.hgr_assign_quoted_material(
+            sale_line.id, move_line_id=detail['move_line_id']
+        )
+
+        self.assertEqual(bill.invoice_line_ids.hgr_sale_line_id, sale_line)
+        summary = self.project._hgr_profitability_summary()
+        self.assertTrue(summary['vendor_details'][0]['matched'])
+        row = next(
+            item for item in summary['material_comparison']
+            if item['product'] == sale_line.product_id.display_name
+        )
+        self.assertEqual(row['quoted_amount'], 165.0)
+        self.assertEqual(row['actual_amount'], 190.38)
+        self.assertFalse(any(
+            item['key'] == 'unmatched-material'
+            for item in summary['material_comparison']
+        ))
+
+    def test_assign_rejects_material_quoted_on_another_project(self):
+        other_project = self.env['project.project'].create({
+            'name': 'Other Project',
+            'partner_id': self.customer.id,
+        })
+        material = self.env['product.product'].create({'name': 'Other', 'type': 'consu'})
+        other_line = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': other_project.id,
+            'order_line': [Command.create({'product_id': material.id})],
+        }).order_line
+        bill = self._posted_bill_without_product()
+
+        with self.assertRaises(ValidationError):
+            self.project.hgr_assign_quoted_material(
+                other_line.id, move_line_id=bill.invoice_line_ids.id
+            )

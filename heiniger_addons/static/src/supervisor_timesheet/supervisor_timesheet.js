@@ -12,6 +12,10 @@ export class HgrSupervisorTimesheet extends Component {
     static components = { RecordSelector };
     static props = { ...standardActionServiceProps };
 
+    get hgrBreadcrumbs() {
+        return this.env.config?.breadcrumbs || [];
+    }
+
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");

@@ -4,12 +4,6 @@
         <xpath expr="//div[@name='so_total_summary']//table/t[@t-call='sale.document_tax_totals']" position="after">
             <t t-if="doc.hgr_has_advance_invoices">
                 <tr class="hgr_advance_summary_row">
-                    <td class="hgr_advance_summary_label" t-translation="off">Auftragswert exkl. MwSt.</td>
-                    <td class="hgr_advance_summary_value text-end">
-                        <span t-field="doc.amount_untaxed"/>
-                    </td>
-                </tr>
-                <tr class="hgr_advance_summary_row">
                     <td class="hgr_advance_summary_label">Invoiced advances</td>
                     <td class="hgr_advance_summary_value text-end">
                         <span>− </span>
@@ -31,15 +25,6 @@
               inherit_id="sale.sale_order_portal_content_totals_table">
         <xpath expr="//table[@name='sale_order_totals_table']/t[@t-call]" position="after">
             <t t-if="sale_order.hgr_has_advance_invoices">
-                <tr class="hgr_advance_summary_row">
-                    <td class="hgr_advance_summary_label" t-translation="off"
-                        style="width:62%; padding-right:12px;">
-                        Auftragswert exkl. MwSt.
-                    </td>
-                    <td class="hgr_advance_summary_value text-end" style="width:38%; white-space:nowrap;">
-                        <span t-field="sale_order.amount_untaxed"/>
-                    </td>
-                </tr>
                 <tr class="hgr_advance_summary_row">
                     <td class="hgr_advance_summary_label" style="width:62%; padding-right:12px;">
                         Invoiced advances
