@@ -180,6 +180,82 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(row['actual_hours'], 7.5)
         self.assertEqual(row['balance_hours'], 4.5)
 
+    def test_quoted_lines_are_split_by_time_uom_not_product_type(self):
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        unit_uom = self.env.ref('uom.product_uom_unit')
+        hourly_service = self.env['product.product'].create({
+            'name': 'Hourly Service Classification',
+            'type': 'service',
+            'uom_id': hour_uom.id,
+            'list_price': 95.0,
+        })
+        fixed_service = self.env['product.product'].create({
+            'name': 'Fixed Service Classification',
+            'type': 'service',
+            'uom_id': unit_uom.id,
+            'list_price': 250.0,
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [
+                Command.create({
+                    'product_id': hourly_service.id,
+                    'product_uom_qty': 3.0,
+                    'product_uom_id': hour_uom.id,
+                }),
+                Command.create({
+                    'product_id': fixed_service.id,
+                    'product_uom_qty': 2.0,
+                    'product_uom_id': unit_uom.id,
+                }),
+            ],
+        })
+
+        summary = self.project._hgr_profitability_summary()
+        labour_keys = {item['key'] for item in summary['labour_comparison']}
+        material_keys = {item['key'] for item in summary['material_comparison']}
+        hourly_line = order.order_line.filtered(
+            lambda line: line.product_id == hourly_service
+        )
+        fixed_line = order.order_line.filtered(
+            lambda line: line.product_id == fixed_service
+        )
+
+        self.assertIn(f'service-{hourly_line.id}', labour_keys)
+        self.assertNotIn(f'product-{hourly_service.id}', material_keys)
+        self.assertIn(f'product-{fixed_service.id}', material_keys)
+        self.assertNotIn(f'service-{fixed_line.id}', labour_keys)
+
+    def test_detached_std_unit_is_classified_as_labour(self):
+        std_uom = self.env['uom.uom'].create({
+            'name': 'Std.',
+            'relative_factor': 1.0,
+        })
+        service = self.env['product.product'].create({
+            'name': 'Detached Std Labour',
+            'type': 'service',
+            'uom_id': std_uom.id,
+            'list_price': 95.0,
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({
+                'product_id': service.id,
+                'product_uom_qty': 4.0,
+                'product_uom_id': std_uom.id,
+            })],
+        })
+
+        summary = self.project._hgr_profitability_summary()
+        labour_keys = {item['key'] for item in summary['labour_comparison']}
+        material_keys = {item['key'] for item in summary['material_comparison']}
+
+        self.assertIn(f'service-{order.order_line.id}', labour_keys)
+        self.assertNotIn(f'product-{service.id}', material_keys)
+        self.assertEqual(summary['quoted_hours'], 4.0)
+
     def test_material_comparison_matches_quoted_and_actual_product(self):
         material = self.env['product.product'].create({
             'name': 'Quoted Paint Material',
@@ -240,6 +316,30 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(summary['manual_material_cost'], 250.0)
         self.assertEqual(summary['total_cost'], 250.0)
         self.assertEqual(summary['manual_material_details'][0]['description'], payload['description'])
+
+    def test_manual_material_uses_product_as_missing_description(self):
+        material = self.env['product.product'].create({
+            'name': 'Manual Cost Product',
+            'type': 'consu',
+        })
+        payload = {
+            'entry_type': 'material',
+            'project_id': self.project.id,
+            'product_id': material.id,
+            'date': '2026-10-29',
+            'amount': 20.0,
+            'description': '',
+        }
+
+        validation = self.env['project.project'].check_hgr_manual_profitability_entry(
+            payload
+        )
+        result = self.env['project.project'].create_hgr_manual_profitability_entry(
+            payload, validation['validation_token']
+        )
+        manual_cost = self.env['hgr.profitability.manual.cost'].browse(result['id'])
+
+        self.assertEqual(manual_cost.description, material.display_name)
 
     def test_manual_entry_must_be_unchanged_after_validation(self):
         payload = {
@@ -336,6 +436,28 @@ class TestHgrProfitability(TransactionCase):
         self.assertFalse(timesheet.so_line)
         self.assertEqual(timesheet.hgr_manual_service_name, 'Emergency call-out')
         self.assertEqual(summary['timesheet_details'][0]['service'], 'Emergency call-out')
+
+    def test_manual_labour_uses_service_as_missing_description(self):
+        payload = {
+            'entry_type': 'labour',
+            'project_id': self.project.id,
+            'employee_id': self.employee.id,
+            'sale_line_id': self.service_line.id,
+            'date': '2026-10-29',
+            'hours': 1.5,
+            'description': '',
+            'work_category_id': self.work_category.id,
+        }
+
+        validation = self.env['project.project'].check_hgr_manual_profitability_entry(
+            payload
+        )
+        result = self.env['project.project'].create_hgr_manual_profitability_entry(
+            payload, validation['validation_token']
+        )
+        timesheet = self.env['account.analytic.line'].browse(result['id'])
+
+        self.assertEqual(timesheet.name, self.service_line.display_name)
 
     def test_manual_labour_requires_sale_line_or_manual_service(self):
         payload = {

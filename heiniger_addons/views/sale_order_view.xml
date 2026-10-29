@@ -56,8 +56,17 @@
 		            </group>
     			</page>
             </xpath>
+            <xpath expr="//div[@name='so_button_below_order_lines']" position="after">
+                <div name="hgr_clear_below_order_buttons" class="clearfix"/>
+            </xpath>
+            <xpath expr="//div[@name='hgr_clear_below_order_buttons']" position="after">
+                <xpath expr="//group[@name='sale_total']" position="move"/>
+            </xpath>
             <xpath expr="//group[@name='sale_total']" position="attributes">
-                <attribute name="class" remove="gap-sm-3" add="gap-1" separator=" "/>
+                <attribute name="class"
+                           remove="gap-sm-3 order-0 order-lg-1"
+                           add="gap-1"
+                           separator=" "/>
             </xpath>
             <xpath expr="//group[@name='sale_total']/field[@name='tax_totals']" position="after">
                 <field name="hgr_has_advance_invoices" invisible="1"/>

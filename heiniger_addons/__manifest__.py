@@ -4,7 +4,7 @@
 
 {
     'name': 'Heiniger Addons',
-    'version': '19.0.1.17.0',
+    'version': '19.0.1.17.3',
     'category': 'Customizations',
     'sequence': 6,
     'summary': 'Custom changes for heiniger ',

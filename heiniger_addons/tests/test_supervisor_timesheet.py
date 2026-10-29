@@ -96,6 +96,39 @@ class TestSupervisorTimesheet(TransactionCase):
         self.assertEqual([option['id'] for option in options], [self.service_line.id])
         self.assertEqual(options[0]['work_category_id'], self.work_category.id)
 
+    def test_lists_all_time_based_items_from_linked_sale_orders(self):
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        hourly_item = self.env['product.product'].create({
+            'name': 'Arbeitsaufwand',
+            'type': 'consu',
+            'uom_id': hour_uom.id,
+            'list_price': 95.0,
+        })
+        self.order.order_line = [Command.create({
+            'product_id': hourly_item.id,
+            'product_uom_qty': 14.75,
+            'product_uom_id': hour_uom.id,
+            'hgr_work_category_id': self.work_category.id,
+        })]
+        hourly_line = self.order.order_line.filtered(
+            lambda line: line.product_id == hourly_item
+        )
+
+        options = self.env['hgr.supervisor.timesheet'].get_service_sale_lines(
+            self.project.id
+        )
+
+        self.assertEqual(
+            {option['id'] for option in options},
+            {self.service_line.id, hourly_line.id},
+        )
+        hourly_option = next(
+            option for option in options if option['id'] == hourly_line.id
+        )
+        self.assertEqual(
+            hourly_option['work_category_id'], self.work_category.id
+        )
+
     def test_manual_service_creates_standard_timesheet(self):
         payload = self.payload()
         payload['lines'][0].update({
@@ -198,3 +231,47 @@ class TestSupervisorTimesheet(TransactionCase):
 
         self.assertFalse(sheet.line_ids.name)
         self.assertEqual(sheet.timesheet_ids.name, self.work_category.display_name)
+
+    def test_service_labels_distinguish_lines_with_same_product(self):
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        hourly_item = self.env['product.product'].create({
+            'name': 'Arbeitsaufwand',
+            'type': 'service',
+            'uom_id': hour_uom.id,
+        })
+        self.order.order_line = [
+            Command.create({
+                'display_type': 'line_section',
+                'name': '<p>Pos. 2 / Freilegearbeiten Ablauf</p>',
+                'sequence': 20,
+            }),
+            Command.create({
+                'product_id': hourly_item.id,
+                'name': '<ul><li>Arbeitsaufwand Freilegearbeiten</li><li>1-2 Mitarbeiter</li></ul>',
+                'product_uom_qty': 5.25,
+                'sequence': 21,
+            }),
+            Command.create({
+                'display_type': 'line_section',
+                'name': '<p>Pos. 3 / Abdichtarbeiten Regenwasserschacht</p>',
+                'sequence': 30,
+            }),
+            Command.create({
+                'product_id': hourly_item.id,
+                'name': '<ul><li>Arbeitsaufwand Abdichtarbeiten</li><li>1-2 Mitarbeiter</li></ul>',
+                'product_uom_qty': 3.0,
+                'sequence': 31,
+            }),
+        ]
+
+        options = self.env['hgr.supervisor.timesheet'].get_service_sale_lines(
+            self.project.id
+        )
+        by_name = {option['name']: option for option in options}
+
+        self.assertIn('Pos. 2 – Arbeitsaufwand Freilegearbeiten', by_name)
+        self.assertIn('Pos. 3 – Arbeitsaufwand Abdichtarbeiten', by_name)
+        self.assertEqual(
+            by_name['Pos. 3 – Arbeitsaufwand Abdichtarbeiten']['section'],
+            'Pos. 3 / Abdichtarbeiten Regenwasserschacht',
+        )

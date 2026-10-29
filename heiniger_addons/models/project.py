@@ -4,6 +4,7 @@
 
 import hashlib
 import json
+import re
 
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, ValidationError
@@ -118,8 +119,8 @@ class Project(models.Model):
     def _hgr_validate_manual_entry(self, payload):
         values = self._hgr_normalize_manual_entry(payload)
         project = self.browse(values['project_id']).exists()
-        if not project or not project.account_id or not values['date'] or not values['description']:
-            raise ValidationError(_('Project, date, and description are required.'))
+        if not project or not project.account_id or not values['date']:
+            raise ValidationError(_('Project and date are required.'))
         project.check_access('read')
         if project.company_id and project.company_id != self.env.company:
             raise ValidationError(_('The project must belong to the active company.'))
@@ -146,6 +147,10 @@ class Project(models.Model):
                 raise ValidationError(_('The service must come from a sales order linked to this project.'))
             if sale_line:
                 values['manual_service_name'] = ''
+            if not values['description']:
+                values['description'] = (
+                    sale_line.display_name if sale_line else values['manual_service_name']
+                )
             if project.company_id and employee.company_id != project.company_id:
                 raise ValidationError(_('The employee and project must belong to the same company.'))
             duplicate_domain = [
@@ -166,6 +171,12 @@ class Project(models.Model):
                 raise ValidationError(_('Enter a positive material cost.'))
             product = self.env['product.product'].browse(values['product_id']).exists()
             values['product_id'] = product.id or False
+            if not values['description']:
+                values['description'] = product.display_name if product else ''
+            if not values['description']:
+                raise ValidationError(_(
+                    'Enter a description when no quoted product is selected.'
+                ))
             duplicate = self.env['hgr.profitability.manual.cost'].sudo().search_count([
                 ('project_id', '=', project.id),
                 ('date', '=', values['date']),
@@ -230,6 +241,28 @@ class Project(models.Model):
         while uom.relative_uom_id:
             uom = uom.relative_uom_id
         return uom
+
+    @api.model
+    def _hgr_is_time_uom(self, uom, hour_uom):
+        """Recognise time units, including detached legacy ``Std.`` units."""
+        if self._hgr_uom_root(uom) == self._hgr_uom_root(hour_uom):
+            return True
+        time_names = {
+            'h', 'hr', 'hrs', 'hour', 'hours',
+            'std', 'stunde', 'stunden',
+            'min', 'mins', 'minute', 'minutes',
+            'day', 'days', 'tag', 'tage',
+        }
+        names = {
+            uom.name or '',
+            uom.with_context(lang='en_US').name or '',
+            uom.with_context(lang='de_CH').name or '',
+        }
+        return any(
+            (re.sub(r'[^a-z0-9]+', ' ', name.lower()).split() or [''])[0]
+            in time_names
+            for name in names
+        )
 
     def _hgr_profitability_summary(self, date_from=False, date_to=False, sale_order=False):
         self.ensure_one()
@@ -387,7 +420,7 @@ class Project(models.Model):
             lambda item: not item.display_type and item.product_uom_id
         )
         for line in quoted_lines:
-            if self._hgr_uom_root(line.product_uom_id) == self._hgr_uom_root(hour_uom):
+            if self._hgr_is_time_uom(line.product_uom_id, hour_uom):
                 quoted_hours += line.product_uom_id._compute_quantity(
                     line.product_uom_qty, hour_uom
                 )
@@ -406,7 +439,7 @@ class Project(models.Model):
             })
 
         for line in quoted_lines:
-            if self._hgr_uom_root(line.product_uom_id) != self._hgr_uom_root(hour_uom):
+            if not self._hgr_is_time_uom(line.product_uom_id, hour_uom):
                 continue
             category = line.hgr_work_category_id
             key = f'category-{category.id}' if category else f'service-{line.id}'
@@ -458,7 +491,14 @@ class Project(models.Model):
                 'entries': 0,
             })
 
-        for line in quoted_lines.filtered(lambda item: item.product_id.type != 'service'):
+        # A quotation line belongs to labour when its unit is time-based.  The
+        # product type is not a reliable discriminator: Heiniger also uses
+        # service products for fixed-price/material items.  Conversely, every
+        # hour-compatible unit (including the German ``Std`` unit) must stay
+        # out of the material summary.
+        for line in quoted_lines.filtered(
+            lambda item: not self._hgr_is_time_uom(item.product_uom_id, hour_uom)
+        ):
             product = line.product_id
             group = material_group(f'product-{product.id}', product.display_name)
             group['quoted_quantity'] += line.product_uom_qty

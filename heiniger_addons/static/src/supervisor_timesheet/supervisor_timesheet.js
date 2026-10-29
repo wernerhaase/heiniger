@@ -167,6 +167,14 @@ export class HgrSupervisorTimesheet extends Component {
         }
     }
 
+    serviceSection(line) {
+        if (!line.saleLineId) {
+            return "";
+        }
+        const service = this.state.serviceLines.find((item) => item.id === line.saleLineId);
+        return service?.section || "";
+    }
+
     setWorkCategory(line, event) {
         line.workCategoryId = Number(event.target.value) || false;
     }

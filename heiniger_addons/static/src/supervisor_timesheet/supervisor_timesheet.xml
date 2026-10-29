@@ -92,6 +92,8 @@
                                                     t-out="service.name"/>
                                             <option value="manual" t-att-selected="line.isManualService">Other / Manual service</option>
                                         </select>
+                                        <div t-if="serviceSection(line)" class="o_hgr_service_section small text-muted mt-1 text-truncate"
+                                             t-att-title="serviceSection(line)" t-out="serviceSection(line)"/>
                                         <input t-if="line.isManualService" type="text" class="form-control mt-2"
                                             placeholder="Enter service name..." t-model="line.manualServiceName"/>
                                     </td>

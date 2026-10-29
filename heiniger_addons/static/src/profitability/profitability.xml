@@ -98,17 +98,17 @@
                                 </div>
                             </t>
                             <t t-else="">
-                                <div class="col-12 col-md-3">
-                                    <label class="form-label fw-semibold">Material Cost</label>
-                                    <input type="number" min="0.01" step="0.01" class="form-control"
-                                        t-model="state.manual.amount" t-on-input="resetManualValidation"/>
-                                </div>
                                 <div class="col-12 col-md-5">
                                     <label class="form-label fw-semibold">Quoted Product (optional)</label>
                                     <RecordSelector resId="state.manual.productId" resModel="'product.product'"
                                         domain="[['type', '!=', 'service'], ['sale_ok', '=', true]]"
                                         fieldString="labels.product" placeholder="labels.selectProduct"
                                         update="(id) => this.setManualProduct(id)"/>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Material Cost</label>
+                                    <input type="number" min="0.01" step="0.01" class="form-control"
+                                        t-model="state.manual.amount" t-on-input="resetManualValidation"/>
                                 </div>
                             </t>
                             <div class="col-12">
