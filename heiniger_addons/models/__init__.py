@@ -7,8 +7,15 @@ from . import sale
 from . import base_layout
 from . import product
 from . import account_move
-# from . import timesheet
+from . import account_bank_statement
+from . import account_journal_dashboard
+from . import analytic_account
+from . import payment_term
+from . import timesheet
 from . import project
 
 
 
+from . import ir_actions_report
+from . import note_pdf_attachments
+from . import ir_module_module

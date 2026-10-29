@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="sale_order_html_description.InsertRecordRow" t-inherit="sale.ListRenderer.RecordRow" t-inherit-mode="primary">
+        <xpath expr="//td[@t-att-name='column.name']" position="inside">
+            <span t-if="column.name === 'sequence' and !props.readonly and !isCombo(record) and !isComboItem(record)"
+                  class="hgr-line-actions d-print-none" t-on-click.stop="() => {}">
+                <Dropdown position="'bottom-start'">
+                    <button type="button" class="btn hgr-line-actions-button" title="Line actions" aria-label="Line actions">
+                        <i class="fa fa-ellipsis-v"/>
+                    </button>
+                    <t t-set-slot="content">
+                        <DropdownItem onSelected="() => this.editHere(record)">Edit line</DropdownItem>
+                        <t t-if="props.canInsert">
+                            <DropdownItem onSelected="() => this.insertHere(record, false)">Insert product below</DropdownItem>
+                            <DropdownItem onSelected="() => this.insertHere(record, 'line_note')">Insert note below</DropdownItem>
+                            <DropdownItem onSelected="() => this.insertHere(record, 'line_section')">Insert section below</DropdownItem>
+                        </t>
+                    </t>
+                </Dropdown>
+            </span>
+        </xpath>
+    </t>
+</templates>

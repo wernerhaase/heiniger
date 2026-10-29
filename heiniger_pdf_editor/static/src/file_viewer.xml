@@ -1,0 +1,10 @@
+<templates xml:space="preserve">
+    <t t-inherit="web.FileViewer" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-FileViewer-header')]/div[hasclass('o-FileViewer-download')]" position="before">
+            <button t-if="hgrEditor.available" t-on-click.stop="hgrEditPdf" t-att-disabled="hgrEditor.busy"
+                    class="btn btn-link text-white o-FileViewer-headerButton px-3" title="Edit PDF">
+                <i class="fa fa-pencil me-1"/> Edit PDF
+            </button>
+        </xpath>
+    </t>
+</templates>

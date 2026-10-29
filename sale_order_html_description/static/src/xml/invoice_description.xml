@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="sale_order_html_description.InvoiceDescription">
+        <div class="o_field_product_label_section_and_note_cell o_hgr_sol_html" t-att-class="sectionAndNoteClasses">
+            <t t-if="!isSectionOrSubSection and !isNote()">
+                <Many2One t-props="this.m2oProps" cssClass="'w-100'"/>
+            </t>
+            <HtmlField t-if="props.record.data.hgr_html_description" name="'hgr_html_description'" record="props.record" readonly="true"/>
+            <div t-else="" class="text-wrap" t-out="label"/>
+        </div>
+    </t>
+</templates>

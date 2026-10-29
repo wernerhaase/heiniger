@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="hgr_report_saleorder_advance_summary" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='so_total_summary']//table/t[@t-call='sale.document_tax_totals']" position="after">
+            <t t-if="doc.hgr_has_advance_invoices">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Invoiced advances</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span>− </span>
+                        <span t-field="doc.hgr_advance_invoiced_total"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row border-black fw-bold">
+                    <td class="hgr_advance_summary_label">Remaining order amount</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span t-field="doc.hgr_remaining_after_advance"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- The Preview button uses the customer portal, not the PDF template. -->
+    <template id="hgr_sale_order_portal_advance_summary"
+              inherit_id="sale.sale_order_portal_content_totals_table">
+        <xpath expr="//table[@name='sale_order_totals_table']/t[@t-call]" position="after">
+            <t t-if="sale_order.hgr_has_advance_invoices">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label" style="width:62%; padding-right:12px;">
+                        Invoiced advances
+                    </td>
+                    <td class="hgr_advance_summary_value text-end" style="width:38%; white-space:nowrap;">
+                        <span>− </span>
+                        <span t-field="sale_order.hgr_advance_invoiced_total"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row border-top border-dark fw-bold">
+                    <td class="hgr_advance_summary_label" style="width:62%; padding-right:12px;">
+                        Remaining order amount
+                    </td>
+                    <td class="hgr_advance_summary_value text-end" style="width:38%; white-space:nowrap;">
+                        <span t-field="sale_order.hgr_remaining_after_advance"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="hgr_report_invoice_advance_summary" inherit_id="account.report_invoice_document">
+        <!--
+            The standard invoice report floats the totals block.  On long
+            invoices Qt can then render the payment terms beside the totals
+            and even put the terms on the preceding page.  Keep the totals
+            right-aligned, but make them a normal block so everything that
+            follows starts below the complete totals table.
+        -->
+        <xpath expr="//div[@id='right-elements']" position="attributes">
+            <attribute name="t-attf-class">#{'col-5 mt-5' if report_type == 'pdf' else 'col-12 col-md-5'} ms-auto hgr_invoice_totals</attribute>
+        </xpath>
+        <xpath expr="//div[@id='payment_term']" position="attributes">
+            <attribute name="class" add="hgr_invoice_terms" separator=" "/>
+        </xpath>
+        <xpath expr="//div[@id='right-elements']//table/t[@t-if='o.tax_totals'][@t-call='account.document_tax_totals']" position="after">
+            <t t-if="o.hgr_has_advance_summary">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label" t-translation="off">Auftragswert exkl. MwSt.</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span t-field="o.hgr_sale_order_untaxed"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Order total incl. tax</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span t-field="o.hgr_sale_order_total"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Invoiced advances</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span>− </span>
+                        <span t-field="o.hgr_advance_invoiced_total"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row border-black fw-bold">
+                    <td class="hgr_advance_summary_label">Remaining order amount</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span t-field="o.hgr_remaining_after_advance"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+</odoo>

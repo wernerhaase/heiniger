@@ -7,24 +7,35 @@ import {
 import { patch } from "@web/core/utils/patch";
 import { FormCompiler } from "@web/views/form/form_compiler";
 
-patch(FormCompiler.prototype, 'full_screen_form_view', {
-    compileSheet(el, params) {
-        const res = this._super(el, params);
+patch(FormCompiler.prototype, {
+    compile(el, params) {
+        const res = super.compile(el, params);
 
-        const $hide_span = createElement('span');
-        $hide_span.className = "hide-right-panel";
-        $hide_span.setAttribute("t-on-click", '_onHideRightPanel');
-        $hide_span.setAttribute("title", 'Hide Chatter');
+        const hideSpan = createElement("button", {
+            class: "btn btn-secondary o_full_screen_toggle o_full_screen_toggle_hide",
+            "t-if": "!__comp__.env.inDialog and __comp__.mailStore",
+            type: "button",
+            title: "Hide Chatter",
+        });
+        hideSpan.textContent = "Hide Chatter";
 
-        const $show_span = createElement('span');
-        $show_span.className = "show-right-panel d-none";
-        $show_span.setAttribute("t-on-click", '_onShowRightPanel');
-        $show_span.setAttribute("title", 'Show Chatter');
+        const showSpan = createElement("button", {
+            class: "btn btn-secondary o_full_screen_toggle o_full_screen_toggle_show d-none",
+            "t-if": "!__comp__.env.inDialog and __comp__.mailStore",
+            type: "button",
+            title: "Show Chatter",
+        });
+        showSpan.textContent = "Show Chatter";
 
-        $(res).prepend($hide_span);
-        $(res).prepend($show_span);
+        const toggleContainer = createElement("div", {
+            class: "o_full_screen_chatter_toggle d-flex align-items-center ms-2",
+        });
+        toggleContainer.append(showSpan, hideSpan);
+        const statusBar = res.querySelector(".o_form_statusbar");
+        if (statusBar) {
+            statusBar.append(toggleContainer);
+        }
 
         return res;
     },
 });
-

@@ -1,0 +1,23 @@
+# Local evaluation only. Use HTTPS and a pinned image digest for production.
+services:
+  onlyoffice:
+    image: ${ONLYOFFICE_IMAGE:-onlyoffice/documentserver:latest}
+    ports:
+      - "127.0.0.1:18080:80"
+    environment:
+      JWT_ENABLED: "true"
+      JWT_SECRET: ${ONLYOFFICE_JWT_SECRET:?Set a strong connection secret in a private .env file}
+      # Local evaluation: allow the editor to reach Odoo on the host machine.
+      ALLOW_PRIVATE_IP_ADDRESS: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_logs:/var/log/onlyoffice
+      - onlyoffice_lib:/var/lib/onlyoffice
+    shm_size: "1gb"
+    restart: unless-stopped
+volumes:
+  onlyoffice_data:
+  onlyoffice_logs:
+  onlyoffice_lib:

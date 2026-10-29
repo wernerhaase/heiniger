@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="heiniger_addons.ProjectProfitability">
+        <div class="o_hgr_profitability h-100 overflow-auto">
+            <div class="container-fluid py-3 py-lg-4 px-lg-4">
+                <t t-call="heiniger_addons.HgrBreadcrumbs"/>
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                    <div>
+                        <h2 class="mb-1">Project Profitability</h2>
+                        <div class="text-muted">Labour, vendor bills, revenue, and margin by analytic account.</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary" t-att-disabled="state.loading" t-on-click="openManualMode">
+                            <i class="fa fa-pencil me-2"/>Manual Mode
+                        </button>
+                        <button type="button" class="btn btn-primary" t-att-disabled="state.loading" t-on-click="load">
+                            <i t-att-class="state.loading ? 'fa fa-spinner fa-spin me-2' : 'fa fa-refresh me-2'"/>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <section class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-semibold">Project</label>
+                                <RecordSelector resId="state.projectId" resModel="'project.project'"
+                                    domain="projectDomain" fieldString="labels.project"
+                                    context="{ hgr_show_quote_no: true }" placeholder="labels.selectProject"
+                                    update="(id) => this.setProject(id)"/>
+                            </div>
+                            <div class="col-6 col-lg-2">
+                                <label class="form-label fw-semibold">From</label>
+                                <input type="date" class="form-control" t-model="state.dateFrom"/>
+                            </div>
+                            <div class="col-6 col-lg-2">
+                                <label class="form-label fw-semibold">To</label>
+                                <input type="date" class="form-control" t-model="state.dateTo"/>
+                            </div>
+                            <div class="col-12 col-lg-2 d-grid">
+                                <button type="button" class="btn btn-outline-primary" t-on-click="load">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section t-if="state.manualOpen" class="card shadow-sm mb-3 border-warning o_hgr_manual_entry">
+                    <div class="card-header bg-warning-subtle d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold">Manual Mode</div>
+                            <small>Automatic timesheets and vendor bills cannot be edited here.</small>
+                        </div>
+                        <button type="button" class="btn-close" aria-label="Close" t-on-click="closeManualMode"/>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning py-2">
+                            Manual entries require two validations. First validate against existing records, then confirm and save.
+                        </div>
+                        <div class="btn-group mb-3" role="group" aria-label="Manual entry type">
+                            <button type="button" t-att-class="state.manual.entryType === 'labour' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setManualType('labour')">Labour</button>
+                            <button type="button" t-att-class="state.manual.entryType === 'material' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setManualType('material')">Material Cost</button>
+                        </div>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label fw-semibold">Date</label>
+                                <input type="date" class="form-control" t-model="state.manual.date" t-on-input="resetManualValidation"/>
+                            </div>
+                            <t t-if="state.manual.entryType === 'labour'">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Employee</label>
+                                    <RecordSelector resId="state.manual.employeeId" resModel="'hr.employee'"
+                                        domain="manualEmployeeDomain" fieldString="labels.employee"
+                                        placeholder="labels.selectEmployee" update="(id) => this.setManualEmployee(id)"/>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label fw-semibold">Service</label>
+                                    <select class="form-select" t-on-change="setManualService">
+                                        <option value="" t-att-selected="!state.manual.saleLineId &amp;&amp; !state.manual.isManualService">Select service...</option>
+                                        <option t-foreach="state.manualOptions.services" t-as="service" t-key="service.id"
+                                                t-att-value="service.id" t-att-selected="state.manual.saleLineId === service.id" t-out="service.name"/>
+                                        <option value="manual" t-att-selected="state.manual.isManualService">Other / Manual service</option>
+                                    </select>
+                                    <input t-if="state.manual.isManualService" type="text" class="form-control mt-2"
+                                        placeholder="Enter service name..." t-model="state.manual.manualServiceName"
+                                        t-on-input="resetManualValidation"/>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Work Category</label>
+                                    <RecordSelector resId="state.manual.workCategoryId" resModel="'hgr.work.category'"
+                                        domain="[['active', '=', true]]" fieldString="labels.workCategory"
+                                        placeholder="labels.selectWorkCategory"
+                                        update="(id) => this.setManualWorkCategory(id)"/>
+                                </div>
+                                <div class="col-12 col-md-2">
+                                    <label class="form-label fw-semibold">Hours</label>
+                                    <input type="number" min="0.01" max="24" step="0.25" class="form-control"
+                                        t-model="state.manual.hours" t-on-input="resetManualValidation"/>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="col-12 col-md-5">
+                                    <label class="form-label fw-semibold">Quoted Product (optional)</label>
+                                    <RecordSelector resId="state.manual.productId" resModel="'product.product'"
+                                        domain="[['type', '!=', 'service'], ['sale_ok', '=', true]]"
+                                        fieldString="labels.product" placeholder="labels.selectProduct"
+                                        update="(id) => this.setManualProduct(id)"/>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Material Cost</label>
+                                    <input type="number" min="0.01" step="0.01" class="form-control"
+                                        t-model="state.manual.amount" t-on-input="resetManualValidation"/>
+                                </div>
+                            </t>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Description</label>
+                                <input type="text" class="form-control" t-model="state.manual.description"
+                                    t-on-input="resetManualValidation" placeholder="Reason and supporting reference..."/>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mt-3">
+                            <span t-if="state.manualValidated" class="badge text-bg-success me-auto"><i class="fa fa-check me-1"/>First validation passed</span>
+                            <button type="button" class="btn btn-outline-secondary" t-on-click="closeManualMode">Cancel</button>
+                            <button t-if="!state.manualValidated" type="button" class="btn btn-warning" t-on-click="validateManualEntry">1. Validate Entry</button>
+                            <button t-else="" type="button" class="btn btn-success" t-on-click="saveManualEntry">2. Confirm &amp; Save</button>
+                        </div>
+                    </div>
+                </section>
+
+                <div t-if="state.loading" class="o_hgr_loading text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-2x text-primary"/>
+                    <div class="text-muted mt-2">Loading profitability...</div>
+                </div>
+
+                <t t-elif="state.data">
+                    <nav class="o_hgr_report_tabs mb-3" aria-label="Profitability report sections">
+                        <div class="nav nav-tabs flex-nowrap overflow-auto">
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'summary' }" t-on-click="() => this.setActiveTab('summary')">Cost Summary</button>
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'labour' }" t-on-click="() => this.setActiveTab('labour')">Labour</button>
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'material' }" t-on-click="() => this.setActiveTab('material')">Material</button>
+                            <button type="button" class="nav-link" t-att-class="{ active: state.activeTab === 'unmatched' }" t-on-click="() => this.setActiveTab('unmatched')">
+                                Unmatched Material
+                                <span t-if="unmatchedMaterialLines.length" class="badge rounded-pill text-bg-danger ms-1" t-out="unmatchedMaterialLines.length"/>
+                            </button>
+                        </div>
+                    </nav>
+
+                    <t t-if="state.activeTab === 'summary'">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Quoted Amount</div>
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="() => this.openQuotedOrders()">
+                                <span t-out="formatMoney(state.data.totals.quoted_amount)"/>
+                                <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
+                            </button>
+                        </div></div></div>
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Invoiced Revenue</div>
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="() => this.openCustomerInvoices()">
+                                <span t-out="formatMoney(state.data.totals.revenue_posted)"/>
+                                <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
+                            </button>
+                        </div></div></div>
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Actual Hours</div>
+                            <button type="button" class="btn btn-link p-0 border-0 fs-4 fw-semibold o_hgr_kpi_link" t-on-click="() => this.openTimesheets()">
+                                <span t-out="formatNumber(state.data.totals.actual_hours)"/>
+                                <i class="fa fa-external-link ms-1 fs-6" aria-hidden="true"/>
+                            </button>
+                        </div></div></div>
+                        <div class="col-6 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi"><div class="card-body">
+                            <div class="text-muted">Total Cost</div><div class="fs-4 fw-semibold" t-out="formatMoney(state.data.totals.total_cost)"/>
+                        </div></div></div>
+                        <div class="col-12 col-xl"><div class="card h-100 shadow-sm o_hgr_kpi" t-att-class="state.data.totals.margin &lt; 0 ? 'border-danger' : 'border-success'"><div class="card-body">
+                            <div class="text-muted">Margin</div>
+                            <div t-att-class="state.data.totals.margin &lt; 0 ? 'fs-4 fw-semibold text-danger' : 'fs-4 fw-semibold text-success'">
+                                <t t-out="formatMoney(state.data.totals.margin)"/> <small t-out="formatPercent(state.data.totals.margin_percent)"/>
+                            </div>
+                        </div></div></div>
+                    </div>
+
+                    <div class="row g-3 mb-3 o_hgr_cost_breakdown">
+                        <div class="col-12 col-xxl-7">
+                            <section class="card shadow-sm h-100 o_hgr_summary_table">
+                                <div class="card-header bg-transparent">
+                                    <div class="fw-semibold">Labour Summary</div>
+                                    <small class="text-muted">Quoted, spent, and remaining hours grouped by work category tag.</small>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-sm align-middle mb-0">
+                                        <thead><tr><th class="ps-3">Work Category</th><th class="text-end">Quoted</th><th class="text-end">Time Taken</th><th class="text-end">Balance</th><th class="text-end pe-3">Cost</th></tr></thead>
+                                        <tbody>
+                                            <t t-foreach="costSummaryProjects" t-as="summary" t-key="summary.project.id">
+                                                <tr t-if="state.data.projects.length &gt; 1" class="o_hgr_project_heading" t-on-click="() => this.selectProject(summary.project.id)">
+                                                    <td class="ps-3 fw-semibold" colspan="5" t-out="summary.project.name"/>
+                                                </tr>
+                                                <tr t-foreach="summary.labourRows" t-as="row" t-key="row.key">
+                                                    <td class="ps-3" t-out="row.category"/>
+                                                    <td class="text-end" t-out="formatNumber(row.quoted_hours)"/>
+                                                    <td class="text-end" t-out="formatNumber(row.actual_hours)"/>
+                                                    <td class="text-end" t-att-class="row.balance_hours &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatNumber(row.balance_hours)"/>
+                                                    <td class="text-end pe-3" t-out="formatMoney(row.cost, summary.project.currency_id)"/>
+                                                </tr>
+                                                <tr t-if="!summary.labourRows.length">
+                                                    <td class="ps-3 text-muted" colspan="5">No quoted or actual labour.</td>
+                                                </tr>
+                                                <tr class="o_hgr_project_total">
+                                                    <td class="ps-3 fw-bold">Labour Total</td>
+                                                    <td class="text-end fw-semibold" t-out="formatNumber(summary.project.quoted_hours)"/>
+                                                    <td class="text-end fw-semibold" t-out="formatNumber(summary.project.actual_hours)"/>
+                                                    <td class="text-end fw-semibold" t-att-class="summary.project.hours_variance &lt; 0 ? 'text-danger' : ''" t-out="formatNumber(summary.project.hours_variance)"/>
+                                                    <td class="text-end pe-3 fw-semibold" t-out="formatMoney(summary.project.labor_cost, summary.project.currency_id)"/>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="col-12 col-xxl-5">
+                            <section class="card shadow-sm h-100 o_hgr_summary_table">
+                                <div class="card-header bg-transparent">
+                                    <div class="fw-semibold">Material Summary</div>
+                                    <small class="text-muted">Quoted amount versus posted cost and profit, grouped by product.</small>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-sm align-middle mb-0">
+                                        <thead><tr><th class="ps-3">Product</th><th class="text-end">Quoted</th><th class="text-end">Cost</th><th class="text-end pe-3">Profit</th></tr></thead>
+                                        <tbody>
+                                            <t t-foreach="costSummaryProjects" t-as="summary" t-key="summary.project.id">
+                                                <tr t-if="state.data.projects.length &gt; 1" class="o_hgr_project_heading" t-on-click="() => this.selectProject(summary.project.id)">
+                                                    <td class="ps-3 fw-semibold" colspan="4" t-out="summary.project.name"/>
+                                                </tr>
+                                                <tr t-foreach="summary.materialRows" t-as="row" t-key="row.key">
+                                                    <td class="ps-3" t-out="row.product"/>
+                                                    <td class="text-end" t-out="formatMoney(row.quoted_amount, summary.project.currency_id)"/>
+                                                    <td class="text-end" t-out="formatMoney(row.actual_amount, summary.project.currency_id)"/>
+                                                    <td class="text-end pe-3" t-att-class="row.balance_amount &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatMoney(row.balance_amount, summary.project.currency_id)"/>
+                                                </tr>
+                                                <tr t-if="!summary.materialRows.length">
+                                                    <td class="ps-3 text-muted" colspan="4">No quoted products or material costs.</td>
+                                                </tr>
+                                                <tr class="o_hgr_project_total">
+                                                    <td class="ps-3 fw-bold">Material Total</td>
+                                                    <td class="text-end fw-semibold" t-out="formatMoney(summary.project.quoted_material_amount, summary.project.currency_id)"/>
+                                                    <td class="text-end fw-semibold" t-out="formatMoney(summary.project.actual_material_amount, summary.project.currency_id)"/>
+                                                    <td class="text-end pe-3 fw-semibold" t-att-class="summary.project.material_balance &lt; 0 ? 'text-danger' : ''" t-out="formatMoney(summary.project.material_balance, summary.project.currency_id)"/>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    </t>
+
+                    <t t-if="state.activeTab === 'labour'">
+                        <section class="card shadow-sm">
+                            <div class="card-header bg-transparent d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <div><div class="fw-semibold">Labour Effort</div><small class="text-muted">Detailed time entries corresponding to the Excel labour sheets.</small></div>
+                                <div class="d-flex gap-2">
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Labour view">
+                                        <button type="button" t-att-class="state.labourView === 'detail' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('detail')">Detailed</button>
+                                        <button type="button" t-att-class="state.labourView === 'service' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('service')">Group by Tag</button>
+                                    </div>
+                                    <button t-if="timesheetLines.length" type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.openTimesheets()">Open Timesheets</button>
+                                </div>
+                            </div>
+                            <div t-if="state.labourView === 'detail'" class="table-responsive o_hgr_detail_table"><table class="table table-hover table-sm align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Date</th><th>Employee</th><th>Service</th><th>Work Category</th><th>Description</th><th class="text-end">Hours</th><th class="text-end">Cost</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="timesheetLines" t-as="line" t-key="line.id">
+                                        <td class="ps-3" t-out="line.project_name"/><td t-out="line.date"/><td t-out="line.employee"/><td t-out="line.service"/><td t-out="line.work_category || line.task"/><td t-out="line.description"/>
+                                        <td class="text-end" t-out="formatNumber(line.hours)"/><td class="text-end" t-out="formatMoney(line.cost, line.currency_id)"/>
+                                    </tr>
+                                    <tr t-if="!timesheetLines.length"><td colspan="8" class="text-center text-muted py-4">No timesheets.</td></tr>
+                                    <tr class="o_hgr_table_total">
+                                        <td colspan="6" class="ps-3 fw-bold">Total</td>
+                                        <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.actual_hours)"/>
+                                        <td class="text-end fw-bold" t-out="formatMoney(state.data.totals.labor_cost)"/>
+                                    </tr>
+                                </tbody>
+                            </table></div>
+                            <div t-else="" class="table-responsive o_hgr_detail_table"><table class="table table-hover align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Work Category</th><th class="text-end">Quoted</th><th class="text-end">Time Taken</th><th class="text-end">Balance</th><th class="text-end">Labour Cost</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="serviceSummary" t-as="service" t-key="service.key">
+                                        <td class="ps-3" t-out="service.project_name"/><td class="fw-semibold" t-out="service.category"/><td class="text-end" t-out="formatNumber(service.quoted_hours)"/><td class="text-end" t-out="formatNumber(service.actual_hours)"/><td class="text-end" t-att-class="service.balance_hours &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatNumber(service.balance_hours)"/><td class="text-end" t-out="formatMoney(service.cost, service.currency_id)"/>
+                                    </tr>
+                                    <tr t-if="!serviceSummary.length"><td colspan="6" class="text-center text-muted py-4">No tagged labour found.</td></tr>
+                                    <tr class="o_hgr_table_total">
+                                        <td colspan="2" class="ps-3 fw-bold">Total</td>
+                                        <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.quoted_hours)"/>
+                                        <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.actual_hours)"/>
+                                        <td class="text-end fw-bold" t-att-class="state.data.totals.hours_variance &lt; 0 ? 'text-danger' : ''" t-out="formatNumber(state.data.totals.hours_variance)"/>
+                                        <td class="text-end fw-bold" t-out="formatMoney(state.data.totals.labor_cost)"/>
+                                    </tr>
+                                </tbody>
+                            </table></div>
+                        </section>
+                    </t>
+
+                    <t t-if="state.activeTab === 'material'">
+                        <section class="card shadow-sm">
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                                <div><div class="fw-semibold">Material Effort</div><small class="text-muted">All project analytic costs except timesheets.</small></div>
+                                <button t-if="materialLines.length" type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.openVendorBills()">Open Vendor Bills</button>
+                            </div>
+                            <div class="table-responsive o_hgr_detail_table"><table class="table table-hover table-sm align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Date</th><th>Vendor</th><th>Invoice</th><th>Product</th><th>Description</th><th class="text-end">Allocation</th><th class="text-end">Amount</th><th>State</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="materialLines" t-as="line" t-key="line.key">
+                                        <td class="ps-3" t-out="line.project_name"/><td t-out="line.date"/><td t-out="line.vendor"/>
+                                        <td>
+                                            <a t-if="line.move_id" t-att-href="'/odoo/vendor-bills/' + line.move_id" class="fw-semibold" t-out="line.invoice"/>
+                                            <t t-else="" t-out="line.invoice"/>
+                                        </td>
+                                        <td t-out="line.product"/><td t-out="line.description"/>
+                                        <td class="text-end" t-out="formatPercent(line.allocation_percent)"/><td class="text-end" t-out="formatMoney(line.allocated_amount, line.currency_id)"/>
+                                        <td><span t-att-class="line.state === 'posted' ? 'badge text-bg-success' : (line.state === 'manual' ? 'badge text-bg-warning' : 'badge text-bg-secondary')"><t t-if="line.state === 'posted'">Posted</t><t t-elif="line.state === 'manual'">Manual</t><t t-else="">Draft</t></span></td>
+                                    </tr>
+                                    <tr t-if="!materialLines.length"><td colspan="9" class="text-center text-muted py-4">No non-timesheet analytic costs.</td></tr>
+                                </tbody>
+                            </table></div>
+                        </section>
+                    </t>
+
+                    <t t-if="state.activeTab === 'unmatched'">
+                        <section class="card shadow-sm">
+                            <div class="card-header bg-transparent">
+                                <div class="fw-semibold">Unmatched Material</div>
+                                <small class="text-muted">Costs that are not linked to a quoted material. Pick the quoted material to include them in the Material Summary.</small>
+                            </div>
+                            <div class="table-responsive o_hgr_detail_table"><table class="table table-hover table-sm align-middle mb-0">
+                                <thead><tr><th class="ps-3">Project</th><th>Date</th><th>Vendor</th><th>Invoice</th><th>Description</th><th>Product</th><th class="text-end">Amount</th><th>State</th><th class="o_hgr_quoted_material_column">Quoted Material</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="unmatchedMaterialLines" t-as="line" t-key="line.key">
+                                        <td class="ps-3" t-out="line.project_name"/><td t-out="line.date"/><td t-out="line.vendor"/>
+                                        <td>
+                                            <a t-if="line.move_id" t-att-href="'/odoo/vendor-bills/' + line.move_id" class="fw-semibold" t-out="line.invoice"/>
+                                            <t t-else="" t-out="line.invoice"/>
+                                        </td>
+                                        <td t-out="line.description"/><td t-out="line.product"/>
+                                        <td class="text-end" t-out="formatMoney(line.allocated_amount, line.currency_id)"/>
+                                        <td><span t-att-class="line.state === 'posted' ? 'badge text-bg-success' : (line.state === 'manual' ? 'badge text-bg-warning' : 'badge text-bg-secondary')"><t t-if="line.state === 'posted'">Posted</t><t t-elif="line.state === 'manual'">Manual</t><t t-else="">Draft</t></span></td>
+                                        <td>
+                                            <select t-if="line.assignable and line.options.length" class="form-select form-select-sm"
+                                                    t-on-change="(event) => this.assignQuotedMaterial(line, event)">
+                                                <option value="">Select quoted material...</option>
+                                                <option t-foreach="line.options" t-as="option" t-key="option.id"
+                                                        t-att-value="option.id" t-out="option.name"/>
+                                            </select>
+                                            <span t-elif="!line.options.length" class="text-muted">No quoted material</span>
+                                            <span t-else="" class="text-muted">Not linked to a bill line</span>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="!unmatchedMaterialLines.length"><td colspan="9" class="text-center text-muted py-4">All material costs are matched to the quotation.</td></tr>
+                                </tbody>
+                            </table></div>
+                        </section>
+                    </t>
+
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

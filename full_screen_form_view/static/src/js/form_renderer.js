@@ -1,59 +1,94 @@
 /** @odoo-module **/
 
-
-const { onMounted } = owl;
-var localStorage = require('web.local_storage');
-
+import { onMounted, onWillUnmount, useEffect, useRef } from "@odoo/owl";
+import { browser } from "@web/core/browser/browser";
 import { patch } from "@web/core/utils/patch";
 import { FormRenderer } from "@web/views/form/form_renderer";
-patch(FormRenderer.prototype, "full_screen_form_view", {
+
+const FULL_SCREEN_KEY = "full_screen";
+
+patch(FormRenderer.prototype, {
     setup() {
-        this._super();
-        if (localStorage.getItem("full_screen") === 'true') {
-            this.hideChatter = true;
-        }
-        else {
-            this.hideChatter = false;
-        }
+        super.setup();
+        this.hideChatter = browser.localStorage.getItem(FULL_SCREEN_KEY) === "true";
+        this.fullScreenRootRef = useRef("compiled_view_root");
+        this._onFullScreenToggleClick = (ev) => {
+            const hideButton = ev.target.closest(".o_full_screen_toggle_hide");
+            if (hideButton) {
+                ev.preventDefault();
+                this._setHideChatter(true);
+                return;
+            }
+            const showButton = ev.target.closest(".o_full_screen_toggle_show");
+            if (showButton) {
+                ev.preventDefault();
+                this._setHideChatter(false);
+            }
+        };
         onMounted(() => {
-            this._ShowHideRightPanel();
+            this._applyRightPanelState();
+            const root = this.fullScreenRootRef?.el || this.el || document;
+            root.addEventListener("click", this._onFullScreenToggleClick);
         });
+        onWillUnmount(() => {
+            const root = this.fullScreenRootRef?.el || this.el || document;
+            root.removeEventListener("click", this._onFullScreenToggleClick);
+        });
+        useEffect(
+            () => {
+                this._applyRightPanelState();
+            },
+            () => [this.props.record?.resId, this.props.record?.resModel]
+        );
     },
+
     _onHideRightPanel(ev) {
         ev.preventDefault();
-        this.hideChatter = true;
-        localStorage.setItem("full_screen", true);
-        this._ShowHideRightPanel();
+        this._setHideChatter(true);
     },
 
     _onShowRightPanel(ev) {
         ev.preventDefault();
-        this.hideChatter = false;
-        localStorage.setItem("full_screen", false);
-        this._ShowHideRightPanel();
+        this._setHideChatter(false);
     },
 
-    _ShowHideRightPanel() {
-        var $parent = $('span.hide-right-panel').parent();
-        if(this.hideChatter) {
-            $('span.hide-right-panel').addClass('d-none');
-            $('span.show-right-panel').removeClass('d-none');
-            if ($('div.o_form_sheet').length) {
-                $('div.o_form_sheet').addClass('full-screen-form');
-            }
-            if ($('div.o_form_view_container').length) {
-                $('div.o_form_view_container').next().addClass('d-none');
-            }
+    _setHideChatter(hideChatter) {
+        this.hideChatter = hideChatter;
+        browser.localStorage.setItem(FULL_SCREEN_KEY, hideChatter ? "true" : "false");
+        this._applyRightPanelState();
+    },
+
+    _applyRightPanelState() {
+        const root = this.fullScreenRootRef?.el || this.el || document;
+        const toggleContainer = root.querySelector(".o_full_screen_chatter_toggle");
+        const statusbarStatus = root.querySelector(
+            ".o_form_statusbar .o_field_statusbar .o_statusbar_status"
+        );
+        if (toggleContainer && statusbarStatus && toggleContainer.parentElement !== statusbarStatus) {
+            statusbarStatus.prepend(toggleContainer);
         }
-        else {
-            $('span.show-right-panel').addClass('d-none');
-            $('span.hide-right-panel').removeClass('d-none');
-            if ($('div.o_form_sheet').length) {
-                $('div.o_form_sheet').removeClass('full-screen-form');
-            }
-            if ($('div.o_form_view_container').length) {
-                $('div.o_form_view_container').next().removeClass('d-none');
-            }
+
+        const hideButton = root.querySelector(".o_full_screen_toggle_hide");
+        const showButton = root.querySelector(".o_full_screen_toggle_show");
+        if (hideButton) {
+            hideButton.classList.toggle("d-none", this.hideChatter);
+        }
+        if (showButton) {
+            showButton.classList.toggle("d-none", !this.hideChatter);
+        }
+
+        const formSheetBg = root.querySelector(".o_form_sheet_bg");
+        if (formSheetBg) {
+            formSheetBg.classList.toggle("full-screen-form", this.hideChatter);
+        }
+        const formSheet = root.querySelector(".o_form_sheet");
+        if (formSheet) {
+            formSheet.classList.toggle("full-screen-form", this.hideChatter);
+        }
+
+        const chatterContainers = root.querySelectorAll(".o-mail-Form-chatter");
+        for (const chatterContainer of chatterContainers) {
+            chatterContainer.classList.toggle("d-none", this.hideChatter);
         }
     },
 });

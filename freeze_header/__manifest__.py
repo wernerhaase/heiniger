@@ -4,7 +4,7 @@
 
 {
     'name': 'Freeze Header',
-    'version': '16.0.1.0',
+    'version': '19.0.1.0',
     'summary': 'Freeze header in list view | sticky header | sticky header in list view | fixed header | sticky header in one2many, many2many list view',
     'description': """
         Freeze header in list
@@ -15,7 +15,7 @@
     'website': 'https://www.kanakinfosystems.com',
     'depends': ['web', 'sale'],
     'data': [
-        'views/freeze_tmp.xml',
+        # 'views/freeze_tmp.xml',
     ],
     'assets': {
         'web.assets_backend': [

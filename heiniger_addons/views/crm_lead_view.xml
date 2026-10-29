@@ -4,7 +4,7 @@
   <record id="action_view_documents_crm_lead" model="ir.actions.act_window">
         <field name="name">Documents</field>
         <field name="res_model">documents.document</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('res_model', '=', 'project.task'), ('res_id', '=', active_id)]</field>
         <field name="context">{'default_res_model': 'project.task', 'default_res_id': active_id, 'limit_folders_to_project': True}</field>
         <field name="help" type="html">
@@ -42,10 +42,10 @@
       </xpath>
       <field name="user_id" position="after">
         <field name="hgr_case_of_insurance"/>
-        <field name="multi_insurance" attrs="{'invisible':[('hgr_case_of_insurance','=',False)]}"/>
+        <field name="multi_insurance" invisible = "not hgr_case_of_insurance"/>
       </field>
-      <xpath expr="//page[3]" position="after">
-        <page string="Insurance Details" attrs="{'invisible':['|',('hgr_case_of_insurance','=',False),('multi_insurance','=',True)]}">
+      <xpath expr="//page" position="after">
+        <page string="Insurance Details" invisible = "not hgr_case_of_insurance or multi_insurance">
             <group>
               <group>
                 <field name="hgr_insurance_id"/>
@@ -59,11 +59,11 @@
               <field name="hgr_insurance_description" placeholder="Add an insurance description..." options="{'collaborative': true}" />
             </group>
         </page>
-        <page string="Insurance Details" attrs="{'invisible':['|',('hgr_case_of_insurance','=',False),('multi_insurance','=',False)]}">
+        <page string="Insurance Details" invisible = "not hgr_case_of_insurance or not multi_insurance">
           <button name="action_view_insurance_details" class="btn btn-primary" type="object" string="Show Insurance Details"/>
           <field name="insurance_line">
             
-            <tree editable="bottom">
+            <list editable="bottom">
               <!-- <field name="order_id" options="{'no_open': True, 'no_quick_create': True}" domain="[('opportunity_id','=',parent.id)]"/> -->
               <field name="order_id" options="{'no_quick_create': True}" domain="[('opportunity_id','=',parent.id)]"/>
               <field name="hgr_subject"/>
@@ -74,7 +74,7 @@
               <field name="hgr_insurance_record_date" />
               <button name="update_sale_order_insurance" class="btn btn-primary" type="object" string="Update"/>
 
-            </tree>
+            </list>
             
           </field>
         </page>

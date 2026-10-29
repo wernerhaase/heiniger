@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hgr_pdf_editor_connection_admin,PDF editor connection admin,model_hgr_pdf_editor_connection,base.group_system,1,1,1,0

@@ -2,7 +2,7 @@
 <odoo>
     <template id="freeze_assets" inherit_id="web.layout" name="Freeze Assets">
         <xpath expr="." position="inside">
-            <link type="text/css" rel="stylesheet" href="/freeze_header/static/src/scss/freeze.scss" />
+            <link type="text/css" rel="stylesheet" href="/freeze_header/static/src/scss/freeze.css" />
         </xpath>
     </template>
 </odoo>

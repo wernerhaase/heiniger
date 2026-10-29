@@ -1,0 +1,7 @@
+/* Sticky first column header */
+.o_form_view .o_list_table thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 40;
+    background-color: #f8f9fa;
+}

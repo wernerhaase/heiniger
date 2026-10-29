@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hgr_account_payment_term_form_two_discounts" model="ir.ui.view">
+        <field name="name">account.payment.term.form.two.discounts</field>
+        <field name="model">account.payment.term</field>
+        <field name="inherit_id" ref="account.view_payment_term_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='early_pay_discount_computation']/ancestor::div[1]" position="after">
+                <div invisible="not early_discount" class="mt-2">
+                    <field name="hgr_second_early_discount" nolabel="1"/>
+                    <label for="hgr_second_early_discount"
+                           string="Second early-payment option" class="ms-2"/>
+                    <div invisible="not hgr_second_early_discount" class="mt-1">
+                        <field name="hgr_second_discount_percentage"
+                               class="text-end o_field_highlight o_input oe_inline"/>
+                        <span>%</span>
+                        <span class="mx-1">if paid within</span>
+                        <field name="hgr_second_discount_days"
+                               class="text-end o_field_highlight o_input oe_inline"/>
+                        <span class="ms-1">days</span>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

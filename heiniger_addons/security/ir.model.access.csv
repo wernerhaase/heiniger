@@ -1,2 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 heiniger_addons.access_crm_lead_insurance,access_crm_lead_insurance,heiniger_addons.model_crm_lead_insurance,base.group_user,1,1,1,1
+access_hgr_supervisor_timesheet_approver,Supervisor timesheet entry approver,model_hgr_supervisor_timesheet,hr_timesheet.group_hr_timesheet_approver,1,1,1,0
+access_hgr_supervisor_timesheet_line_approver,Supervisor timesheet line approver,model_hgr_supervisor_timesheet_line,hr_timesheet.group_hr_timesheet_approver,1,1,1,0
+access_hgr_profitability_manual_cost_system,Manual profitability cost system access,model_hgr_profitability_manual_cost,base.group_no_one,1,0,0,0
+access_hgr_work_category_user,Work category user,model_hgr_work_category,base.group_user,1,1,1,0
+access_hgr_bank_statement_tax_allocation_account_user,Bank statement tax allocation,model_hgr_bank_statement_tax_allocation,account.group_account_user,1,1,1,1

@@ -1,0 +1,161 @@
+/* =============================================================
+   Heiniger Gebäude-Service — PDF Report Page-Break Fixes
+
+   Problem: Sale order / invoice lines with long HTML descriptions
+   (bullet lists) were causing entire sections to jump to the next
+   page even when partial content would have fit, leaving large
+   blank spaces at the bottom of pages.
+
+   Fix: Allow table rows that contain HTML to break naturally
+   across page boundaries. Section header rows still try to stay
+   attached to the first line below them. Individual list items
+   are kept together so a single bullet is never split mid-item.
+   ============================================================= */
+
+.din_page,
+.din_page * {
+    font-family: Helvetica, Arial, sans-serif !important;
+}
+
+/* ── 0. Keep quantity and UoM on one line without compressing text ── */
+.page table.o_main_table td.o_td_quantity,
+.page table.o_main_table td.o_td_quantity span {
+    white-space: nowrap !important;
+}
+
+.page table.o_main_table td.o_td_quantity .text-muted.small {
+    display: none;
+}
+
+.page table.o_main_table td {
+    vertical-align: top;
+}
+
+/* Keep advance-summary labels and monetary values in distinct columns. */
+.page table tr.hgr_advance_summary_row > td.hgr_advance_summary_label {
+    width: 62%;
+    padding-right: 12px !important;
+    white-space: normal;
+}
+
+.page table tr.hgr_advance_summary_row > td.hgr_advance_summary_value {
+    width: 38%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* Totals must finish before payment terms and contractual text begin. */
+.din_page .page .hgr_invoice_totals {
+    display: block !important;
+    float: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.din_page .page .hgr_invoice_terms {
+    display: block;
+    clear: both;
+    break-before: auto;
+    page-break-before: auto;
+}
+
+/* ── 1. Allow all order-line rows to break across pages ───── */
+.page table.table tbody tr {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+}
+
+/* ── 2. Section headers stay attached to the row below ───── */
+.page table.table tbody tr.o_line_section,
+.page table.table tbody tr.o_line_subsection,
+.page table.table tbody tr[style*="font-weight:bold"],
+.page table.table tbody tr.font-weight-bold,
+.page table.table tbody tr.fw-bold {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+}
+
+.page table.table tbody tr.o_line_section + tr,
+.page table.table tbody tr.o_line_subsection + tr,
+.page table.table tbody tr[style*="font-weight:bold"] + tr,
+.page table.table tbody tr.font-weight-bold + tr,
+.page table.table tbody tr.fw-bold + tr {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+}
+
+/* ── 3. HTML lists inside cells can break between items ───── */
+.page table.table td ul,
+.page table.table td ol {
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
+/* ── 4. Keep each individual bullet item together ─────────── */
+.page table.table td li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+/* ── 5. Subtotals / totals rows: never split ──────────────── */
+.page table.table tfoot tr,
+.page table.table tbody tr.o_subtotal,
+.page table.table tbody tr.o_total {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+}
+
+/* Qt applies page-break rules to blocks more reliably than to table rows.
+   These PDF-only line tables retain shared widths and original rich text. */
+.din_page .page .hgr_paginated_lines {
+    margin-top: 8.46mm;
+    margin-bottom: 1rem;
+}
+.din_page .page .hgr_paginated_lines table.o_main_table {
+    table-layout: fixed;
+    width: 100%;
+    margin: 0 !important;
+}
+.hgr_paginated_lines .hgr_keep {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+.hgr_paginated_lines .hgr_flow_note {
+    page-break-inside: auto;
+    break-inside: auto;
+}
+.hgr_paginated_lines .hgr_line_heading {
+    page-break-after: avoid;
+}
+.hgr_paginated_lines td.o_price_total,
+.hgr_paginated_lines td[name="td_product_priceunit"],
+.hgr_paginated_lines td[name="td_price_unit"] {
+    white-space: nowrap !important;
+}
+.hgr_paginated_lines td p,
+.hgr_paginated_lines td li {
+    page-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+}
+.hgr_paginated_lines .hgr_note_content {
+    padding: .5rem;
+}
+.hgr_paginated_lines .hgr_note_content ul,
+.hgr_paginated_lines .hgr_note_content ol,
+.hgr_paginated_lines .hgr_note_content li {
+    page-break-inside: auto;
+    break-inside: auto;
+    orphans: 2;
+    widows: 2;
+}
+.hgr_paginated_lines .hgr_note_content p,
+.hgr_paginated_lines .hgr_note_content .hgr_note_leaf {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+.din_page.footer.hgr_pagination_footer {
+    padding-top: 4mm;
+}

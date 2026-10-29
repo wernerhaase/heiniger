@@ -6,13 +6,50 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+			<xpath expr="//div[@name='button_box']" position="inside">
+				<field name="hgr_has_timesheet_project" invisible="1"/>
+				<button name="action_open_hgr_supervisor_timesheet"
+						type="object"
+						class="oe_stat_button"
+						icon="fa-clock-o"
+						invisible="not hgr_has_timesheet_project"
+						groups="hr_timesheet.group_hr_timesheet_approver">
+					<div class="o_stat_info">
+						<span class="o_stat_text">Enter Timesheets</span>
+					</div>
+				</button>
+				<button name="action_open_hgr_profitability"
+						type="object"
+						class="oe_stat_button"
+						icon="fa-line-chart"
+						invisible="not hgr_has_timesheet_project"
+						groups="project.group_project_manager,account.group_account_invoice,account.group_account_readonly">
+					<div class="o_stat_info">
+						<span class="o_stat_text">Profitability</span>
+					</div>
+				</button>
+			</xpath>
+			<xpath expr="//field[@name='order_line']//field[@name='product_uom_qty']" position="after">
+				<field name="hgr_work_category_id" optional="show"/>
+			</xpath>
+			<xpath expr="//field[@name='order_line']//form//label[@for='product_uom_qty']" position="before">
+				<field name="qty_delivered_method" readonly="0"/>
+			</xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="class" add="hgr_document_line_table" separator=" "/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_subtotal'] | //field[@name='order_line']/list/field[@name='price_total']"
+                   position="attributes">
+                <attribute name="class" add="hgr_document_line_amount" separator=" "/>
+                <attribute name="width">150px</attribute>
+            </xpath>
             <field name="payment_term_id" position="after">
-                <field name="hgr_object_id" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
-                <field name="hgr_subject" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
-                <field name="hgr_case_of_insurance" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"/>
+                <field name="hgr_object_id" readonly="state in ('done','cancel')"/>
+                <field name="hgr_subject" readonly="state in ('done','cancel')"/>
+                <field name="hgr_case_of_insurance" readonly="state in ('done','cancel')"/>
             </field>
-            <xpath expr="//page[3]" position="after">
-    			<page string="Insurance Details" attrs="{'invisible':[('hgr_case_of_insurance', '=', False)],'readonly': [('state', 'in', ('done','cancel'))]}">
+            <xpath expr="//notebook" position="inside">
+    			<page string="Insurance Details" invisible = "not hgr_case_of_insurance" readonly="state in ('done','cancel')">
         			<group>
 		              <group>
 		                <field name="hgr_insurance_id"/>
@@ -26,7 +63,41 @@
 		              <field name="hgr_insurance_description" placeholder="Add an insurance description..." options="{'collaborative': true}" />
 		            </group>
     			</page>
-  			</xpath> 
+            </xpath>
+            <xpath expr="//div[@name='so_button_below_order_lines']" position="after">
+                <div name="hgr_clear_below_order_buttons" class="clearfix"/>
+            </xpath>
+            <xpath expr="//div[@name='hgr_clear_below_order_buttons']" position="after">
+                <xpath expr="//group[@name='sale_total']" position="move"/>
+            </xpath>
+            <xpath expr="//group[@name='sale_total']" position="attributes">
+                <attribute name="class"
+                           remove="gap-sm-3 order-0 order-lg-1"
+                           add="gap-1"
+                           separator=" "/>
+            </xpath>
+            <xpath expr="//group[@name='sale_total']/field[@name='tax_totals']" position="after">
+                <field name="hgr_has_advance_invoices" invisible="1"/>
+                <div class="d-flex flex-column gap-1" colspan="2"
+                     invisible="not hgr_has_advance_invoices">
+                    <div class="d-flex align-items-baseline">
+                        <label for="hgr_advance_invoiced_total"
+                               class="mb-0 flex-grow-1 text-end pe-4"/>
+                        <div class="text-end text-nowrap">
+                            <field name="hgr_advance_invoiced_total" widget="monetary"/>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-baseline">
+                        <label for="hgr_remaining_after_advance"
+                               class="mb-0 flex-grow-1 text-end pe-4"/>
+                        <div class="text-end text-nowrap">
+                            <field name="hgr_remaining_after_advance"
+                                   widget="monetary"
+                                   class="oe_subtotal_footer_separator"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
         </field>
     </record>
 </odoo>

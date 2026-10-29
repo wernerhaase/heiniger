@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="analytic.AnalyticDistributionPopup" t-inherit-mode="extension">
+        <xpath expr="//thead//th[hasclass('numeric_column_width')]" position="after">
+            <th t-if="hgrShowQuotedMaterial" class="o_hgr_quoted_material_column">Quoted Material <small class="text-muted fw-normal">(optional)</small></th>
+        </xpath>
+        <xpath expr="//tbody//td[hasclass('numeric_column_width')]" position="after">
+            <td t-if="hgrShowQuotedMaterial" class="o_hgr_quoted_material_column">
+                <t t-set="hgrLineOptions" t-value="hgrQuotedMaterialsForLine(line)"/>
+                <select t-if="hgrLineOptions.length" class="o_input"
+                        t-on-change="(ev) => this.hgrSetQuotedMaterial(ev)">
+                    <option value="" t-att-selected="!hgrSelectedQuotedMaterial">No quoted material</option>
+                    <option t-foreach="hgrLineOptions" t-as="option" t-key="option.id"
+                            t-att-value="option.id"
+                            t-att-selected="option.id === hgrSelectedQuotedMaterial"
+                            t-out="option.name"/>
+                </select>
+            </td>
+        </xpath>
+        <xpath expr="//td[hasclass('o_field_x2many_list_row_add')]" position="attributes">
+            <attribute name="t-att-colspan">allPlans.length + 2 + valueColumnEnabled + (hgrShowQuotedMaterial ? 1 : 0)</attribute>
+        </xpath>
+    </t>
+</templates>

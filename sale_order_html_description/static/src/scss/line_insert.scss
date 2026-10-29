@@ -1,0 +1,27 @@
+.hgr-order-line-actions {
+    th[data-name="sequence"], td[name="sequence"] {
+        min-width: 80px !important;
+        width: 80px !important;
+        white-space: nowrap;
+    }
+    td[name="sequence"] {
+        vertical-align: top;
+        .o_field_handle { display: inline-block; vertical-align: middle; }
+        .hgr-line-actions { display: inline-block; margin-inline-start: 8px; vertical-align: middle; }
+    }
+    .hgr-line-actions-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 1px solid var(--border-color, #d8dadd);
+        border-radius: 5px;
+        background: var(--body-bg, #fff);
+        color: var(--body-color, #495057);
+        line-height: 1;
+        &:hover, &[aria-expanded="true"] { background: #e9ecef; color: #017e84; }
+        &:focus-visible { outline: 2px solid #017e84; outline-offset: 2px; }
+    }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="hgr_report_invoice_two_early_discounts" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='early_payment_discount']" position="attributes">
+            <attribute name="class">text-danger fw-bold</attribute>
+        </xpath>
+        <xpath expr="//div[@id='early_payment_discount']" position="after">
+            <t t-if="o.invoice_payment_term_id.hgr_second_early_discount">
+                <t t-set="hgr_discount_options"
+                   t-value="o.invoice_payment_term_id._hgr_discount_options(o.invoice_date, o.amount_total, o.amount_untaxed, o.currency_id, o.invoice_cash_rounding_id)"/>
+                <div class="text-danger fw-bold" t-foreach="hgr_discount_options[1:]" t-as="option">
+                    <span t-out="o.invoice_payment_term_id._hgr_format_discount_option(option, o.currency_id)"/>
+                </div>
+                <div class="text-danger fw-bold">
+                    <span t-out="o._hgr_format_net_due()"/>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

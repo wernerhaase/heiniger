@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Client actions have no control panel, so render the breadcrumbs
+         ourselves to give users a way back to where they came from. -->
+    <t t-name="heiniger_addons.HgrBreadcrumbs">
+        <ol t-if="hgrBreadcrumbs.length &gt; 1" class="breadcrumb mb-2">
+            <li t-foreach="hgrBreadcrumbs" t-as="crumb" t-key="crumb.jsId"
+                class="breadcrumb-item" t-att-class="{ active: crumb_last }">
+                <t t-if="crumb_last" t-out="crumb.name"/>
+                <a t-else="" href="#" t-on-click.prevent="() => crumb.onSelected()" t-out="crumb.name"/>
+            </li>
+        </ol>
+    </t>
+</templates>

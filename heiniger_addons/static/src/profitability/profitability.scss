@@ -1,0 +1,110 @@
+.o_hgr_profitability {
+    background: $o-webclient-background-color;
+    color: $o-main-text-color;
+
+    .card {
+        border-color: var(--border-color, #dee2e6);
+        border-radius: .75rem;
+    }
+
+    .o_hgr_kpi {
+        min-width: 190px;
+    }
+
+    .o_hgr_kpi_link {
+        color: inherit;
+        line-height: inherit;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: .2rem;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--o-brand-primary, #714b67);
+        }
+    }
+
+    .form-control,
+    .form-select,
+    .o_record_selector {
+        min-height: 42px;
+    }
+
+    .o_hgr_manual_entry {
+        border-width: 2px;
+    }
+
+    .o_hgr_project_row {
+        cursor: pointer;
+    }
+
+    .o_hgr_cost_breakdown {
+        .o_hgr_project_heading {
+            cursor: pointer;
+            background: color-mix(in srgb, var(--o-brand-primary, #714b67) 8%, transparent);
+        }
+
+        .o_hgr_breakdown_row td {
+            border-bottom-color: color-mix(in srgb, var(--border-color, #dee2e6) 65%, transparent);
+        }
+
+        .o_hgr_project_total {
+            background: color-mix(in srgb, var(--o-brand-primary, #714b67) 12%, transparent);
+            border-top: 2px solid var(--o-brand-primary, #714b67);
+        }
+
+        tbody + tbody {
+            border-top: 0;
+        }
+    }
+
+    .o_hgr_detail_table {
+        max-height: 520px;
+    }
+
+    .o_hgr_table_total {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        background: color-mix(in srgb, var(--o-brand-primary, #714b67) 12%, $o-view-background-color);
+        border-top: 2px solid var(--o-brand-primary, #714b67);
+    }
+
+    .o_hgr_report_tabs {
+        border-bottom: 1px solid var(--border-color, #dee2e6);
+
+        .nav-tabs {
+            border-bottom: 0;
+            gap: .25rem;
+        }
+
+        .nav-link {
+            flex: 0 0 auto;
+            color: $o-main-text-color;
+            background: $o-view-background-color;
+            border: 1px solid var(--border-color, #dee2e6);
+            border-bottom: 0;
+            border-radius: .5rem .5rem 0 0;
+            padding: .65rem 1.15rem;
+        }
+
+        .nav-link.active {
+            color: var(--o-brand-primary, #714b67);
+            font-weight: 600;
+            box-shadow: inset 0 -3px 0 var(--o-brand-primary, #714b67);
+        }
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: $o-view-background-color;
+        color: $o-main-text-color;
+        white-space: nowrap;
+    }
+
+    .o_hgr_quoted_material_column {
+        min-width: 260px;
+    }
+}

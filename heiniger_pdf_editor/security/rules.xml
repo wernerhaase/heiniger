@@ -1,0 +1,7 @@
+<odoo>
+    <record id="connection_company_rule" model="ir.rule">
+        <field name="name">PDF editor connections: allowed companies</field>
+        <field name="model_id" ref="model_hgr_pdf_editor_connection"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

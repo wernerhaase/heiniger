@@ -1,0 +1,1652 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* heiniger_addons
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-28 06:39+0000\n"
+"PO-Revision-Date: 2026-10-28 06:39+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_advance_invoiced_total
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_advance_invoiced_total
+msgid "Invoiced advances (-)"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_invoice_advance_summary
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_saleorder_advance_summary
+msgid "Invoiced advances"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_sale_order_total
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_invoice_advance_summary
+msgid "Order total incl. tax"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_remaining_after_advance
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_remaining_after_advance
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_invoice_advance_summary
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_saleorder_advance_summary
+msgid "Remaining order amount"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "%(date)s - %(project)s"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "%s timesheet entries saved."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "1. Validate Entry"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "2. Confirm & Save"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.portal_note_pdf_preview
+msgid "<i class=\"fa fa-download me-1\"/> Download"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_view_order_form
+msgid "<span class=\"o_stat_text\">Enter Timesheets</span>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_view_order_form
+msgid "<span class=\"o_stat_text\">Profitability</span>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_timesheet_document
+msgid "<span>Work Report / Hourly Billing </span>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_timesheet_document
+msgid "<strong>Customer:</strong>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_timesheet_document
+msgid "<strong>Employees:</strong>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_timesheet_document
+msgid "<strong>Object:</strong>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_timesheet_document
+msgid "<strong>Task Description:</strong>"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid ""
+"A matching entry already exists. Review the Timesheets or Material tab "
+"before entering it again."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Actual Hours"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Add Another Worker"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Add Worker"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_crm_lead_form
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_view_order_form
+msgid "Add an insurance description..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Add at least one worker line."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "All projects"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Allocation"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__amount
+msgid "Amount"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/note_pdf_attachments.py:0
+msgid ""
+"An attachment referenced in the notes is missing (ID %s). Remove or replace "
+"its link before printing with attachments."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Analytic Account"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__analytic_distribution
+msgid "Analytic Distribution"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__analytic_precision
+msgid "Analytic Precision"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_account_bank_statement_line__hgr_print_with_attachments
+#: model:ir.model.fields,help:heiniger_addons.field_account_move__hgr_print_with_attachments
+#: model:ir.model.fields,help:heiniger_addons.field_hgr_note_pdf_mixin__hgr_print_with_attachments
+#: model:ir.model.fields,help:heiniger_addons.field_sale_order__hgr_print_with_attachments
+msgid ""
+"Append PDFs inserted in the document notes after the formal report, in note "
+"order."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Apply"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_ir_attachment
+msgid "Attachment"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Automatic timesheets and vendor bills cannot be edited here."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_crm_lead_insurance
+msgid "CRM Insurance Companies"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Cancel"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/ir_actions_report.py:0
+msgid ""
+"Cannot append PDF \"%s\". Upload a readable, unencrypted PDF or uncheck "
+"Print with attachments."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_insurance_claim_no
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__hgr_insurance_claim_no
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_insurance_claim_no
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_document_information
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Claim No"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_document_information
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Claim Record Date"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_claim_person_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__hgr_claim_person_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_claim_person_id
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Claims Expert"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead__hgr_claim_person_id
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead_insurance__hgr_claim_person_id
+#: model:ir.model.fields,help:heiniger_addons.field_sale_order__hgr_claim_person_id
+msgid "Claims contact person"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Close"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__company_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__company_id
+msgid "Company"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_base_document_layout
+msgid "Company Document Layout"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "Complete the customer, project, supervisor, and date."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Cost"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Cost Summary"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,website_form_label:heiniger_addons.model_project_task
+msgid "Create a Task"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,website_form_label:heiniger_addons.model_crm_lead
+msgid "Create an Opportunity"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__create_uid
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__create_uid
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__create_uid
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__create_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__create_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__create_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_res_currency
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__partner_id
+msgid "Customer"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Customer, project, supervisor, and date are required."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_insurance_record_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__hgr_insurance_record_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__date
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_insurance_record_date
+msgid "Date"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__description
+msgid "Description"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Detailed"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Detailed time entries corresponding to the Excel labour sheets."
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_document_information
+msgid "Discount Date"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_base_document_layout__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_note_pdf_mixin__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_actions_report__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_attachment__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_module_module__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_product_product__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_project_project__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_project_task__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_res_currency__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_res_partner__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__display_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__distribution_analytic_account_ids
+msgid "Distribution Analytic Account"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.actions.act_window,name:heiniger_addons.action_view_documents_crm_lead
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_crm_lead_form
+msgid "Documents"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Draft"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Draft:"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_bank_statement_line__invoice_discount_date_due
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__invoice_discount_date_due
+msgid "Due Date with discount"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Each worker and service combination can only appear once."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Employee"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "Employee, service, and positive hours are required."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_project_task__employee_ids
+msgid "Employees"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "Enter a positive material cost."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Enter service name..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Enter the daily work for your team."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Entries"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid ""
+"Every line needs a worker, service, work category, and positive hours."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "First validation passed"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "From"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "General notes about the workday..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Group by Service"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Header"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_bank_statement_line__hgr_invoice_preview_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_invoice_preview_id
+msgid "Hgr Invoice Preview"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_attachment__hgr_note_original_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_product_document__hgr_note_original_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_quotation_document__hgr_note_original_name
+msgid "Hgr Note Original Name"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_attachment__hgr_note_source_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_product_document__hgr_note_source_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_quotation_document__hgr_note_source_id
+msgid "Hgr Note Source"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Hours"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Hours Spent"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "Hours cannot exceed 24 for one employee."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Hours cannot exceed 24 for one worker."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move_line__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_base_document_layout__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_note_pdf_mixin__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_actions_report__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_attachment__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_ir_module_module__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_product_product__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_project_project__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_project_task__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_res_currency__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_res_partner__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__id
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order_line__id
+msgid "ID"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.portal_note_pdf_preview
+msgid ""
+"If your browser cannot display the PDF, use Download to open it on your "
+"computer."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_insurance_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__hgr_insurance_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_res_partner__hgr_is_insurance
+#: model:ir.model.fields,field_description:heiniger_addons.field_res_users__hgr_is_insurance
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_insurance_id
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead__hgr_insurance_id
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead_insurance__hgr_insurance_id
+#: model:ir.model.fields,help:heiniger_addons.field_sale_order__hgr_insurance_id
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_document_information
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Insurance Company"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_crm_lead_form
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_view_order_form
+msgid "Insurance Details"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_insurance_description
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_insurance_description
+msgid "Insurance Notes"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_case_of_insurance
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_case_of_insurance
+msgid "Insurance case"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__insurance_line
+msgid "Insurances For Quotation"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "Invalid manual profitability data."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Invalid timesheet data."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Invoice"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/note_pdf_attachments.py:0
+msgid "Invoice preview is available for posted customer documents."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Invoiced Revenue"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_account_move_line
+msgid "Journal Item"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__l10n_din5008_addresses
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_bank_statement_line__l10n_din5008_addresses
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__l10n_din5008_addresses
+msgid "L10N Din5008 Addresses"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__l10n_din5008_document_subject
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_bank_statement_line__l10n_din5008_document_subject
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__l10n_din5008_document_subject
+#: model:ir.model.fields,field_description:heiniger_addons.field_base_document_layout__l10n_din5008_document_subject
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__l10n_din5008_document_subject
+msgid "L10N Din5008 Document Subject"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__l10n_din5008_document_title
+msgid "L10N Din5008 Document Title"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__l10n_din5008_template_data
+msgid "L10N Din5008 Template Data"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: model:ir.model.fields.selection,name:heiniger_addons.selection__account_analytic_line__hgr_profitability_manual_type__labour
+msgid "Labour"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Labour Cost"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Labour Effort"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Labour view"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Labour, vendor bills, revenue, and margin by analytic account."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__write_uid
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__write_uid
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__write_uid
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__write_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__write_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__write_date
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_crm_lead
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__lead_id
+msgid "Lead"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Loading profitability..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Loading services..."
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_work_report_layout
+msgid "Logo"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Manual"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Manual Entry"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__hgr_profitability_manual_user_id
+msgid "Manual Entry By"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Manual Mode"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_hgr_profitability_manual_cost
+msgid "Manual Profitability Material Cost"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__hgr_profitability_manual_type
+msgid "Manual Profitability Type"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__hgr_manual_service_name
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__manual_service_name
+msgid "Manual Service"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid ""
+"Manual entries require two validations. First validate against existing "
+"records, then confirm and save."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Manual entry type"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Manual profitability entry saved."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Manual:"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Margin"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Material"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Material Cost"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Material Effort"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_ir_module_module
+msgid "Module"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__multi_insurance
+msgid "Multiple Insurance"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__name
+msgid "Name"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "No Service"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "No allocated vendor bill lines."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "No projects with an analytic account were found."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "No service hours found."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "No service items found on the linked sales orders"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "No timesheets."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__document_count
+msgid "Number of documents"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_object_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_object_id
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_document_information
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Object"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Objekt:"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Only timesheet approvers can enter time for other workers."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Open Timesheets"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Open Vendor Bills"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__order_id
+msgid "Order"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/sale.py:0
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Order Confirmation"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Other / Manual service"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__description
+msgid "Overall Description"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_hgr_note_pdf_mixin
+msgid "PDF attachments embedded in notes"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.portal_note_pdf_preview
+msgid "PDF preview"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead__hgr_object_id
+#: model:ir.model.fields,help:heiniger_addons.field_sale_order__hgr_object_id
+msgid "Partner object"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "Please select a project that allows timesheets."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_insurance_policy_no
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__hgr_insurance_policy_no
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_insurance_policy_no
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Policy No"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Posted"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_bank_statement_line__hgr_print_with_attachments
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_print_with_attachments
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_note_pdf_mixin__hgr_print_with_attachments
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_print_with_attachments
+msgid "Print with attachments"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Pro Forma Invoice"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Product"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_product_product
+msgid "Product Variant"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.actions.client,name:heiniger_addons.action_hgr_project_profitability
+#: model:ir.ui.menu,name:heiniger_addons.menu_hgr_project_profitability
+msgid "Profitability"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Profitability report sections"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model,name:heiniger_addons.model_project_project
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__project_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__project_id
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__project_id
+msgid "Project"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Project Profitability"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "Project, date, and description are required."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Projects"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/sale.py:0
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.sale_document_information
+msgid "Quotation"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Quoted Amount"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Quoted Hours"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Reason and supporting reference..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Refresh"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.invoice_print_attachments
+msgid "Refresh invoice preview"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Remove line"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/note_pdf_attachments.py:0
+msgid "Report"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_ir_actions_report
+msgid "Report Action"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Save Timesheets"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Saving..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "Select Labour or Material Cost."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead__project_id
+msgid "Select a billable project on which tasks can be created."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "Select a customer first"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Select a project first"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Select a worker first"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "Select customer..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Select employee..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Select one project before using Manual Mode."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "Select project..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Select service..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "Select supervisor..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "Select worker..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__sale_line_id
+msgid "Service"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__sheet_id
+msgid "Sheet"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/account_move.py:0
+msgid "Shipping Address:"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_crm_lead_form
+msgid "Show Insurance Details"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "State"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/base_layout.py:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead__hgr_subject
+#: model:ir.model.fields,field_description:heiniger_addons.field_crm_lead_insurance__hgr_subject
+#: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_subject
+msgid "Subject"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_crm_lead__hgr_subject
+msgid "Subject of the lead"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__supervisor_id
+msgid "Supervisor"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_analytic_line__hgr_supervisor_sheet_id
+#: model:ir.ui.menu,name:heiniger_addons.menu_hgr_supervisor_timesheet
+msgid "Supervisor Entry"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.actions.client,name:heiniger_addons.action_hgr_supervisor_timesheet
+msgid "Supervisor Timesheet"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_hgr_supervisor_timesheet
+msgid "Supervisor Timesheet Entry"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_hgr_supervisor_timesheet_line
+msgid "Supervisor Timesheet Worker Line"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model,name:heiniger_addons.model_project_task
+msgid "Task"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Task / Trade"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "The employee and project must belong to the same company."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "The entry changed after validation. Validate it again before saving."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/note_pdf_attachments.py:0
+msgid "The invoice report did not produce a PDF."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "The manual entry contains an invalid number."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "The manual entry could not be saved."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "The profitability report could not be loaded."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "The project must belong to the active company."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "The selected project does not belong to this customer."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid ""
+"The selected service must be a service item from a sales order linked to "
+"this project."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "The service must come from a sales order linked to this project."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+msgid "The timesheet entries could not be saved."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+msgid "The worker and project must belong to the same company."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__unit_amount
+msgid "Time (Hours)"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/timesheet.py:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__timesheet_id
+msgid "Timesheet"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__timesheet_ids
+msgid "Timesheets"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.heiniger_timesheet_document
+msgid "Timesheets:"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "To"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Total Cost"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Total"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_crm_lead_form
+msgid "Update"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/note_pdf_attachments.py:0
+msgid "Upload \"%s\" as a PDF file before printing with attachments."
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.actions.act_window,help:heiniger_addons.action_view_documents_crm_lead
+msgid ""
+"Upload <span class=\"fw-normal\">a file or </span>drag <span class=\"fw-"
+"normal\">it here.</span>"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_profitability_manual_cost__validated_by_id
+msgid "Validated By"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Validation failed."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Validation passed. Review the entry, then confirm and save."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Vendor"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Vendor Bill Cost"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.js:0
+msgid "Vendor Bills"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Vendor bill lines allocated to the project analytic account."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Optional notes about the work..."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__name
+msgid "Work Description"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Work Description (Optional)"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.actions.report,name:heiniger_addons.heiniger_timesheet_report_project_task
+msgid "Work sheet"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.js:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet_line__employee_id
+msgid "Worker"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+#: model:ir.model.fields,field_description:heiniger_addons.field_hgr_supervisor_timesheet__line_ids
+msgid "Worker Lines"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/project.py:0
+msgid "You are not allowed to view project profitability."
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,help:heiniger_addons.field_res_partner__hgr_is_insurance
+#: model:ir.model.fields,help:heiniger_addons.field_res_users__hgr_is_insurance
+msgid "help to classify insurance comapny seperately"
+msgstr ""
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_payment_term__hgr_second_early_discount
+msgid "Second Early Discount"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_payment_term__hgr_second_discount_percentage
+msgid "Second Discount %"
+msgstr ""
+
+#. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_payment_term__hgr_second_discount_days
+msgid "Second Discount Days"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_account_payment_term_form_two_discounts
+msgid "Second early-payment option"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_account_payment_term_form_two_discounts
+msgid "if paid within"
+msgstr ""
+
+#. module: heiniger_addons
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_account_payment_term_form_two_discounts
+msgid "days"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "Enable the first early discount before adding a second discount."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "Two early discounts require one 100% due line."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "The second discount must be positive and lower than the first discount."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "The second discount deadline must be later than the first discount deadline."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "%(percentage)s%% discount: pay %(amount)s by %(date)s"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "Net amount: pay %(amount)s by %(date)s"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "%(percentage)s%% discount: <b>%(amount)s</b> if paid by <b>%(date)s</b>"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "<div><b>%(percentage)s%% discount</b>: pay %(amount)s by %(date)s</div>"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-python
+#: code:addons/heiniger_addons/models/payment_term.py:0
+msgid "<div><b>Net amount</b>: pay %(amount)s by %(date)s</div>"
+msgstr ""
