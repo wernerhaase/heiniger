@@ -56,6 +56,7 @@ class TestAdvanceSummary(AccountTestInvoicingCommon):
         self.assertEqual(self.order.hgr_remaining_after_advance, 700.0)
 
         self.assertTrue(advance.hgr_has_advance_summary)
+        self.assertEqual(advance.hgr_sale_order_untaxed, 1000.0)
         self.assertEqual(advance.hgr_sale_order_total, 1000.0)
         self.assertEqual(advance.hgr_advance_invoiced_total, 300.0)
         self.assertEqual(advance.hgr_remaining_after_advance, 700.0)
@@ -102,6 +103,7 @@ class TestAdvanceSummary(AccountTestInvoicingCommon):
         self.assertIn(b'Remaining order amount', portal_totals_html)
         self.assertIn(b'hgr_advance_summary_label', portal_totals_html)
         self.assertIn(b'hgr_advance_summary_value', portal_totals_html)
+        self.assertIn(b'Order total excl. tax', invoice_html)
         self.assertIn(b'Order total incl. tax', invoice_html)
         self.assertIn(b'Invoiced advances', invoice_html)
         self.assertIn(b'hgr_advance_summary_label', invoice_html)

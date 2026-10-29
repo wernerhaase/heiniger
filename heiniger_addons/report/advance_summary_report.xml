@@ -63,6 +63,12 @@
         <xpath expr="//div[@id='right-elements']//table/t[@t-if='o.tax_totals'][@t-call='account.document_tax_totals']" position="after">
             <t t-if="o.hgr_has_advance_summary">
                 <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Order total excl. tax</td>
+                    <td class="hgr_advance_summary_value text-end">
+                        <span t-field="o.hgr_sale_order_untaxed"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row">
                     <td class="hgr_advance_summary_label">Order total incl. tax</td>
                     <td class="hgr_advance_summary_value text-end">
                         <span t-field="o.hgr_sale_order_total"/>

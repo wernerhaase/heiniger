@@ -35,6 +35,12 @@ msgid "Order total incl. tax"
 msgstr "Auftragswert inkl. MwSt."
 
 #. module: heiniger_addons
+#: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_sale_order_untaxed
+#: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_invoice_advance_summary
+msgid "Order total excl. tax"
+msgstr "Auftragswert exkl. MwSt."
+
+#. module: heiniger_addons
 #: model:ir.model.fields,field_description:heiniger_addons.field_account_move__hgr_remaining_after_advance
 #: model:ir.model.fields,field_description:heiniger_addons.field_sale_order__hgr_remaining_after_advance
 #: model_terms:ir.ui.view,arch_db:heiniger_addons.hgr_report_invoice_advance_summary

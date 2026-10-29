@@ -18,6 +18,11 @@ class AccountMove(models.Model):
 		compute="_compute_hgr_advance_summary",
 		currency_field="currency_id",
 	)
+	hgr_sale_order_untaxed = fields.Monetary(
+		string="Order total excl. tax",
+		compute="_compute_hgr_advance_summary",
+		currency_field="currency_id",
+	)
 	hgr_advance_invoiced_total = fields.Monetary(
 		string="Invoiced advances (-)",
 		compute="_compute_hgr_advance_summary",
@@ -38,6 +43,7 @@ class AccountMove(models.Model):
 	@api.depends(
 		'currency_id',
 		'invoice_date',
+		'line_ids.sale_line_ids.order_id.amount_untaxed',
 		'line_ids.sale_line_ids.order_id.amount_total',
 		'line_ids.sale_line_ids.order_id.hgr_has_advance_invoices',
 		'line_ids.sale_line_ids.order_id.hgr_advance_invoiced_total',
@@ -52,6 +58,7 @@ class AccountMove(models.Model):
 				and orders.hgr_has_advance_invoices
 			)
 			move.hgr_has_advance_summary = show_summary
+			move.hgr_sale_order_untaxed = 0.0
 			move.hgr_sale_order_total = 0.0
 			move.hgr_advance_invoiced_total = 0.0
 			move.hgr_remaining_after_advance = 0.0
@@ -60,6 +67,9 @@ class AccountMove(models.Model):
 
 			order = orders
 			conversion_date = move.invoice_date or fields.Date.context_today(move)
+			move.hgr_sale_order_untaxed = order.currency_id._convert(
+				order.amount_untaxed, move.currency_id, move.company_id, conversion_date
+			)
 			move.hgr_sale_order_total = order.currency_id._convert(
 				order.amount_total, move.currency_id, move.company_id, conversion_date
 			)
