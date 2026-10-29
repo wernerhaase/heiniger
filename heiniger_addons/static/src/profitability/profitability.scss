@@ -24,6 +24,26 @@
         cursor: pointer;
     }
 
+    .o_hgr_cost_breakdown {
+        .o_hgr_project_heading {
+            cursor: pointer;
+            background: color-mix(in srgb, var(--o-brand-primary, #714b67) 8%, transparent);
+        }
+
+        .o_hgr_breakdown_row td {
+            border-bottom-color: color-mix(in srgb, var(--border-color, #dee2e6) 65%, transparent);
+        }
+
+        .o_hgr_project_total {
+            background: color-mix(in srgb, var(--o-brand-primary, #714b67) 12%, transparent);
+            border-top: 2px solid var(--o-brand-primary, #714b67);
+        }
+
+        tbody + tbody {
+            border-top: 0;
+        }
+    }
+
     .o_hgr_detail_table {
         max-height: 520px;
     }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hgr_work_category_list" model="ir.ui.view">
+        <field name="name">hgr.work.category.list</field>
+        <field name="model">hgr.work.category</field>
+        <field name="arch" type="xml">
+            <list string="Work Categories" editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hgr_work_category_form" model="ir.ui.view">
+        <field name="name">hgr.work.category.form</field>
+        <field name="model">hgr.work.category</field>
+        <field name="arch" type="xml">
+            <form string="Work Category">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hgr_work_category_search" model="ir.ui.view">
+        <field name="name">hgr.work.category.search</field>
+        <field name="model">hgr.work.category</field>
+        <field name="arch" type="xml">
+            <search string="Work Categories">
+                <field name="name"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hgr_work_category" model="ir.actions.act_window">
+        <field name="name">Work Categories</field>
+        <field name="res_model">hgr.work.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hgr_work_category_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a work category</p>
+            <p>Use work categories to group quoted and actual labour and material costs.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hgr_work_category"
+              name="Work Categories"
+              parent="hr_timesheet.hr_timesheet_menu_configuration"
+              action="action_hgr_work_category"
+              groups="hr_timesheet.group_hr_timesheet_approver"
+              sequence="20"/>
+</odoo>

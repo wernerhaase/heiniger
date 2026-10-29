@@ -24,6 +24,9 @@ class TestSupervisorTimesheet(TransactionCase):
             'name': 'Test Worker',
             'company_id': self.env.company.id,
         })
+        self.work_category = self.env['hgr.work.category'].create({
+            'name': 'Installation Work',
+        })
         self.service = self.env['product.product'].create({
             'name': 'Installation Service',
             'type': 'service',
@@ -35,6 +38,7 @@ class TestSupervisorTimesheet(TransactionCase):
             'order_line': [Command.create({
                 'product_id': self.service.id,
                 'product_uom_qty': 10.0,
+                'hgr_work_category_id': self.work_category.id,
             })],
         })
         self.service_line = self.order.order_line
@@ -49,6 +53,7 @@ class TestSupervisorTimesheet(TransactionCase):
             'lines': [{
                 'employee_id': self.worker.id,
                 'sale_line_id': self.service_line.id,
+                'work_category_id': self.work_category.id,
                 'unit_amount': 7.5,
                 'name': 'Installed and tested equipment',
             }],
@@ -61,11 +66,16 @@ class TestSupervisorTimesheet(TransactionCase):
         self.assertEqual(sheet.description, 'General site work')
         self.assertEqual(sheet.line_ids.employee_id, self.worker)
         self.assertEqual(sheet.line_ids.sale_line_id, self.service_line)
+        self.assertEqual(sheet.line_ids.work_category_id, self.work_category)
         self.assertEqual(sheet.line_ids.unit_amount, 7.5)
         self.assertEqual(sheet.timesheet_ids, sheet.line_ids.timesheet_id)
         self.assertEqual(sheet.timesheet_ids.project_id, self.project)
         self.assertEqual(sheet.timesheet_ids.employee_id, self.worker)
         self.assertEqual(sheet.timesheet_ids.so_line, self.service_line)
+        self.assertEqual(
+            sheet.timesheet_ids.hgr_work_category_id,
+            self.work_category,
+        )
         self.assertTrue(sheet.timesheet_ids.is_so_line_edited)
         self.assertEqual(sheet.timesheet_ids.name, 'Installed and tested equipment')
 
@@ -84,6 +94,7 @@ class TestSupervisorTimesheet(TransactionCase):
         )
 
         self.assertEqual([option['id'] for option in options], [self.service_line.id])
+        self.assertEqual(options[0]['work_category_id'], self.work_category.id)
 
     def test_manual_service_creates_standard_timesheet(self):
         payload = self.payload()
@@ -168,5 +179,12 @@ class TestSupervisorTimesheet(TransactionCase):
     def test_rejects_incomplete_worker_line(self):
         payload = self.payload()
         payload['lines'][0]['unit_amount'] = 0
+        with self.assertRaises(ValidationError):
+            self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
+
+    def test_work_category_is_required(self):
+        payload = self.payload()
+        payload['lines'][0]['work_category_id'] = False
+
         with self.assertRaises(ValidationError):
             self.env['hgr.supervisor.timesheet'].create_from_ui(payload)

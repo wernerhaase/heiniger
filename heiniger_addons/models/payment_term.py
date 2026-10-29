@@ -276,6 +276,8 @@ class AccountMoveLine(models.Model):
         for installment in installments:
             line = installment['line']
             term = line.move_id.invoice_payment_term_id
+            if not term:
+                continue
             tier = term._hgr_discount_tier(line.move_id.invoice_date, payment_date)
             if installment['type'] != 'early_payment_discount' or not tier or tier[2] != 'second':
                 continue

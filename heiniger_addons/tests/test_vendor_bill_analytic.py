@@ -86,3 +86,24 @@ class TestVendorBillAnalyticDistribution(TransactionCase):
         invoice.analytic_distribution = self.distribution
 
         self.assertFalse(invoice.invoice_line_ids.analytic_distribution)
+
+    def test_analytic_distribution_can_be_searched_by_project_customer(self):
+        customer = self.env['res.partner'].create({
+            'name': 'Needle Analytic Customer',
+            'customer_rank': 1,
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'Unrelated Project Account Name',
+            'plan_id': self.plan.id,
+        })
+        self.env['project.project'].create({
+            'name': 'Customer Search Project',
+            'partner_id': customer.id,
+            'account_id': analytic_account.id,
+        })
+
+        results = self.env['account.analytic.account'].name_search(
+            name='Needle Analytic',
+        )
+
+        self.assertIn(analytic_account.id, dict(results))

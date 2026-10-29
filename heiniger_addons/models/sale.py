@@ -97,6 +97,11 @@ class Saleorder(models.Model):
 class SaleOrderLine(models.Model):
 	_inherit = "sale.order.line"
 
+	hgr_work_category_id = fields.Many2one(
+		'hgr.work.category', string='Work Category', ondelete='restrict', index=True,
+		help='Groups quoted and actual labour in the project profitability report.',
+	)
+
 	def _timesheet_create_task_prepare_values(self, project):
 		res = super(SaleOrderLine, self)._timesheet_create_task_prepare_values(project)
 		sale_line_name_parts = self.name.split('\n')

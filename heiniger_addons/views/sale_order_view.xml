@@ -29,6 +29,9 @@
 					</div>
 				</button>
 			</xpath>
+			<xpath expr="//field[@name='order_line']//field[@name='product_uom_qty']" position="after">
+				<field name="hgr_work_category_id" optional="show"/>
+			</xpath>
             <field name="payment_term_id" position="after">
                 <field name="hgr_object_id" readonly="state in ('done','cancel')"/>
                 <field name="hgr_subject" readonly="state in ('done','cancel')"/>

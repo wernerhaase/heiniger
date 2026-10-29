@@ -22,6 +22,7 @@ export class HgrSupervisorTimesheet extends Component {
             supervisor: _t("Supervisor"),
             worker: _t("Worker"),
             service: _t("Service"),
+            workCategory: _t("Work Category"),
             selectCustomer: _t("Select customer..."),
             selectProject: _t("Select project..."),
             selectCustomerFirst: _t("Select a customer first"),
@@ -29,6 +30,7 @@ export class HgrSupervisorTimesheet extends Component {
             selectSupervisor: _t("Select supervisor..."),
             selectWorker: _t("Select worker..."),
             selectService: _t("Select service..."),
+            selectWorkCategory: _t("Select work category..."),
             manualService: _t("Other / Manual service"),
             selectWorkerFirst: _t("Select a worker first"),
             noServices: _t("No service items found on the linked sales orders"),
@@ -68,6 +70,7 @@ export class HgrSupervisorTimesheet extends Component {
             saleLineId: false,
             isManualService: false,
             manualServiceName: "",
+            workCategoryId: false,
             hours: "",
             description: "",
         };
@@ -99,6 +102,7 @@ export class HgrSupervisorTimesheet extends Component {
             line.saleLineId = false;
             line.isManualService = false;
             line.manualServiceName = "";
+            line.workCategoryId = false;
         }
     }
 
@@ -108,6 +112,7 @@ export class HgrSupervisorTimesheet extends Component {
             line.saleLineId = false;
             line.isManualService = false;
             line.manualServiceName = "";
+            line.workCategoryId = false;
         }
         await this.loadServiceLines();
     }
@@ -143,6 +148,12 @@ export class HgrSupervisorTimesheet extends Component {
         line.saleLineId = line.isManualService ? false : (Number(event.target.value) || false);
         if (!line.isManualService) {
             line.manualServiceName = "";
+            const service = this.state.serviceLines.find(
+                (item) => item.id === line.saleLineId
+            );
+            if (service?.work_category_id) {
+                line.workCategoryId = service.work_category_id;
+            }
         }
     }
 
@@ -168,10 +179,11 @@ export class HgrSupervisorTimesheet extends Component {
         const invalidLine = this.state.lines.some(
             (line) => !line.employeeId
                 || (!line.saleLineId && !line.manualServiceName.trim())
+                || !line.workCategoryId
                 || Number(line.hours) <= 0 || !line.description.trim()
         );
         if (invalidLine) {
-            return _t("Every line needs a worker, service, positive hours, and a work description.");
+            return _t("Every line needs a worker, service, work category, positive hours, and a work description.");
         }
         return false;
     }
@@ -194,6 +206,7 @@ export class HgrSupervisorTimesheet extends Component {
                     employee_id: line.employeeId,
                     sale_line_id: line.saleLineId,
                     manual_service_name: line.manualServiceName.trim(),
+                    work_category_id: line.workCategoryId,
                     unit_amount: Number(line.hours),
                     name: line.description.trim(),
                 })),

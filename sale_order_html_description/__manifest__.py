@@ -11,7 +11,7 @@
     'author': 'Ashish Thomas',
     'maintainer': 'Ashish Thomas',
     'category': 'Sales',
-    'version': "19.0.1.3.2",
+    'version': "19.0.1.3.3",
     'license': 'AGPL-3',
     'depends': [
         'sale','sale_project','account','html_editor'

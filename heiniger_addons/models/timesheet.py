@@ -2,6 +2,15 @@ from odoo import api, fields, models, Command, _
 from odoo.exceptions import AccessError, ValidationError
 
 
+class HgrWorkCategory(models.Model):
+    _name = 'hgr.work.category'
+    _description = 'Work Category'
+    _order = 'name'
+
+    name = fields.Char(required=True, translate=True, index='trigram')
+    active = fields.Boolean(default=True)
+    color = fields.Integer()
+
 class HgrSupervisorTimesheet(models.Model):
     _name = 'hgr.supervisor.timesheet'
     _description = 'Supervisor Timesheet Entry'
@@ -63,7 +72,11 @@ class HgrSupervisorTimesheet(models.Model):
         if project.company_id and project.company_id != self.env.company:
             return []
         return [
-            {'id': line.id, 'name': line.display_name}
+            {
+                'id': line.id,
+                'name': line.display_name,
+                'work_category_id': line.hgr_work_category_id.id or False,
+            }
             for line in self._get_project_service_sale_lines(project)
         ]
 
@@ -95,15 +108,24 @@ class HgrSupervisorTimesheet(models.Model):
             sale_line = self.env['sale.order.line'].sudo().browse(
                 raw_line.get('sale_line_id')
             ).exists()
+            work_category = self.env['hgr.work.category'].browse(
+                raw_line.get('work_category_id')
+            ).exists()
             manual_service_name = (raw_line.get('manual_service_name') or '').strip()
             try:
                 hours = float(raw_line.get('unit_amount') or 0)
             except (TypeError, ValueError):
                 hours = 0
             description = (raw_line.get('name') or '').strip()
-            if not employee or (not sale_line and not manual_service_name) or hours <= 0 or not description:
+            if (
+                not employee
+                or (not sale_line and not manual_service_name)
+                or not work_category
+                or hours <= 0
+                or not description
+            ):
                 raise ValidationError(_(
-                    'Every line needs a worker, service, positive hours, and a work description.'
+                    'Every line needs a worker, service, work category, positive hours, and a work description.'
                 ))
             if sale_line and sale_line not in allowed_sale_lines:
                 raise ValidationError(_(
@@ -124,6 +146,7 @@ class HgrSupervisorTimesheet(models.Model):
                 'employee_id': employee.id,
                 'sale_line_id': sale_line.id,
                 'manual_service_name': manual_service_name,
+                'work_category_id': work_category.id,
                 'unit_amount': hours,
                 'name': description,
             }))
@@ -144,6 +167,7 @@ class HgrSupervisorTimesheet(models.Model):
                 'so_line': line.sale_line_id.id or False,
                 'is_so_line_edited': bool(line.sale_line_id),
                 'hgr_manual_service_name': line.manual_service_name,
+                'hgr_work_category_id': line.work_category_id.id,
                 'unit_amount': line.unit_amount,
                 'name': line.name,
                 'hgr_supervisor_sheet_id': sheet.id,
@@ -162,6 +186,10 @@ class HgrSupervisorTimesheetLine(models.Model):
         'sale.order.line', string='Service', ondelete='restrict'
     )
     manual_service_name = fields.Char(string='Manual Service')
+    work_category_id = fields.Many2one(
+        'hgr.work.category', string='Work Category',
+        ondelete='restrict', index=True,
+    )
     unit_amount = fields.Float(string='Time (Hours)', required=True)
     name = fields.Char(string='Work Description', required=True)
     timesheet_id = fields.Many2one('account.analytic.line', readonly=True, ondelete='set null')
@@ -178,6 +206,9 @@ class AccountAnalyticLine(models.Model):
     )
     hgr_manual_service_name = fields.Char(
         string='Manual Service', readonly=True, index=True,
+    )
+    hgr_work_category_id = fields.Many2one(
+        'hgr.work.category', string='Work Category', ondelete='restrict', index=True,
     )
 
     hgr_supervisor_sheet_id = fields.Many2one(

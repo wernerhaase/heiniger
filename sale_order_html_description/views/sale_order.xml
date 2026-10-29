@@ -35,6 +35,7 @@
             </xpath>
             <xpath expr="//field[@name='order_line']/list" position="attributes">
                 <attribute name="editable"></attribute>
+                <attribute name="limit">150</attribute>
 
             </xpath>
         </field>

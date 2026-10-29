@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="work_category_painting_plastering" model="hgr.work.category"><field name="name">Maler/Gipser</field></record>
+    <record id="work_category_carpentry" model="hgr.work.category"><field name="name">Schreiner</field></record>
+    <record id="work_category_installation" model="hgr.work.category"><field name="name">Installationsarbeiten</field></record>
+    <record id="work_category_meetings" model="hgr.work.category"><field name="name">Besprechungen</field></record>
+    <record id="work_category_office" model="hgr.work.category"><field name="name">Büroarbeiten</field></record>
+    <record id="work_category_dismantling" model="hgr.work.category"><field name="name">Demontagearbeiten</field></record>
+    <record id="work_category_survey" model="hgr.work.category"><field name="name">Bestandsaufnahme</field></record>
+    <record id="work_category_demolition" model="hgr.work.category"><field name="name">Rückbau/Abbrucharbeiten</field></record>
+    <record id="work_category_reconstruction" model="hgr.work.category"><field name="name">Wiederaufbau Schadenbedingt</field></record>
+    <record id="work_category_preparation" model="hgr.work.category"><field name="name">Vorbereitungsarbeiten</field></record>
+    <record id="work_category_maintenance" model="hgr.work.category"><field name="name">Unterhaltsarbeiten</field></record>
+    <record id="work_category_interior" model="hgr.work.category"><field name="name">Innenausbau/Vorbereitungsarbeiten</field></record>
+    <record id="work_category_decontamination" model="hgr.work.category"><field name="name">Dekontaminationsarbeiten</field></record>
+    <record id="work_category_site_management" model="hgr.work.category"><field name="name">Bauleitung</field></record>
+    <record id="work_category_timber" model="hgr.work.category"><field name="name">Zimmermannarbeiten</field></record>
+    <record id="work_category_plumbing" model="hgr.work.category"><field name="name">Sanitärinstallation</field></record>
+    <record id="work_category_masonry" model="hgr.work.category"><field name="name">Mauerarbeiten</field></record>
+    <record id="work_category_flooring" model="hgr.work.category"><field name="name">Bodenlegearbeiten</field></record>
+</odoo>

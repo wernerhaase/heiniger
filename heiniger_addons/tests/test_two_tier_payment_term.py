@@ -256,6 +256,30 @@ class TestTwoTierPaymentTerm(AccountTestInvoicingCommon):
         self.assertEqual(installments[0]['amount_residual_currency_unsigned'], 970.0)
         self.assertNotIn('hgr_discount_tier', installments[0])
 
+    def test_invoice_without_payment_term_uses_standard_odoo_path(self):
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2026-07-07',
+            'date': '2026-07-07',
+            'invoice_payment_term_id': False,
+            'invoice_line_ids': [Command.create({
+                'name': 'No payment term test',
+                'price_unit': 1000.0,
+                'tax_ids': [],
+            })],
+        })
+        invoice.action_post()
+        line = invoice.line_ids.filtered(lambda item: item.display_type == 'payment_term')
+
+        installments = line._get_installments_data(
+            payment_currency=invoice.currency_id,
+            payment_date=fields.Date.from_string('2026-07-27'),
+        )
+
+        self.assertTrue(installments)
+        self.assertNotIn('hgr_discount_tier', installments[0])
+
     def test_invalid_second_tier_is_rejected(self):
         with self.assertRaises(ValidationError):
             self.term.hgr_second_discount_percentage = 4.0

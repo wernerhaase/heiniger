@@ -10,12 +10,18 @@ import { InvoiceExtractFormRenderer } from "@account_invoice_extract/js/invoice_
 // genuine invoice-line fields.
 patch(InvoiceExtractFormRenderer.prototype, {
     getBoxType(fullFieldName) {
-        if (fullFieldName?.includes(".")) {
-            const [parentField] = fullFieldName.split(".");
-            const parentValue = this.props.record.data[parentField];
-            if (parentValue && !parentValue._config?.fields) {
+        if (!fullFieldName) {
+            return false;
+        }
+        const record = this.props.record;
+        if (fullFieldName.includes(".")) {
+            const [parentField, fieldName] = fullFieldName.split(".");
+            const parentRecord = record?.data?.[parentField];
+            if (!parentRecord?._config?.fields?.[fieldName]) {
                 return false;
             }
+        } else if (!record?.fields?.[fullFieldName]) {
+            return false;
         }
         return super.getBoxType(fullFieldName);
     },

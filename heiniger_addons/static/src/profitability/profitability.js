@@ -22,8 +22,12 @@ export class HgrProjectProfitability extends Component {
         this.labels = {
             project: _t("Project"),
             employee: _t("Employee"),
+            workCategory: _t("Work Category"),
+            product: _t("Product"),
             selectProject: _t("All projects"),
             selectEmployee: _t("Select employee..."),
+            selectWorkCategory: _t("Select work category..."),
+            selectProduct: _t("Select quoted product (optional)..."),
         };
         this.state = useState({
             projectId: context.default_project_id || false,
@@ -45,6 +49,8 @@ export class HgrProjectProfitability extends Component {
                 saleLineId: false,
                 isManualService: false,
                 manualServiceName: "",
+                workCategoryId: false,
+                productId: false,
                 hours: "",
                 amount: "",
                 description: "",
@@ -123,7 +129,7 @@ export class HgrProjectProfitability extends Component {
         return (this.state.data?.projects || []).flatMap((project) => [
             ...project.vendor_details.map((line) => ({
                 ...line,
-                key: `vendor-${line.id}`,
+                key: line.detail_key || `material-${line.id}`,
                 project_id: project.id,
                 project_name: project.name,
                 currency_id: project.currency_id,
@@ -144,27 +150,22 @@ export class HgrProjectProfitability extends Component {
     }
 
     get serviceSummary() {
-        const grouped = new Map();
-        for (const line of this.timesheetLines) {
-            const service = line.service || _t("No Service");
-            const key = `${line.project_id}:${service}`;
-            const current = grouped.get(key) || {
-                key,
-                project_name: line.project_name,
-                service,
-                hours: 0,
-                cost: 0,
-                entries: 0,
-                currency_id: line.currency_id,
-            };
-            current.hours += line.hours || 0;
-            current.cost += line.cost || 0;
-            current.entries += 1;
-            grouped.set(key, current);
-        }
-        return [...grouped.values()].sort((a, b) =>
-            a.project_name.localeCompare(b.project_name) || a.service.localeCompare(b.service)
+        return (this.state.data?.projects || []).flatMap((project) =>
+            (project.labour_comparison || []).map((row) => ({
+                ...row,
+                key: `${project.id}-${row.key}`,
+                project_name: project.name,
+                currency_id: project.currency_id,
+            }))
         );
+    }
+
+    get costSummaryProjects() {
+        return (this.state.data?.projects || []).map((project) => ({
+            project,
+            labourRows: project.labour_comparison || [],
+            materialRows: project.material_comparison || [],
+        }));
     }
 
     get manualEmployeeDomain() {
@@ -179,6 +180,8 @@ export class HgrProjectProfitability extends Component {
             employee_id: manual.employeeId || false,
             sale_line_id: manual.saleLineId || false,
             manual_service_name: manual.manualServiceName.trim(),
+            work_category_id: manual.workCategoryId || false,
+            product_id: manual.productId || false,
             date: manual.date,
             hours: Number(manual.hours) || 0,
             amount: Number(manual.amount) || 0,
@@ -218,6 +221,8 @@ export class HgrProjectProfitability extends Component {
         this.state.manual.saleLineId = false;
         this.state.manual.isManualService = false;
         this.state.manual.manualServiceName = "";
+        this.state.manual.workCategoryId = false;
+        this.state.manual.productId = false;
         this.state.manual.hours = "";
         this.state.manual.amount = "";
         this.resetManualValidation();
@@ -225,6 +230,16 @@ export class HgrProjectProfitability extends Component {
 
     setManualEmployee(id) {
         this.state.manual.employeeId = id;
+        this.resetManualValidation();
+    }
+
+    setManualWorkCategory(id) {
+        this.state.manual.workCategoryId = id;
+        this.resetManualValidation();
+    }
+
+    setManualProduct(id) {
+        this.state.manual.productId = id;
         this.resetManualValidation();
     }
 
@@ -293,7 +308,7 @@ export class HgrProjectProfitability extends Component {
         const projects = project ? [project] : (this.state.data?.projects || []);
         const ids = [...new Set(projects.flatMap((item) =>
             item.vendor_details.map((line) => line.move_id)
-        ))];
+        ).filter(Boolean))];
         this.actionService.doAction({
             type: "ir.actions.act_window",
             name: _t("Vendor Bills"),

@@ -48,8 +48,6 @@ def _repair_note_translations(env, terms):
         """,
         [json.dumps(translations), terms.ids],
     )
-    terms.invalidate_recordset(['note'])
-
     env.cr.execute(
         """
         SELECT id, note->>'en_US', note->>'en_GB', note->>'de_CH'
@@ -69,6 +67,7 @@ def _repair_note_translations(env, terms):
         raise RuntimeError(
             f'Payment-term note translation repair failed for term(s) {invalid}'
         )
+    terms.invalidate_recordset(['note'])
 
 
 def _repair_view_translations(env):

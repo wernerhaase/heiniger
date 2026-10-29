@@ -35,6 +35,9 @@ class TestHgrProfitability(TransactionCase):
             'name': 'Manual Profitability Worker',
             'company_id': cls.env.company.id,
         })
+        cls.work_category = cls.env['hgr.work.category'].create({
+            'name': 'Installation Work',
+        })
         cls.service = cls.env['product.product'].create({
             'name': 'Manual Profitability Service',
             'type': 'service',
@@ -46,6 +49,7 @@ class TestHgrProfitability(TransactionCase):
             'order_line': [Command.create({
                 'product_id': cls.service.id,
                 'product_uom_qty': 10.0,
+                'hgr_work_category_id': cls.work_category.id,
             })],
         })
         cls.service_line = cls.order.order_line
@@ -67,6 +71,42 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(summary['vendor_cost_draft'], 400.0)
         self.assertEqual(summary['vendor_details'][0]['allocation_percent'], 40.0)
         self.assertEqual(summary['vendor_details'][0]['move_id'], bill.id)
+
+    def test_posted_vendor_bill_is_reported_as_material(self):
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.vendor.id,
+            'invoice_date': '2026-10-28',
+            'invoice_line_ids': [Command.create({
+                'name': 'Posted allocated material',
+                'account_id': self.expense_account.id,
+                'quantity': 1,
+                'price_unit': 301.67,
+                'analytic_distribution': {str(self.account.id): 100.0},
+            })],
+        })
+        bill.action_post()
+
+        summary = self.project._hgr_profitability_summary()
+
+        self.assertEqual(summary['vendor_cost_posted'], 301.67)
+        self.assertEqual(summary['total_cost'], 301.67)
+        self.assertEqual(summary['vendor_details'][0]['move_id'], bill.id)
+        self.assertEqual(summary['vendor_details'][0]['allocated_amount'], 301.67)
+
+    def test_non_timesheet_analytic_cost_is_reported_as_material(self):
+        material = self.env['account.analytic.line'].create({
+            'name': 'Warehouse material allocation',
+            'date': '2026-10-28',
+            'account_id': self.account.id,
+            'amount': -125.0,
+        })
+
+        summary = self.project._hgr_profitability_summary()
+
+        self.assertEqual(summary['vendor_cost_posted'], 125.0)
+        self.assertEqual(summary['vendor_details'][0]['id'], material.id)
+        self.assertEqual(summary['vendor_details'][0]['allocated_amount'], 125.0)
 
     def test_sale_order_button_opens_filtered_profitability(self):
         order = self.env['sale.order'].create({
@@ -100,6 +140,85 @@ class TestHgrProfitability(TransactionCase):
         summary = self.project._hgr_profitability_summary()
 
         self.assertEqual(summary['quoted_hours'], 16.0)
+
+    def test_labour_comparison_groups_quote_and_actual_by_work_category(self):
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        service = self.env['product.product'].create({
+            'name': 'Tagged Installation Hours',
+            'type': 'service',
+            'uom_id': hour_uom.id,
+            'list_price': 100.0,
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({
+                'product_id': service.id,
+                'product_uom_qty': 12.0,
+                'product_uom_id': hour_uom.id,
+                'hgr_work_category_id': self.work_category.id,
+            })],
+        })
+        self.env['account.analytic.line'].create({
+            'date': '2026-10-28',
+            'project_id': self.project.id,
+            'account_id': self.account.id,
+            'employee_id': self.employee.id,
+            'so_line': order.order_line.id,
+            'hgr_work_category_id': self.work_category.id,
+            'unit_amount': 7.5,
+            'name': 'Tagged installation',
+        })
+
+        summary = self.project._hgr_profitability_summary()
+        row = next(
+            item for item in summary['labour_comparison']
+            if item['category'] == self.work_category.name
+        )
+
+        self.assertEqual(row['quoted_hours'], 12.0)
+        self.assertEqual(row['actual_hours'], 7.5)
+        self.assertEqual(row['balance_hours'], 4.5)
+
+    def test_material_comparison_matches_quoted_and_actual_product(self):
+        material = self.env['product.product'].create({
+            'name': 'Quoted Paint Material',
+            'type': 'consu',
+            'list_price': 500.0,
+        })
+        self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({
+                'product_id': material.id,
+                'product_uom_qty': 2.0,
+                'price_unit': 500.0,
+            })],
+        })
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.vendor.id,
+            'invoice_date': '2026-10-28',
+            'invoice_line_ids': [Command.create({
+                'name': 'Actual paint material',
+                'product_id': material.id,
+                'account_id': self.expense_account.id,
+                'quantity': 2.0,
+                'price_unit': 350.0,
+                'analytic_distribution': {str(self.account.id): 100.0},
+            })],
+        })
+        bill.action_post()
+
+        summary = self.project._hgr_profitability_summary()
+        row = next(
+            item for item in summary['material_comparison']
+            if item['product'] == material.display_name
+        )
+
+        self.assertEqual(row['quoted_amount'], 1000.0)
+        self.assertEqual(row['actual_amount'], 700.0)
+        self.assertEqual(row['balance_amount'], 300.0)
 
     def test_double_validated_manual_material_cost_is_reported(self):
         payload = {
@@ -159,6 +278,7 @@ class TestHgrProfitability(TransactionCase):
             'date': '2026-10-28',
             'hours': 4.0,
             'description': description,
+            'work_category_id': self.work_category.id,
         }
 
         with self.assertRaises(ValidationError):
@@ -173,6 +293,7 @@ class TestHgrProfitability(TransactionCase):
             'date': '2026-10-28',
             'hours': 3.5,
             'description': 'Manual emergency installation',
+            'work_category_id': self.work_category.id,
         }
         validation = self.env['project.project'].check_hgr_manual_profitability_entry(
             payload
@@ -188,6 +309,7 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(timesheet.so_line, self.service_line)
         self.assertEqual(timesheet.unit_amount, 3.5)
         self.assertEqual(timesheet.hgr_profitability_manual_type, 'labour')
+        self.assertEqual(timesheet.hgr_work_category_id, self.work_category)
 
     def test_double_validated_manual_labour_accepts_manual_service(self):
         payload = {
@@ -199,6 +321,7 @@ class TestHgrProfitability(TransactionCase):
             'date': '2026-10-29',
             'hours': 2.25,
             'description': 'Unplanned emergency service',
+            'work_category_id': self.work_category.id,
         }
         validation = self.env['project.project'].check_hgr_manual_profitability_entry(
             payload
@@ -224,6 +347,7 @@ class TestHgrProfitability(TransactionCase):
             'date': '2026-10-29',
             'hours': 1.0,
             'description': 'Missing service',
+            'work_category_id': self.work_category.id,
         }
 
         with self.assertRaises(ValidationError):
