@@ -31,6 +31,19 @@
     vertical-align: top;
 }
 
+/* Keep advance-summary labels and monetary values in distinct columns. */
+.page table tr.hgr_advance_summary_row > td.hgr_advance_summary_label {
+    width: 62%;
+    padding-right: 12px !important;
+    white-space: normal;
+}
+
+.page table tr.hgr_advance_summary_row > td.hgr_advance_summary_value {
+    width: 38%;
+    white-space: nowrap;
+    text-align: right;
+}
+
 /* ── 1. Allow all order-line rows to break across pages ───── */
 .page table.table tbody tr {
     break-inside: auto !important;

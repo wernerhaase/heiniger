@@ -3,16 +3,16 @@
     <template id="hgr_report_saleorder_advance_summary" inherit_id="sale.report_saleorder_document">
         <xpath expr="//div[@name='so_total_summary']//table/t[@t-call='sale.document_tax_totals']" position="after">
             <t t-if="doc.hgr_has_advance_invoices">
-                <tr>
-                    <td>Invoiced advances</td>
-                    <td class="text-end">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Invoiced advances</td>
+                    <td class="hgr_advance_summary_value text-end">
                         <span>− </span>
                         <span t-field="doc.hgr_advance_invoiced_total"/>
                     </td>
                 </tr>
-                <tr class="border-black fw-bold">
-                    <td>Remaining order amount</td>
-                    <td class="text-end">
+                <tr class="hgr_advance_summary_row border-black fw-bold">
+                    <td class="hgr_advance_summary_label">Remaining order amount</td>
+                    <td class="hgr_advance_summary_value text-end">
                         <span t-field="doc.hgr_remaining_after_advance"/>
                     </td>
                 </tr>
@@ -23,22 +23,22 @@
     <template id="hgr_report_invoice_advance_summary" inherit_id="account.report_invoice_document">
         <xpath expr="//div[@id='right-elements']//table/t[@t-if='o.tax_totals'][@t-call='account.document_tax_totals']" position="after">
             <t t-if="o.hgr_has_advance_summary">
-                <tr>
-                    <td>Order total incl. tax</td>
-                    <td class="text-end">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Order total incl. tax</td>
+                    <td class="hgr_advance_summary_value text-end">
                         <span t-field="o.hgr_sale_order_total"/>
                     </td>
                 </tr>
-                <tr>
-                    <td>Invoiced advances</td>
-                    <td class="text-end">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label">Invoiced advances</td>
+                    <td class="hgr_advance_summary_value text-end">
                         <span>− </span>
                         <span t-field="o.hgr_advance_invoiced_total"/>
                     </td>
                 </tr>
-                <tr class="border-black fw-bold">
-                    <td>Remaining order amount</td>
-                    <td class="text-end">
+                <tr class="hgr_advance_summary_row border-black fw-bold">
+                    <td class="hgr_advance_summary_label">Remaining order amount</td>
+                    <td class="hgr_advance_summary_value text-end">
                         <span t-field="o.hgr_remaining_after_advance"/>
                     </td>
                 </tr>
