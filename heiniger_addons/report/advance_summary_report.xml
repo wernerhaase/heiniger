@@ -20,6 +20,32 @@
         </xpath>
     </template>
 
+    <!-- The Preview button uses the customer portal, not the PDF template. -->
+    <template id="hgr_sale_order_portal_advance_summary"
+              inherit_id="sale.sale_order_portal_content_totals_table">
+        <xpath expr="//table[@name='sale_order_totals_table']/t[@t-call]" position="after">
+            <t t-if="sale_order.hgr_has_advance_invoices">
+                <tr class="hgr_advance_summary_row">
+                    <td class="hgr_advance_summary_label" style="width:62%; padding-right:12px;">
+                        Invoiced advances
+                    </td>
+                    <td class="hgr_advance_summary_value text-end" style="width:38%; white-space:nowrap;">
+                        <span>− </span>
+                        <span t-field="sale_order.hgr_advance_invoiced_total"/>
+                    </td>
+                </tr>
+                <tr class="hgr_advance_summary_row border-top border-dark fw-bold">
+                    <td class="hgr_advance_summary_label" style="width:62%; padding-right:12px;">
+                        Remaining order amount
+                    </td>
+                    <td class="hgr_advance_summary_value text-end" style="width:38%; white-space:nowrap;">
+                        <span t-field="sale_order.hgr_remaining_after_advance"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
     <template id="hgr_report_invoice_advance_summary" inherit_id="account.report_invoice_document">
         <!--
             The standard invoice report floats the totals block.  On long

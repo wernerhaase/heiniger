@@ -92,8 +92,16 @@ class TestAdvanceSummary(AccountTestInvoicingCommon):
         invoice_html, _ = report_model._render_qweb_html(
             'account.account_invoices', advance.ids,
         )
+        portal_totals_html = self.env['ir.ui.view']._render_template(
+            'sale.sale_order_portal_content_totals_table',
+            {'sale_order': self.order},
+        )
         self.assertIn(b'Invoiced advances', sale_html)
         self.assertIn(b'Remaining order amount', sale_html)
+        self.assertIn(b'Invoiced advances', portal_totals_html)
+        self.assertIn(b'Remaining order amount', portal_totals_html)
+        self.assertIn(b'hgr_advance_summary_label', portal_totals_html)
+        self.assertIn(b'hgr_advance_summary_value', portal_totals_html)
         self.assertIn(b'Order total incl. tax', invoice_html)
         self.assertIn(b'Invoiced advances', invoice_html)
         self.assertIn(b'hgr_advance_summary_label', invoice_html)
