@@ -32,6 +32,12 @@
                 <div class="d-flex flex-column gap-1" colspan="2"
                      invisible="not hgr_has_advance_summary">
                     <div class="d-flex float-end">
+                        <label for="hgr_sale_order_untaxed" class="mb-0"/>
+                        <div>
+                            <field name="hgr_sale_order_untaxed" widget="monetary"/>
+                        </div>
+                    </div>
+                    <div class="d-flex float-end">
                         <label for="hgr_sale_order_total" class="mb-0"/>
                         <div>
                             <field name="hgr_sale_order_total" widget="monetary"/>

@@ -98,8 +98,10 @@ class TestAdvanceSummary(AccountTestInvoicingCommon):
             {'sale_order': self.order},
         )
         self.assertIn(b'Invoiced advances', sale_html)
+        self.assertIn(b'Auftragswert exkl. MwSt.', sale_html)
         self.assertIn(b'Remaining order amount', sale_html)
         self.assertIn(b'Invoiced advances', portal_totals_html)
+        self.assertIn(b'Auftragswert exkl. MwSt.', portal_totals_html)
         self.assertIn(b'Remaining order amount', portal_totals_html)
         self.assertIn(b'hgr_advance_summary_label', portal_totals_html)
         self.assertIn(b'hgr_advance_summary_value', portal_totals_html)
