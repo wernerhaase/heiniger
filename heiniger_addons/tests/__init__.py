@@ -9,3 +9,4 @@ from . import test_profitability
 from . import test_two_tier_payment_term
 from . import test_dashboard_ledger_balance
 from . import test_bank_statement_quick_tax
+from . import test_advance_summary

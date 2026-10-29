@@ -8,12 +8,67 @@ class AccountMove(models.Model):
 
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 	l10n_din5008_addresses = fields.Binary(compute='_compute_l10n_din5008_addresses')
+	hgr_has_advance_summary = fields.Boolean(
+		string="Show advance summary",
+		compute="_compute_hgr_advance_summary",
+		export_string_translation=False,
+	)
+	hgr_sale_order_total = fields.Monetary(
+		string="Order total incl. tax",
+		compute="_compute_hgr_advance_summary",
+		currency_field="currency_id",
+	)
+	hgr_advance_invoiced_total = fields.Monetary(
+		string="Invoiced advances (-)",
+		compute="_compute_hgr_advance_summary",
+		currency_field="currency_id",
+	)
+	hgr_remaining_after_advance = fields.Monetary(
+		string="Remaining order amount",
+		compute="_compute_hgr_advance_summary",
+		currency_field="currency_id",
+	)
 	
 	invoice_discount_date_due = fields.Date(
 		string='Due Date with discount',
 		compute='_compute_invoice_discount_date_due',
 		copy=False,
 	)
+
+	@api.depends(
+		'currency_id',
+		'invoice_date',
+		'line_ids.sale_line_ids.order_id.amount_total',
+		'line_ids.sale_line_ids.order_id.hgr_has_advance_invoices',
+		'line_ids.sale_line_ids.order_id.hgr_advance_invoiced_total',
+		'line_ids.sale_line_ids.order_id.hgr_remaining_after_advance',
+	)
+	def _compute_hgr_advance_summary(self):
+		for move in self:
+			orders = move.line_ids.sale_line_ids.order_id
+			show_summary = (
+				move.move_type in ('out_invoice', 'out_refund')
+				and len(orders) == 1
+				and orders.hgr_has_advance_invoices
+			)
+			move.hgr_has_advance_summary = show_summary
+			move.hgr_sale_order_total = 0.0
+			move.hgr_advance_invoiced_total = 0.0
+			move.hgr_remaining_after_advance = 0.0
+			if not show_summary:
+				continue
+
+			order = orders
+			conversion_date = move.invoice_date or fields.Date.context_today(move)
+			move.hgr_sale_order_total = order.currency_id._convert(
+				order.amount_total, move.currency_id, move.company_id, conversion_date
+			)
+			move.hgr_advance_invoiced_total = order.currency_id._convert(
+				order.hgr_advance_invoiced_total, move.currency_id, move.company_id, conversion_date
+			)
+			move.hgr_remaining_after_advance = order.currency_id._convert(
+				order.hgr_remaining_after_advance, move.currency_id, move.company_id, conversion_date
+			)
 
 	def _hgr_apply_analytic_distribution_to_bill_lines(self):
 		for move in self.filtered(

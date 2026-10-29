@@ -4,7 +4,7 @@
 
 {
     'name': 'Heiniger Addons',
-    'version': '19.0.1.14.0',
+    'version': '19.0.1.15.0',
     'category': 'Customizations',
     'sequence': 6,
     'summary': 'Custom changes for heiniger ',
@@ -49,6 +49,7 @@ This module added for additional fields & custom developments.
         'report/timesheet_report.xml',
         'report/document_language.xml',
         'report/payment_term_report.xml',
+        'report/advance_summary_report.xml',
         'report/sender_address.xml',
         'report/legacy_reports.xml',
         ],

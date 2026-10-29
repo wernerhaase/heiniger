@@ -17,7 +17,10 @@ class AccountJournal(models.Model):
         super()._fill_bank_cash_dashboard_data(dashboard_data)
 
         journals = self.filtered(
-            lambda journal: journal.type in ('cash', 'credit')
+            lambda journal: (
+                journal.type == 'cash'
+                or journal.default_account_id.account_type == 'liability_credit_card'
+            )
             and journal.default_account_id
         )
         for journal in journals:

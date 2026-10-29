@@ -82,7 +82,9 @@ class TestDashboardLedgerBalance(AccountTestInvoicingCommon):
         credit_journal = self.env['account.journal'].create({
             'name': 'Dashboard credit-card test',
             'code': 'HGDCC',
-            'type': 'credit',
+            # The UAT credit-card journal is a bank journal whose default
+            # account carries the credit-card liability account type.
+            'type': 'bank',
             'default_account_id': credit_account.id,
         })
         move = self.env['account.move'].create({

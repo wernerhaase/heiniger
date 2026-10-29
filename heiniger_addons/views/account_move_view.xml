@@ -26,6 +26,33 @@
                    position="attributes">
                 <attribute name="options">{'product_field': 'product_id', 'account_field': 'account_id', 'amount_field': 'price_subtotal'}</attribute>
             </xpath>
+
+            <xpath expr="//group[hasclass('oe_subtotal_footer')]/field[@name='tax_totals']" position="after">
+                <field name="hgr_has_advance_summary" invisible="1"/>
+                <div class="d-flex float-end" colspan="2"
+                     invisible="not hgr_has_advance_summary">
+                    <label for="hgr_sale_order_total"/>
+                    <div>
+                        <field name="hgr_sale_order_total" widget="monetary"/>
+                    </div>
+                </div>
+                <div class="d-flex float-end" colspan="2"
+                     invisible="not hgr_has_advance_summary">
+                    <label for="hgr_advance_invoiced_total"/>
+                    <div>
+                        <field name="hgr_advance_invoiced_total" widget="monetary"/>
+                    </div>
+                </div>
+                <div class="d-flex float-end" colspan="2"
+                     invisible="not hgr_has_advance_summary">
+                    <label for="hgr_remaining_after_advance"/>
+                    <div>
+                        <field name="hgr_remaining_after_advance"
+                               widget="monetary"
+                               class="oe_subtotal_footer_separator"/>
+                    </div>
+                </div>
+            </xpath>
         </field>
     </record>
 

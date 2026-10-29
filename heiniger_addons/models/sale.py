@@ -6,6 +6,22 @@ from odoo import api, fields, models, tools, SUPERUSER_ID, _
 class Saleorder(models.Model):
 	_inherit = "sale.order"
 
+	hgr_has_advance_invoices = fields.Boolean(
+		string="Has invoiced advances",
+		compute="_compute_hgr_advance_summary",
+		export_string_translation=False,
+	)
+	hgr_advance_invoiced_total = fields.Monetary(
+		string="Invoiced advances (-)",
+		compute="_compute_hgr_advance_summary",
+		currency_field="currency_id",
+	)
+	hgr_remaining_after_advance = fields.Monetary(
+		string="Remaining order amount",
+		compute="_compute_hgr_advance_summary",
+		currency_field="currency_id",
+	)
+
 	hgr_object_id = fields.Many2one(related="opportunity_id.hgr_object_id",string="Object",store=True)
 	hgr_subject = fields.Char(string="Subject")
 	hgr_case_of_insurance = fields.Boolean(string="Insurance case",related="opportunity_id.hgr_case_of_insurance",store=True)
@@ -20,6 +36,36 @@ class Saleorder(models.Model):
 	hgr_has_timesheet_project = fields.Boolean(
 		compute='_compute_hgr_has_timesheet_project', export_string_translation=False,
 	)
+
+	@api.depends(
+		'amount_total',
+		'currency_id',
+		'order_line.invoice_lines.move_id.state',
+		'order_line.invoice_lines.move_id.move_type',
+		'order_line.invoice_lines.move_id.amount_total',
+		'order_line.invoice_lines.move_id.currency_id',
+		'order_line.invoice_lines.move_id.invoice_date',
+		'order_line.invoice_lines.is_downpayment',
+	)
+	def _compute_hgr_advance_summary(self):
+		for order in self:
+			advance_total = 0.0
+			advance_invoices = order.invoice_ids.filtered(
+				lambda invoice: invoice.state == 'posted' and invoice._is_downpayment()
+			)
+			for invoice in advance_invoices:
+				invoice_amount = invoice.currency_id._convert(
+					invoice.amount_total,
+					order.currency_id,
+					order.company_id,
+					invoice.invoice_date or fields.Date.context_today(order),
+				)
+				advance_total += invoice_amount if invoice.move_type == 'out_invoice' else -invoice_amount
+
+			advance_total = max(order.currency_id.round(advance_total), 0.0)
+			order.hgr_has_advance_invoices = bool(advance_invoices) and not order.currency_id.is_zero(advance_total)
+			order.hgr_advance_invoiced_total = advance_total
+			order.hgr_remaining_after_advance = order.currency_id.round(order.amount_total - advance_total)
 
 	@api.depends('project_id', 'project_ids')
 	def _compute_hgr_has_timesheet_project(self):
