@@ -55,23 +55,29 @@
 		              <field name="hgr_insurance_description" placeholder="Add an insurance description..." options="{'collaborative': true}" />
 		            </group>
     			</page>
-  			</xpath> 
+            </xpath>
+            <xpath expr="//group[@name='sale_total']" position="attributes">
+                <attribute name="class" remove="gap-sm-3" add="gap-1" separator=" "/>
+            </xpath>
             <xpath expr="//group[@name='sale_total']/field[@name='tax_totals']" position="after">
                 <field name="hgr_has_advance_invoices" invisible="1"/>
-                <div class="d-flex float-end" colspan="2"
+                <div class="d-flex flex-column gap-1" colspan="2"
                      invisible="not hgr_has_advance_invoices">
-                    <label for="hgr_advance_invoiced_total"/>
-                    <div>
-                        <field name="hgr_advance_invoiced_total" widget="monetary"/>
+                    <div class="d-flex align-items-baseline">
+                        <label for="hgr_advance_invoiced_total"
+                               class="mb-0 flex-grow-1 text-end pe-4"/>
+                        <div class="text-end text-nowrap">
+                            <field name="hgr_advance_invoiced_total" widget="monetary"/>
+                        </div>
                     </div>
-                </div>
-                <div class="d-flex float-end" colspan="2"
-                     invisible="not hgr_has_advance_invoices">
-                    <label for="hgr_remaining_after_advance"/>
-                    <div>
-                        <field name="hgr_remaining_after_advance"
-                               widget="monetary"
-                               class="oe_subtotal_footer_separator"/>
+                    <div class="d-flex align-items-baseline">
+                        <label for="hgr_remaining_after_advance"
+                               class="mb-0 flex-grow-1 text-end pe-4"/>
+                        <div class="text-end text-nowrap">
+                            <field name="hgr_remaining_after_advance"
+                                   widget="monetary"
+                                   class="oe_subtotal_footer_separator"/>
+                        </div>
                     </div>
                 </div>
             </xpath>
