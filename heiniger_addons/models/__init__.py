@@ -7,6 +7,7 @@ from . import sale
 from . import base_layout
 from . import product
 from . import account_move
+from . import account_bank_statement
 from . import account_journal_dashboard
 from . import analytic_account
 from . import payment_term

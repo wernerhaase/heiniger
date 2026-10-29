@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hgr_bank_statement_line_quick_create_tax" model="ir.ui.view">
+        <field name="name">account.bank.statement.line.quick.create.tax</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="inherit_id" ref="account_accountant.view_bank_statement_line_quick_create_form_bank_rec_widget"/>
+        <field name="arch" type="xml">
+            <field name="journal_id" position="after">
+                <field name="company_id" invisible="1"/>
+            </field>
+            <field name="amount" position="after">
+                <field name="hgr_tax_id"
+                       nolabel="1"
+                       placeholder="Tax"
+                       options="{'no_create': True, 'no_open': True}"
+                       domain="[('company_id', '=', company_id), ('active', '=', True), ('type_tax_use', '=', amount &lt; 0 and 'purchase' or 'sale')]"/>
+            </field>
+        </field>
+    </record>
+</odoo>
