@@ -29,9 +29,11 @@
             <!-- Quoted Material is picked inside the analytic distribution popup -->
             <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='analytic_distribution']" position="after">
                 <field name="hgr_sale_line_id" invisible="1"/>
+                <field name="hgr_sale_line_distribution" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='analytic_distribution']" position="after">
                 <field name="hgr_sale_line_id" column_invisible="1"/>
+                <field name="hgr_sale_line_distribution" column_invisible="1"/>
             </xpath>
 
             <xpath expr="//field[@name='invoice_line_ids']" position="attributes">

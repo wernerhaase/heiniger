@@ -189,6 +189,45 @@ class AccountMoveLine(models.Model):
 		help='Quotation line this vendor cost belongs to. Used to match the cost '
 			 'against the quoted material in the project profitability report.',
 	)
+	hgr_sale_line_distribution = fields.Json(
+		string='Quoted Material by Analytic Distribution',
+		copy=False,
+		help='Quotation line selected for each analytic distribution row. This '
+			 'keeps split vendor costs matched independently line by line.',
+	)
+
+	def _hgr_distribution_keys_for_account(self, analytic_account):
+		self.ensure_one()
+		account_id = str(analytic_account.id)
+		return [
+			key for key in (self.analytic_distribution or {})
+			if account_id in str(key).split(',')
+		]
+
+	def _hgr_sale_line_for_distribution_key(self, distribution_key):
+		"""Return the quoted material assigned to one distribution row.
+
+		``hgr_sale_line_id`` was the original, line-wide value. Keep it as a
+		fallback for existing vendor bills while new edits use the per-row JSON
+		mapping.
+		"""
+		if not self:
+			return self.env['sale.order.line']
+		self.ensure_one()
+		mapping = self.hgr_sale_line_distribution or {}
+		distribution_key = str(distribution_key or '')
+		sale_line_id = mapping.get(distribution_key)
+		if not sale_line_id and distribution_key:
+			account_ids = set(distribution_key.split(','))
+			matching_key = next((
+				key for key in mapping
+				if set(str(key).split(',')) == account_ids
+			), False)
+			if matching_key:
+				sale_line_id = mapping[matching_key]
+		if sale_line_id:
+			return self.env['sale.order.line'].browse(int(sale_line_id)).exists()
+		return self.hgr_sale_line_id if not mapping else self.env['sale.order.line']
 
 	@api.model
 	def hgr_quoted_material_options(self, account_ids):

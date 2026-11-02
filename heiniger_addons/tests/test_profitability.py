@@ -72,6 +72,114 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(summary['vendor_details'][0]['allocation_percent'], 40.0)
         self.assertEqual(summary['vendor_details'][0]['move_id'], bill.id)
 
+    def test_quoted_material_is_independent_for_separate_projects(self):
+        other_account = self.env['account.analytic.account'].create({
+            'name': 'Other Project Analytic Account',
+            'plan_id': self.plan.id,
+            'company_id': self.env.company.id,
+        })
+        other_project = self.env['project.project'].create({
+            'name': 'Other Profitability Project',
+            'partner_id': self.customer.id,
+            'account_id': other_account.id,
+        })
+        first_product = self.env['product.product'].create({
+            'name': 'First Project Material', 'type': 'consu',
+        })
+        second_product = self.env['product.product'].create({
+            'name': 'Second Project Material', 'type': 'consu',
+        })
+        first_line = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({'product_id': first_product.id})],
+        }).order_line
+        second_line = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': other_project.id,
+            'order_line': [Command.create({'product_id': second_product.id})],
+        }).order_line
+        distribution = {
+            str(self.account.id): 40.0,
+            str(other_account.id): 60.0,
+        }
+        self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.vendor.id,
+            'invoice_line_ids': [Command.create({
+                'name': 'Materials split between projects',
+                'account_id': self.expense_account.id,
+                'quantity': 1,
+                'price_unit': 1000,
+                'analytic_distribution': distribution,
+                'hgr_sale_line_distribution': {
+                    str(self.account.id): first_line.id,
+                    str(other_account.id): second_line.id,
+                },
+            })],
+        })
+
+        first_detail = self.project._hgr_profitability_summary()['vendor_details'][0]
+        second_detail = other_project._hgr_profitability_summary()['vendor_details'][0]
+        self.assertEqual(first_detail['sale_line_id'], first_line.id)
+        self.assertEqual(first_detail['allocation_percent'], 40.0)
+        self.assertEqual(second_detail['sale_line_id'], second_line.id)
+        self.assertEqual(second_detail['allocation_percent'], 60.0)
+
+    def test_quoted_material_is_independent_for_repeated_project_rows(self):
+        secondary_plan = self.env['account.analytic.plan'].create({
+            'name': 'Material Split Plan',
+        })
+        split_a = self.env['account.analytic.account'].create({
+            'name': 'Material Split A',
+            'plan_id': secondary_plan.id,
+            'company_id': self.env.company.id,
+        })
+        split_b = self.env['account.analytic.account'].create({
+            'name': 'Material Split B',
+            'plan_id': secondary_plan.id,
+            'company_id': self.env.company.id,
+        })
+        product_a = self.env['product.product'].create({
+            'name': 'Quoted Material A', 'type': 'consu',
+        })
+        product_b = self.env['product.product'].create({
+            'name': 'Quoted Material B', 'type': 'consu',
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [
+                Command.create({'product_id': product_a.id}),
+                Command.create({'product_id': product_b.id}),
+            ],
+        })
+        line_a, line_b = order.order_line
+        key_a = f'{self.account.id},{split_a.id}'
+        key_b = f'{self.account.id},{split_b.id}'
+        self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.vendor.id,
+            'invoice_line_ids': [Command.create({
+                'name': 'Two material rows for one project',
+                'account_id': self.expense_account.id,
+                'quantity': 1,
+                'price_unit': 200,
+                'analytic_distribution': {key_a: 50.0, key_b: 50.0},
+                'hgr_sale_line_distribution': {
+                    key_a: line_a.id,
+                    key_b: line_b.id,
+                },
+            })],
+        })
+
+        summary = self.project._hgr_profitability_summary()
+        details = summary['vendor_details']
+        self.assertEqual(len(details), 2)
+        self.assertEqual({detail['sale_line_id'] for detail in details}, {line_a.id, line_b.id})
+        self.assertEqual({detail['allocation_percent'] for detail in details}, {50.0})
+        self.assertEqual(summary['vendor_cost_draft'], 200.0)
+
     def test_posted_vendor_bill_is_reported_as_material(self):
         bill = self.env['account.move'].create({
             'move_type': 'in_invoice',
