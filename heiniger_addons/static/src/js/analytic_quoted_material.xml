@@ -8,11 +8,11 @@
             <td t-if="hgrShowQuotedMaterial" class="o_hgr_quoted_material_column">
                 <t t-set="hgrLineOptions" t-value="hgrQuotedMaterialsForLine(line)"/>
                 <select t-if="hgrLineOptions.length" class="o_input"
-                        t-on-change="(ev) => this.hgrSetQuotedMaterial(ev)">
-                    <option value="" t-att-selected="!hgrSelectedQuotedMaterial">No quoted material</option>
+                        t-on-change="(ev) => this.hgrSetQuotedMaterial(ev, line)">
+                    <option value="" t-att-selected="!hgrSelectedQuotedMaterial(line)">No quoted material</option>
                     <option t-foreach="hgrLineOptions" t-as="option" t-key="option.id"
                             t-att-value="option.id"
-                            t-att-selected="option.id === hgrSelectedQuotedMaterial"
+                            t-att-selected="option.id === hgrSelectedQuotedMaterial(line)"
                             t-out="option.name"/>
                 </select>
             </td>

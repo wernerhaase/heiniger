@@ -397,7 +397,10 @@ class Project(models.Model):
             'product': line.product_id.display_name or '',
             'product_id': line.product_id.id or False,
             'move_line_id': line.move_line_id.id or False,
-            'sale_line_id': line.move_line_id.hgr_sale_line_id.id or False,
+            'sale_line_id': line.move_line_id._hgr_sale_line_for_distribution_key(
+                line._get_distribution_key()
+            ).id or False,
+            'analytic_distribution_key': line._get_distribution_key(),
             'quantity': line.unit_amount or 0.0,
             'allocation_percent': 100.0,
             'allocated_amount': currency.round(-line.amount),
@@ -405,27 +408,31 @@ class Project(models.Model):
             'source': line.category or 'analytic',
         } for line in material_lines]
         for line in draft_vendor_lines:
-            share = self._hgr_analytic_share(line.analytic_distribution, account)
-            allocated_amount = line.balance * share
-            vendor_cost_draft += allocated_amount
-            vendor_details.append({
-                'id': line.id,
-                'detail_key': f'draft-vendor-{line.id}',
-                'move_id': line.move_id.id,
-                'invoice': line.move_id.name or line.move_id.ref or _('Draft'),
-                'date': fields.Date.to_string(line.date),
-                'vendor': line.partner_id.display_name or '',
-                'description': line.name or '',
-                'product': line.product_id.display_name or '',
-                'product_id': line.product_id.id or False,
-                'move_line_id': line.id,
-                'sale_line_id': line.hgr_sale_line_id.id or False,
-                'quantity': (line.quantity or 0.0) * share,
-                'allocation_percent': share * 100.0,
-                'allocated_amount': currency.round(allocated_amount),
-                'state': 'draft',
-                'source': 'vendor_bill',
-            })
+            for distribution_key in line._hgr_distribution_keys_for_account(account):
+                share = (line.analytic_distribution or {}).get(distribution_key, 0.0) / 100.0
+                allocated_amount = line.balance * share
+                vendor_cost_draft += allocated_amount
+                vendor_details.append({
+                    'id': line.id,
+                    'detail_key': f'draft-vendor-{line.id}-{distribution_key}',
+                    'move_id': line.move_id.id,
+                    'invoice': line.move_id.name or line.move_id.ref or _('Draft'),
+                    'date': fields.Date.to_string(line.date),
+                    'vendor': line.partner_id.display_name or '',
+                    'description': line.name or '',
+                    'product': line.product_id.display_name or '',
+                    'product_id': line.product_id.id or False,
+                    'move_line_id': line.id,
+                    'sale_line_id': line._hgr_sale_line_for_distribution_key(
+                        distribution_key
+                    ).id or False,
+                    'analytic_distribution_key': distribution_key,
+                    'quantity': (line.quantity or 0.0) * share,
+                    'allocation_percent': share * 100.0,
+                    'allocated_amount': currency.round(allocated_amount),
+                    'state': 'draft',
+                    'source': 'vendor_bill',
+                })
 
         manual_material_lines = self.env['hgr.profitability.manual.cost'].sudo().search([
             ('project_id', '=', self.id),
@@ -581,7 +588,10 @@ class Project(models.Model):
             )
 
         for line in material_lines:
-            product = line.move_line_id.hgr_sale_line_id.product_id or line.product_id
+            sale_line = line.move_line_id._hgr_sale_line_for_distribution_key(
+                line._get_distribution_key()
+            )
+            product = sale_line.product_id or line.product_id
             key = f'product-{product.id}' if product else 'unmatched-material'
             label = product.display_name if product else _('Unmatched Material')
             group = material_group(key, label)
@@ -752,7 +762,10 @@ class Project(models.Model):
             'date_to': date_to or False,
         }
 
-    def hgr_assign_quoted_material(self, sale_line_id, move_line_id=False, manual_cost_id=False):
+    def hgr_assign_quoted_material(
+        self, sale_line_id, move_line_id=False, manual_cost_id=False,
+        analytic_distribution_key=False,
+    ):
         """Link an unmatched material cost to a quoted material line."""
         self.ensure_one()
         self._hgr_check_profitability_access()
@@ -783,7 +796,12 @@ class Project(models.Model):
             or not self._hgr_analytic_share(move_line.analytic_distribution, self.account_id)
         ):
             raise ValidationError(_('The vendor cost does not belong to this project.'))
-        move_line.hgr_sale_line_id = sale_line
+        if analytic_distribution_key:
+            mapping = dict(move_line.hgr_sale_line_distribution or {})
+            mapping[str(analytic_distribution_key)] = sale_line.id
+            move_line.hgr_sale_line_distribution = mapping
+        else:
+            move_line.hgr_sale_line_id = sale_line
         return True
 
     @api.depends('name', 'sale_order_id.name', 'reinvoiced_sale_order_id.name')
