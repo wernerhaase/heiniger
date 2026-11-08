@@ -1,5 +1,6 @@
 {
     'name': 'Heiniger PDF Editor',
+    'author': 'Orchid Infosys',
     'version': '19.0.1.1.0',
     'license': 'LGPL-3',
     'depends': ['heiniger_addons', 'base_setup'],

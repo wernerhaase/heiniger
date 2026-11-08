@@ -12,12 +12,8 @@ class City(models.Model):
     # we can add a specific code to identify locations in Geonames, for example.
     code = fields.Char()
 
-    _sql_constraints = [
-        (
-            "name_state_country_uniq",
-            "UNIQUE(name, state_id, country_id)",
-            "You already have a city with that name in the same state."
-            "The city must have a unique name within "
-            "it's state and it's country",
-        )
-    ]
+    _name_state_country_uniq = models.Constraint(
+        "UNIQUE(name, state_id, country_id)",
+        "You already have a city with that name in the same state. "
+        "The city must have a unique name within its state and country.",
+    )
