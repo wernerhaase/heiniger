@@ -9,7 +9,7 @@
         </t>
     </template>
     <template id="heiniger_work_report_layout" inherit_id="web.internal_layout" primary="True">
-        <xpath expr="//div[@class='header']" position="replace">
+        <xpath expr="//div[hasclass('header')]" position="replace">
             <div class="header" style="font-family: Helvetica, Arial, sans-serif;">
                 <div class="row mb8">
                     <div class="col-6">
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </xpath>
-        <xpath expr="//div[@class='article']" position="attributes">
+        <xpath expr="//div[hasclass('article')]" position="attributes">
             <attribute name="style">font-family: Helvetica, Arial, sans-serif;</attribute>
         </xpath>
     </template>

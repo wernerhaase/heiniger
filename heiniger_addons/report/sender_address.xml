@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="din5008_sender_address" inherit_id="l10n_din5008.external_layout_din5008">
-        <xpath expr="//div[@id='din5008_report_main_address']/div[@class='colored_address']" position="replace">
+        <xpath expr="//div[@id='din5008_report_main_address']/div[hasclass('colored_address')]" position="replace">
             <div class="colored_address">
                 <span t-if="company.name" t-field="company.name"/>
                 <t t-if="company.street">

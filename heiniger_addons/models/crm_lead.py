@@ -16,7 +16,7 @@ class Lead(models.Model):
 	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person")
 	hgr_insurance_policy_no = fields.Char(string="Policy No")
 	hgr_insurance_claim_no = fields.Char(string="Claim No")
-	hgr_insurance_record_date = fields.Date(string="Date")
+	hgr_insurance_record_date = fields.Date(string="Claim Record Date")
 
 	project_id = fields.Many2one('project.project', 'Project', readonly=True,help='Select a billable project on which tasks can be created.')
 
@@ -194,7 +194,7 @@ class CrmLeadInsurance(models.Model):
 	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person",)
 	hgr_insurance_policy_no = fields.Char(string="Policy No",)
 	hgr_insurance_claim_no = fields.Char(string="Claim No")
-	hgr_insurance_record_date = fields.Date(string="Date")
+	hgr_insurance_record_date = fields.Date(string="Claim Record Date")
 	hgr_subject = fields.Char(string="Subject")
 	lead_id = fields.Many2one('crm.lead',string="Lead")
 	order_id = fields.Many2one('sale.order',string="Order",readonly=True)

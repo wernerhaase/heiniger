@@ -68,7 +68,7 @@ class Saleorder(models.Model):
 	hgr_claim_person_id = fields.Many2one('res.partner',string="Claims Expert", ondelete='restrict', domain="[('parent_id','=',hgr_insurance_id)]", help="Claims contact person")
 	hgr_insurance_policy_no = fields.Char(string="Policy No",)
 	hgr_insurance_claim_no = fields.Char(string="Claim No",)
-	hgr_insurance_record_date = fields.Date(string="Date")
+	hgr_insurance_record_date = fields.Date(string="Claim Record Date")
 	hgr_insurance_description = fields.Html(string="Insurance Notes",related="opportunity_id.hgr_insurance_description",store=True,readonly=False)
 	l10n_din5008_document_subject = fields.Char(compute='_compute_l10n_din5008_document_subject')
 	hgr_has_timesheet_project = fields.Boolean(
