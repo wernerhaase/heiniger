@@ -55,6 +55,11 @@ registry.category("fields").add("list.hgr_sol_html_text", listSaleOrderLineHtmlT
 
 patch(SaleOrderLineProductField.prototype, {
     get hgrHtmlLabel() {
-        return markup(this.label || "");
+        // `this.label` is Odoo's plain-text product-label helper. It removes the
+        // product name with a string replacement, which corrupts rich HTML such
+        // as `<li>Product name</li>` and leaves an empty list item behind.
+        // The sale-order description is an Html field, so render its stored
+        // value directly and preserve every paragraph and list item.
+        return markup(this.props.record.data.name || "");
     },
 });

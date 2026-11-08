@@ -38,6 +38,7 @@ class Project(models.Model):
     def create(self, vals_list):
         projects = super().create(vals_list)
         projects._hgr_sync_analytic_quotation_codes()
+        projects._hgr_sync_analytic_customers()
         projects._hgr_sync_sale_line_analytic_distributions()
         return projects
 
@@ -45,6 +46,7 @@ class Project(models.Model):
         result = super().write(vals)
         if {'account_id', 'sale_line_id', 'reinvoiced_sale_order_id'} & vals.keys():
             self._hgr_sync_analytic_quotation_codes()
+            self._hgr_sync_analytic_customers()
             self._hgr_sync_sale_line_analytic_distributions()
         return result
 
@@ -122,6 +124,30 @@ class Project(models.Model):
                 continue
 
             account.with_context(tracking_disable=True).code = primary_order.name
+            updated_accounts |= account
+        return updated_accounts
+
+    def _hgr_sync_analytic_customers(self):
+        """Keep project analytic accounts aligned with their sole customer.
+
+        An account can be shared by several projects or quotations.  Update it
+        only when every active linked quotation belongs to the same commercial
+        customer; ambiguous multi-customer accounts are intentionally left
+        untouched.
+        """
+        updated_accounts = self.env['account.analytic.account']
+        for account in self.sudo().mapped('account_id'):
+            linked_orders = self.env['sale.order']
+            for project in account.project_ids:
+                linked_orders |= project._hgr_profitability_sale_orders()
+            customers = linked_orders.mapped('partner_id.commercial_partner_id')
+            if len(customers) != 1:
+                continue
+
+            customer = customers[0]
+            if account.partner_id.commercial_partner_id == customer:
+                continue
+            account.with_context(tracking_disable=True).partner_id = customer
             updated_accounts |= account
         return updated_accounts
 
@@ -502,42 +528,57 @@ class Project(models.Model):
 
         labour_groups = {}
 
-        def labour_group(key, category):
-            return labour_groups.setdefault(key, {
+        def labour_group(key, service, work_category=''):
+            group = labour_groups.setdefault(key, {
                 'key': key,
-                'category': category,
+                'service': service,
+                'work_category': '',
+                # Kept for older clients while the report moves to the
+                # explicit service/work-category columns below.
+                'category': '',
+                '_work_categories': set(),
                 'quoted_hours': 0.0,
                 'actual_hours': 0.0,
                 'balance_hours': 0.0,
                 'cost': 0.0,
                 'entries': 0,
             })
+            if work_category:
+                group['_work_categories'].add(work_category)
+            return group
 
         with_order = len(quoted_lines.order_id | timesheets.so_line.order_id) > 1
         for line in quoted_lines:
             if not self._hgr_is_time_uom(line.product_uom_id, hour_uom):
                 continue
             category = line.hgr_work_category_id
-            key = f'category-{category.id}' if category else f'service-{line.id}'
-            label = category.display_name if category else line._hgr_service_label(
-                with_order=with_order
+            # The quotation position is the commercial item whose quoted
+            # hours must be reduced.  Work Category is descriptive metadata;
+            # using it as the key splits a supervisor entry away from the
+            # selected quotation line whenever the two tags differ.
+            key = f'service-{line.id}'
+            group = labour_group(
+                key,
+                line._hgr_service_label(with_order=with_order),
+                category.display_name if category else '',
             )
-            labour_group(key, label)['quoted_hours'] += line.product_uom_id._compute_quantity(
+            group['quoted_hours'] += line.product_uom_id._compute_quantity(
                 line.product_uom_qty, hour_uom
             )
 
         for line in timesheets:
             category = line.hgr_work_category_id or line.so_line.hgr_work_category_id
-            if category:
-                key = f'category-{category.id}'
-                label = category.display_name
-            elif line.so_line:
+            if line.so_line:
                 key = f'service-{line.so_line.id}'
-                label = line.so_line._hgr_service_label(with_order=with_order)
+                service = line.so_line._hgr_service_label(with_order=with_order)
             else:
-                label = line.hgr_manual_service_name or _('Uncategorised Labour')
-                key = f'manual-{label}'
-            group = labour_group(key, label)
+                service = line.hgr_manual_service_name or _('Uncategorised Labour')
+                key = f'manual-{service}-{category.id if category else 0}'
+            group = labour_group(
+                key,
+                service,
+                category.display_name if category else '',
+            )
             group['actual_hours'] += (
                 line.product_uom_id or company.project_time_mode_id
             )._compute_quantity(line.unit_amount, hour_uom)
@@ -546,6 +587,9 @@ class Project(models.Model):
 
         labour_comparison = []
         for group in labour_groups.values():
+            work_categories = sorted(group.pop('_work_categories'))
+            group['work_category'] = ', '.join(work_categories)
+            group['category'] = group['work_category']
             group['quoted_hours'] = round(group['quoted_hours'], 4)
             group['actual_hours'] = round(group['actual_hours'], 4)
             group['balance_hours'] = round(
@@ -553,7 +597,9 @@ class Project(models.Model):
             )
             group['cost'] = currency.round(group['cost'])
             labour_comparison.append(group)
-        labour_comparison.sort(key=lambda item: item['category'])
+        labour_comparison.sort(
+            key=lambda item: (item['service'], item['work_category'])
+        )
 
         material_groups = {}
 

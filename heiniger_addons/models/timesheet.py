@@ -1,5 +1,24 @@
+import base64
+import binascii
+import mimetypes
+import os
+
 from odoo import api, fields, models, Command, _
 from odoo.exceptions import AccessError, ValidationError
+
+
+_ALLOWED_WORK_REPORT_MIMETYPES = {
+    'application/pdf',
+    'image/heic',
+    'image/heif',
+    'image/jpeg',
+    'image/png',
+    'image/tiff',
+    'image/webp',
+}
+_MAX_WORK_REPORT_ATTACHMENTS = 10
+_MAX_WORK_REPORT_ATTACHMENT_BYTES = 10 * 1024 * 1024
+_MAX_WORK_REPORT_TOTAL_BYTES = 25 * 1024 * 1024
 
 
 class HgrWorkCategory(models.Model):
@@ -27,6 +46,10 @@ class HgrSupervisorTimesheet(models.Model):
     description = fields.Text(string='Overall Description')
     line_ids = fields.One2many('hgr.supervisor.timesheet.line', 'sheet_id', string='Worker Lines')
     timesheet_ids = fields.One2many('account.analytic.line', 'hgr_supervisor_sheet_id', string='Timesheets')
+    attachment_ids = fields.Many2many(
+        'ir.attachment', 'hgr_supervisor_timesheet_attachment_rel',
+        'sheet_id', 'attachment_id', string='Work Reports', copy=False,
+    )
     company_id = fields.Many2one(related='project_id.company_id', store=True)
 
     @api.depends('date', 'project_id')
@@ -93,10 +116,68 @@ class HgrSupervisorTimesheet(models.Model):
         ]
 
     @api.model
+    def _prepare_work_report_attachments(self, raw_attachments):
+        if not raw_attachments:
+            return []
+        if not isinstance(raw_attachments, list):
+            raise ValidationError(_('Invalid work report attachments.'))
+        if len(raw_attachments) > _MAX_WORK_REPORT_ATTACHMENTS:
+            raise ValidationError(_(
+                'You can attach at most %(count)s work reports.',
+                count=_MAX_WORK_REPORT_ATTACHMENTS,
+            ))
+
+        prepared = []
+        total_size = 0
+        for raw_attachment in raw_attachments:
+            if not isinstance(raw_attachment, dict):
+                raise ValidationError(_('Invalid work report attachment.'))
+            filename = (raw_attachment.get('name') or '').replace('\\', '/')
+            filename = os.path.basename(filename).strip()[:255]
+            datas = (raw_attachment.get('datas') or '').strip()
+            mimetype = (raw_attachment.get('mimetype') or '').strip().lower()
+            mimetype = mimetype or (mimetypes.guess_type(filename)[0] or '')
+            if not filename or not datas:
+                raise ValidationError(_('Every work report needs a filename and file content.'))
+            if mimetype not in _ALLOWED_WORK_REPORT_MIMETYPES:
+                raise ValidationError(_(
+                    '%(filename)s is not a supported image or PDF file.',
+                    filename=filename,
+                ))
+            try:
+                decoded = base64.b64decode(datas, validate=True)
+            except (binascii.Error, ValueError):
+                raise ValidationError(_(
+                    '%(filename)s could not be read. Please attach it again.',
+                    filename=filename,
+                ))
+            if not decoded:
+                raise ValidationError(_('%(filename)s is empty.', filename=filename))
+            if len(decoded) > _MAX_WORK_REPORT_ATTACHMENT_BYTES:
+                raise ValidationError(_(
+                    '%(filename)s exceeds the 10 MB file limit.',
+                    filename=filename,
+                ))
+            total_size += len(decoded)
+            if total_size > _MAX_WORK_REPORT_TOTAL_BYTES:
+                raise ValidationError(_('Work report attachments cannot exceed 25 MB in total.'))
+            prepared.append({
+                'name': filename,
+                'datas': datas,
+                'mimetype': mimetype,
+                'type': 'binary',
+            })
+        return prepared
+
+    @api.model
     def create_from_ui(self, payload):
         self._check_supervisor_access()
         if not isinstance(payload, dict):
             raise ValidationError(_('Invalid timesheet data.'))
+
+        attachment_values = self._prepare_work_report_attachments(
+            payload.get('attachments') or []
+        )
 
         partner = self.env['res.partner'].browse(payload.get('partner_id')).exists()
         project = self.env['project.project'].browse(payload.get('project_id')).exists()
@@ -190,7 +271,22 @@ class HgrSupervisorTimesheet(models.Model):
                 'name': timesheet_description,
                 'hgr_supervisor_sheet_id': sheet.id,
             })
-        return {'id': sheet.id, 'count': len(sheet.line_ids)}
+        if attachment_values:
+            attachments = self.env['ir.attachment'].create([
+                {
+                    **values,
+                    'res_model': sheet._name,
+                    'res_id': sheet.id,
+                    'company_id': sheet.company_id.id or False,
+                }
+                for values in attachment_values
+            ])
+            sheet.attachment_ids = [Command.set(attachments.ids)]
+        return {
+            'id': sheet.id,
+            'count': len(sheet.line_ids),
+            'attachment_count': len(sheet.attachment_ids),
+        }
 
 
 class HgrSupervisorTimesheetLine(models.Model):

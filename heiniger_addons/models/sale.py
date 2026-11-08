@@ -13,15 +13,17 @@ class Saleorder(models.Model):
 	def create(self, vals_list):
 		orders = super().create(vals_list)
 		orders.sudo().project_id._hgr_sync_analytic_quotation_codes()
+		orders.sudo().project_id._hgr_sync_analytic_customers()
 		orders._hgr_sync_line_analytic_distributions()
 		return orders
 
 	def write(self, vals):
 		projects = self.sudo().project_id
 		result = super().write(vals)
-		if {'name', 'project_id', 'state'} & vals.keys():
+		if {'name', 'partner_id', 'project_id', 'state'} & vals.keys():
 			projects |= self.sudo().project_id
 			projects._hgr_sync_analytic_quotation_codes()
+			projects._hgr_sync_analytic_customers()
 		if 'project_id' in vals:
 			self._hgr_sync_line_analytic_distributions()
 		return result

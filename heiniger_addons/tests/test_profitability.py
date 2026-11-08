@@ -72,6 +72,27 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(summary['vendor_details'][0]['allocation_percent'], 40.0)
         self.assertEqual(summary['vendor_details'][0]['move_id'], bill.id)
 
+    def test_quotation_customer_is_synchronized_to_analytic_account(self):
+        replacement_customer = self.env['res.partner'].create({
+            'name': 'Replacement Profitability Customer',
+        })
+
+        self.order.partner_id = replacement_customer
+
+        self.assertEqual(self.account.partner_id, replacement_customer)
+
+    def test_shared_account_with_different_customers_is_not_overwritten(self):
+        original_customer = self.account.partner_id
+        other_customer = self.env['res.partner'].create({
+            'name': 'Other Profitability Customer',
+        })
+        self.env['sale.order'].create({
+            'partner_id': other_customer.id,
+            'project_id': self.project.id,
+        })
+
+        self.assertEqual(self.account.partner_id, original_customer)
+
     def test_quoted_material_is_independent_for_separate_projects(self):
         other_account = self.env['account.analytic.account'].create({
             'name': 'Other Project Analytic Account',
@@ -327,6 +348,55 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual(row['quoted_hours'], 12.0)
         self.assertEqual(row['actual_hours'], 7.5)
         self.assertEqual(row['balance_hours'], 4.5)
+
+    def test_labour_comparison_matches_sale_line_when_work_category_differs(self):
+        hour_uom = self.env.ref('uom.product_uom_hour')
+        quoted_category = self.env['hgr.work.category'].create({
+            'name': 'Quoted Covering Work',
+        })
+        entered_category = self.env['hgr.work.category'].create({
+            'name': 'Entered Installation Work',
+        })
+        service = self.env['product.product'].create({
+            'name': 'Covering Work Position',
+            'type': 'service',
+            'uom_id': hour_uom.id,
+            'list_price': 100.0,
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [Command.create({
+                'product_id': service.id,
+                'product_uom_qty': 12.75,
+                'product_uom_id': hour_uom.id,
+                'hgr_work_category_id': quoted_category.id,
+            })],
+        })
+        self.env['account.analytic.line'].create({
+            'date': '2026-11-02',
+            'project_id': self.project.id,
+            'account_id': self.account.id,
+            'employee_id': self.employee.id,
+            'so_line': order.order_line.id,
+            'hgr_work_category_id': entered_category.id,
+            'unit_amount': 12.0,
+            'name': 'Supervisor-entered covering work',
+        })
+
+        summary = self.project._hgr_profitability_summary()
+        row = next(
+            item for item in summary['labour_comparison']
+            if item['key'] == f'service-{order.order_line.id}'
+        )
+
+        self.assertEqual(row['quoted_hours'], 12.75)
+        self.assertEqual(row['actual_hours'], 12.0)
+        self.assertEqual(row['balance_hours'], 0.75)
+        self.assertEqual(row['work_category'], ', '.join(sorted([
+            quoted_category.name,
+            entered_category.name,
+        ])))
 
     def test_quoted_lines_are_split_by_time_uom_not_product_type(self):
         hour_uom = self.env.ref('uom.product_uom_hour')

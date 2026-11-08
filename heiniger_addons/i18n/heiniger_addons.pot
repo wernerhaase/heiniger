@@ -1650,3 +1650,52 @@ msgstr ""
 #: code:addons/heiniger_addons/models/payment_term.py:0
 msgid "<div><b>Net amount</b>: pay %(amount)s by %(date)s</div>"
 msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Work Category"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Quotation Position"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "By Quotation Position"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Quoted"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Time Taken"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Balance"
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "No labour found."
+msgstr ""
+
+#. module: heiniger_addons
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
+msgid "Quoted, spent, and remaining hours matched to each quotation position."
+msgstr ""

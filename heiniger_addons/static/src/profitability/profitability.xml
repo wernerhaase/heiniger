@@ -184,28 +184,29 @@
                             <section class="card shadow-sm h-100 o_hgr_summary_table">
                                 <div class="card-header bg-transparent">
                                     <div class="fw-semibold">Labour Summary</div>
-                                    <small class="text-muted">Quoted, spent, and remaining hours grouped by work category tag.</small>
+                                    <small class="text-muted">Quoted, spent, and remaining hours matched to each quotation position.</small>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover table-sm align-middle mb-0">
-                                        <thead><tr><th class="ps-3">Work Category</th><th class="text-end">Quoted</th><th class="text-end">Time Taken</th><th class="text-end">Balance</th><th class="text-end pe-3">Cost</th></tr></thead>
+                                        <thead><tr><th class="ps-3">Quotation Position</th><th>Work Category</th><th class="text-end">Quoted</th><th class="text-end">Time Taken</th><th class="text-end">Balance</th><th class="text-end pe-3">Cost</th></tr></thead>
                                         <tbody>
                                             <t t-foreach="costSummaryProjects" t-as="summary" t-key="summary.project.id">
                                                 <tr t-if="state.data.projects.length &gt; 1" class="o_hgr_project_heading" t-on-click="() => this.selectProject(summary.project.id)">
-                                                    <td class="ps-3 fw-semibold" colspan="5" t-out="summary.project.name"/>
+                                                    <td class="ps-3 fw-semibold" colspan="6" t-out="summary.project.name"/>
                                                 </tr>
                                                 <tr t-foreach="summary.labourRows" t-as="row" t-key="row.key">
-                                                    <td class="ps-3" t-out="row.category"/>
+                                                    <td class="ps-3" t-out="row.service"/>
+                                                    <td t-out="row.work_category"/>
                                                     <td class="text-end" t-out="formatNumber(row.quoted_hours)"/>
                                                     <td class="text-end" t-out="formatNumber(row.actual_hours)"/>
                                                     <td class="text-end" t-att-class="row.balance_hours &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatNumber(row.balance_hours)"/>
                                                     <td class="text-end pe-3" t-out="formatMoney(row.cost, summary.project.currency_id)"/>
                                                 </tr>
                                                 <tr t-if="!summary.labourRows.length">
-                                                    <td class="ps-3 text-muted" colspan="5">No quoted or actual labour.</td>
+                                                    <td class="ps-3 text-muted" colspan="6">No quoted or actual labour.</td>
                                                 </tr>
                                                 <tr class="o_hgr_project_total">
-                                                    <td class="ps-3 fw-bold">Labour Total</td>
+                                                    <td class="ps-3 fw-bold" colspan="2">Labour Total</td>
                                                     <td class="text-end fw-semibold" t-out="formatNumber(summary.project.quoted_hours)"/>
                                                     <td class="text-end fw-semibold" t-out="formatNumber(summary.project.actual_hours)"/>
                                                     <td class="text-end fw-semibold" t-att-class="summary.project.hours_variance &lt; 0 ? 'text-danger' : ''" t-out="formatNumber(summary.project.hours_variance)"/>
@@ -262,7 +263,7 @@
                                 <div class="d-flex gap-2">
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Labour view">
                                         <button type="button" t-att-class="state.labourView === 'detail' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('detail')">Detailed</button>
-                                        <button type="button" t-att-class="state.labourView === 'service' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('service')">Group by Tag</button>
+                                        <button type="button" t-att-class="state.labourView === 'service' ? 'btn btn-primary' : 'btn btn-outline-primary'" t-on-click="() => this.setLabourView('service')">By Quotation Position</button>
                                     </div>
                                     <button t-if="timesheetLines.length" type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.openTimesheets()">Open Timesheets</button>
                                 </div>
@@ -283,14 +284,14 @@
                                 </tbody>
                             </table></div>
                             <div t-else="" class="table-responsive o_hgr_detail_table"><table class="table table-hover align-middle mb-0">
-                                <thead><tr><th class="ps-3">Project</th><th>Work Category</th><th class="text-end">Quoted</th><th class="text-end">Time Taken</th><th class="text-end">Balance</th><th class="text-end">Labour Cost</th></tr></thead>
+                                <thead><tr><th class="ps-3">Project</th><th>Quotation Position</th><th>Work Category</th><th class="text-end">Quoted</th><th class="text-end">Time Taken</th><th class="text-end">Balance</th><th class="text-end">Labour Cost</th></tr></thead>
                                 <tbody>
                                     <tr t-foreach="serviceSummary" t-as="service" t-key="service.key">
-                                        <td class="ps-3" t-out="service.project_name"/><td class="fw-semibold" t-out="service.category"/><td class="text-end" t-out="formatNumber(service.quoted_hours)"/><td class="text-end" t-out="formatNumber(service.actual_hours)"/><td class="text-end" t-att-class="service.balance_hours &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatNumber(service.balance_hours)"/><td class="text-end" t-out="formatMoney(service.cost, service.currency_id)"/>
+                                        <td class="ps-3" t-out="service.project_name"/><td class="fw-semibold" t-out="service.service"/><td t-out="service.work_category"/><td class="text-end" t-out="formatNumber(service.quoted_hours)"/><td class="text-end" t-out="formatNumber(service.actual_hours)"/><td class="text-end" t-att-class="service.balance_hours &lt; 0 ? 'text-danger fw-semibold' : ''" t-out="formatNumber(service.balance_hours)"/><td class="text-end" t-out="formatMoney(service.cost, service.currency_id)"/>
                                     </tr>
-                                    <tr t-if="!serviceSummary.length"><td colspan="6" class="text-center text-muted py-4">No tagged labour found.</td></tr>
+                                    <tr t-if="!serviceSummary.length"><td colspan="7" class="text-center text-muted py-4">No labour found.</td></tr>
                                     <tr class="o_hgr_table_total">
-                                        <td colspan="2" class="ps-3 fw-bold">Total</td>
+                                        <td colspan="3" class="ps-3 fw-bold">Total</td>
                                         <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.quoted_hours)"/>
                                         <td class="text-end fw-bold" t-out="formatNumber(state.data.totals.actual_hours)"/>
                                         <td class="text-end fw-bold" t-att-class="state.data.totals.hours_variance &lt; 0 ? 'text-danger' : ''" t-out="formatNumber(state.data.totals.hours_variance)"/>
