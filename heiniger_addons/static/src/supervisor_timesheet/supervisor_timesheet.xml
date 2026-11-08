@@ -135,11 +135,47 @@
                     </div>
                 </section>
 
-                <section class="card shadow-sm">
+                <section class="card shadow-sm mb-3">
                     <div class="card-body">
                         <label class="form-label fw-semibold">Overall Description</label>
                         <textarea class="form-control" rows="4"
                             placeholder="General notes about the workday..." t-model="state.description"/>
+                    </div>
+                </section>
+
+                <section class="card shadow-sm">
+                    <div class="card-header bg-transparent fw-semibold">Attachments (Optional)</div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <label class="btn btn-outline-primary mb-0"
+                                   t-att-class="state.saving ? 'disabled' : ''">
+                                <i class="fa fa-paperclip me-1"/> Attach Work Reports
+                                <input type="file" class="d-none" multiple="multiple"
+                                       accept=".pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,image/tiff"
+                                       t-att-disabled="state.saving"
+                                       t-on-change="onFilesSelected"/>
+                            </label>
+                            <span class="text-muted small">
+                                Photos or PDFs of handwritten work reports. Maximum 10 MB per file.
+                            </span>
+                        </div>
+                        <div t-if="state.attachments.length" class="list-group mt-3">
+                            <div t-foreach="state.attachments" t-as="attachment"
+                                 t-key="attachment.key"
+                                 class="list-group-item d-flex align-items-center gap-3">
+                                <i t-att-class="attachment.mimetype === 'application/pdf' ? 'fa fa-file-pdf-o text-danger' : 'fa fa-file-image-o text-primary'"/>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="fw-semibold text-truncate" t-out="attachment.name"/>
+                                    <div class="small text-muted" t-out="attachmentSize(attachment.size)"/>
+                                </div>
+                                <button type="button" class="btn btn-link text-danger p-1"
+                                        title="Remove attachment"
+                                        t-att-disabled="state.saving"
+                                        t-on-click="() => this.removeAttachment(attachment.key)">
+                                    <i class="fa fa-trash"/>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>

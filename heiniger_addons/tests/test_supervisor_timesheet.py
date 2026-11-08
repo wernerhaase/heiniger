@@ -1,3 +1,5 @@
+import base64
+
 from odoo import Command
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
@@ -78,6 +80,49 @@ class TestSupervisorTimesheet(TransactionCase):
         )
         self.assertTrue(sheet.timesheet_ids.is_so_line_edited)
         self.assertEqual(sheet.timesheet_ids.name, 'Installed and tested equipment')
+
+    def test_attaches_handwritten_work_report(self):
+        payload = self.payload()
+        payload['attachments'] = [{
+            'name': '../handwritten-report.jpg',
+            'mimetype': 'image/jpeg',
+            'datas': base64.b64encode(b'work report image').decode(),
+        }]
+
+        result = self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
+        sheet = self.env['hgr.supervisor.timesheet'].browse(result['id'])
+
+        self.assertEqual(result['attachment_count'], 1)
+        self.assertEqual(sheet.attachment_ids.name, 'handwritten-report.jpg')
+        self.assertEqual(sheet.attachment_ids.mimetype, 'image/jpeg')
+        self.assertEqual(sheet.attachment_ids.res_model, sheet._name)
+        self.assertEqual(sheet.attachment_ids.res_id, sheet.id)
+        self.assertEqual(
+            base64.b64decode(sheet.attachment_ids.datas),
+            b'work report image',
+        )
+
+    def test_rejects_unsupported_work_report_attachment(self):
+        payload = self.payload()
+        payload['attachments'] = [{
+            'name': 'unsafe.svg',
+            'mimetype': 'image/svg+xml',
+            'datas': base64.b64encode(b'<svg/>').decode(),
+        }]
+
+        with self.assertRaises(ValidationError):
+            self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
+
+    def test_rejects_invalid_work_report_content(self):
+        payload = self.payload()
+        payload['attachments'] = [{
+            'name': 'report.pdf',
+            'mimetype': 'application/pdf',
+            'datas': 'not valid base64',
+        }]
+
+        with self.assertRaises(ValidationError):
+            self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
 
     def test_lists_service_items_from_linked_sale_orders(self):
         goods = self.env['product.product'].create({

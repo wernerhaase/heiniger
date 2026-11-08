@@ -40,6 +40,7 @@ export class HgrSupervisorTimesheet extends Component {
             noServices: _t("No service items found on the linked sales orders"),
         };
         this.nextLineKey = 1;
+        this.nextAttachmentKey = 1;
         this.state = useState({
             partnerId: actionContext.default_partner_id || false,
             projectId: actionContext.default_project_id || false,
@@ -51,6 +52,7 @@ export class HgrSupervisorTimesheet extends Component {
             workCategories: [],
             loadingServices: false,
             lines: [this.newLine()],
+            attachments: [],
             saving: false,
         });
         onWillStart(async () => {
@@ -215,6 +217,105 @@ export class HgrSupervisorTimesheet extends Component {
         }
     }
 
+    attachmentMimetype(file) {
+        if (file.type) {
+            return file.type.toLowerCase();
+        }
+        const extension = file.name.split(".").pop()?.toLowerCase();
+        return {
+            pdf: "application/pdf",
+            heic: "image/heic",
+            heif: "image/heif",
+            jpeg: "image/jpeg",
+            jpg: "image/jpeg",
+            png: "image/png",
+            tif: "image/tiff",
+            tiff: "image/tiff",
+            webp: "image/webp",
+        }[extension] || "";
+    }
+
+    readFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = String(reader.result || "");
+                resolve(result.includes(",") ? result.split(",", 2)[1] : "");
+            };
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async onFilesSelected(event) {
+        const files = Array.from(event.target.files || []);
+        event.target.value = "";
+        for (const file of files) {
+            if (this.state.attachments.length >= 10) {
+                this.notification.add(_t("You can attach at most 10 work reports."), {
+                    type: "warning",
+                });
+                break;
+            }
+            const mimetype = this.attachmentMimetype(file);
+            if (!(mimetype === "application/pdf" || mimetype.startsWith("image/"))) {
+                this.notification.add(
+                    _t("%s is not a supported image or PDF file.", file.name),
+                    { type: "warning" }
+                );
+                continue;
+            }
+            if (!file.size || file.size > 10 * 1024 * 1024) {
+                this.notification.add(
+                    _t("%s is empty or exceeds the 10 MB file limit.", file.name),
+                    { type: "warning" }
+                );
+                continue;
+            }
+            const totalSize = this.state.attachments.reduce(
+                (total, attachment) => total + attachment.size,
+                file.size
+            );
+            if (totalSize > 25 * 1024 * 1024) {
+                this.notification.add(
+                    _t("Work report attachments cannot exceed 25 MB in total."),
+                    { type: "warning" }
+                );
+                break;
+            }
+            try {
+                this.state.attachments.push({
+                    key: this.nextAttachmentKey++,
+                    name: file.name,
+                    mimetype,
+                    size: file.size,
+                    datas: await this.readFile(file),
+                });
+            } catch {
+                this.notification.add(
+                    _t("%s could not be read. Please attach it again.", file.name),
+                    { type: "danger" }
+                );
+            }
+        }
+    }
+
+    removeAttachment(key) {
+        const index = this.state.attachments.findIndex(
+            (attachment) => attachment.key === key
+        );
+        if (index >= 0) {
+            this.state.attachments.splice(index, 1);
+        }
+    }
+
+    attachmentSize(size) {
+        if (size < 1024 * 1024) {
+            return `${Math.max(1, Math.round(size / 1024))} KB`;
+        }
+        return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
     validate() {
         if (!this.state.partnerId || !this.state.projectId || !this.state.supervisorId || !this.state.date) {
             return _t("Complete the customer, project, supervisor, and date.");
@@ -245,6 +346,11 @@ export class HgrSupervisorTimesheet extends Component {
                 supervisor_id: this.state.supervisorId,
                 date: this.state.date,
                 description: this.state.description,
+                attachments: this.state.attachments.map((attachment) => ({
+                    name: attachment.name,
+                    mimetype: attachment.mimetype,
+                    datas: attachment.datas,
+                })),
                 lines: this.state.lines.map((line) => ({
                     employee_id: line.employeeId,
                     sale_line_id: line.saleLineId,
@@ -260,6 +366,7 @@ export class HgrSupervisorTimesheet extends Component {
             );
             this.state.description = "";
             this.state.lines.splice(0, this.state.lines.length, this.newLine());
+            this.state.attachments.splice(0, this.state.attachments.length);
         } catch (error) {
             this.notification.add(
                 error?.data?.message || _t("The timesheet entries could not be saved."),
