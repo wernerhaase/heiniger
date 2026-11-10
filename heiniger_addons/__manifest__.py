@@ -5,7 +5,7 @@
 {
     'name': 'Heiniger Addons',
     'author': 'Orchid Infosys',
-    'version': '19.0.1.17.14',
+    'version': '19.0.1.17.15',
     'category': 'Customizations',
     'sequence': 6,
     'summary': 'Custom changes for heiniger ',

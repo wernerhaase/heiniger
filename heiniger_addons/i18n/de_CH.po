@@ -506,6 +506,23 @@ msgid "Enter the daily work for your team."
 msgstr "Erfassen Sie die tägliche Arbeit Ihres Teams."
 
 #. module: heiniger_addons
+#: model:ir.actions.client,name:heiniger_addons.action_hgr_supervisor_timesheet
+#: model:ir.ui.menu,name:heiniger_addons.menu_hgr_supervisor_timesheet
+#. odoo-javascript
+#: code:addons/heiniger_addons/static/src/supervisor_timesheet/supervisor_timesheet.xml:0
+msgid "Daily Work Entry"
+msgstr "Tägliche Arbeitserfassung"
+
+#. module: heiniger_addons
+#: model:ir.actions.act_window,name:heiniger_addons.action_hgr_supervisor_timesheet_history
+#: model:ir.ui.menu,name:heiniger_addons.menu_hgr_supervisor_timesheet_history
+#: model:ir.ui.view,arch_db:heiniger_addons.view_hgr_supervisor_timesheet_search
+#: model:ir.ui.view,arch_db:heiniger_addons.view_hgr_supervisor_timesheet_list
+#: model:ir.ui.view,arch_db:heiniger_addons.view_hgr_supervisor_timesheet_form
+msgid "Entry History"
+msgstr "Erfassungsverlauf"
+
+#. module: heiniger_addons
 #. odoo-javascript
 #: code:addons/heiniger_addons/static/src/profitability/profitability.xml:0
 msgid "Entries"
