@@ -1,14 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="action_hgr_supervisor_timesheet" model="ir.actions.client">
-        <field name="name">Supervisor Timesheet</field>
+        <field name="name">Daily Work Entry</field>
         <field name="tag">hgr_supervisor_timesheet</field>
     </record>
 
+    <record id="view_hgr_supervisor_timesheet_search" model="ir.ui.view">
+        <field name="name">hgr.supervisor.timesheet.search</field>
+        <field name="model">hgr.supervisor.timesheet</field>
+        <field name="arch" type="xml">
+            <search string="Entry History">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <field name="supervisor_id"/>
+                <field name="date"/>
+                <filter name="group_date" string="Date" context="{'group_by': 'date:day'}"/>
+                <filter name="group_project" string="Project" context="{'group_by': 'project_id'}"/>
+                <filter name="group_supervisor" string="Supervisor" context="{'group_by': 'supervisor_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_hgr_supervisor_timesheet_list" model="ir.ui.view">
+        <field name="name">hgr.supervisor.timesheet.list</field>
+        <field name="model">hgr.supervisor.timesheet</field>
+        <field name="arch" type="xml">
+            <list string="Entry History" default_order="date desc, id desc" create="false" delete="false">
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <field name="supervisor_id"/>
+                <field name="description" optional="show"/>
+                <field name="worker_count" string="Workers"/>
+                <field name="attachment_count" string="Attachments"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hgr_supervisor_timesheet_form" model="ir.ui.view">
+        <field name="name">hgr.supervisor.timesheet.form</field>
+        <field name="model">hgr.supervisor.timesheet</field>
+        <field name="arch" type="xml">
+            <form string="Entry History" create="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="project_id" domain="[('partner_id', '=', partner_id), ('allow_timesheets', '=', True), ('is_template', '=', False)]"/>
+                        </group>
+                        <group>
+                            <field name="supervisor_id"/>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="General notes about the workday..."/>
+                    </group>
+                    <notebook>
+                        <page string="Workers">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="sale_line_id" optional="show"/>
+                                    <field name="manual_service_name" optional="show"/>
+                                    <field name="work_category_id"/>
+                                    <field name="unit_amount"/>
+                                    <field name="name"/>
+                                    <field name="timesheet_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hgr_supervisor_timesheet_history" model="ir.actions.act_window">
+        <field name="name">Entry History</field>
+        <field name="res_model">hgr.supervisor.timesheet</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hgr_supervisor_timesheet_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No saved work entries yet.</p>
+            <p>Entries submitted from Daily Work Entry will appear here.</p>
+        </field>
+    </record>
+
     <menuitem id="menu_hgr_supervisor_timesheet"
-              name="Supervisor Entry"
+              name="Daily Work Entry"
               parent="hr_timesheet.timesheet_menu_root"
               action="action_hgr_supervisor_timesheet"
               groups="hr_timesheet.group_hr_timesheet_approver"
               sequence="2"/>
+
+    <menuitem id="menu_hgr_supervisor_timesheet_history"
+              name="Entry History"
+              parent="hr_timesheet.timesheet_menu_root"
+              action="action_hgr_supervisor_timesheet_history"
+              groups="hr_timesheet.group_hr_timesheet_approver"
+              sequence="3"/>
 </odoo>

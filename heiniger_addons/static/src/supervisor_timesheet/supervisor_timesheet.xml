@@ -6,7 +6,7 @@
                 <t t-call="heiniger_addons.HgrBreadcrumbs"/>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                     <div>
-                        <h2 class="mb-1">Supervisor Timesheet</h2>
+                        <h2 class="mb-1">Daily Work Entry</h2>
                         <div class="text-muted">Enter the daily work for your team.</div>
                     </div>
                     <button type="button" class="btn btn-primary btn-lg px-4"

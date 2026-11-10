@@ -51,12 +51,139 @@ class HgrSupervisorTimesheet(models.Model):
         'sheet_id', 'attachment_id', string='Work Reports', copy=False,
     )
     company_id = fields.Many2one(related='project_id.company_id', store=True)
+    worker_count = fields.Integer(compute='_compute_entry_counts')
+    attachment_count = fields.Integer(compute='_compute_entry_counts')
+
+    @api.depends('line_ids', 'attachment_ids')
+    def _compute_entry_counts(self):
+        for sheet in self:
+            sheet.worker_count = len(sheet.line_ids)
+            sheet.attachment_count = len(sheet.attachment_ids)
 
     @api.depends('date', 'project_id')
     def _compute_name(self):
         for sheet in self:
             sheet.name = _('%(date)s - %(project)s',
                 date=sheet.date or '', project=sheet.project_id.display_name or '')
+
+    def _get_analytic_line_values(self, line):
+        self.ensure_one()
+        timesheet_description = (
+            line.name
+            or line.work_category_id.display_name
+            or line.manual_service_name
+            or line.sale_line_id.display_name
+            or _('Timesheet')
+        )
+        return {
+            'date': self.date,
+            'project_id': self.project_id.id,
+            'employee_id': line.employee_id.id,
+            'so_line': line.sale_line_id.id or False,
+            'is_so_line_edited': bool(line.sale_line_id),
+            'hgr_manual_service_name': line.manual_service_name,
+            'hgr_work_category_id': line.work_category_id.id,
+            'unit_amount': line.unit_amount,
+            'name': timesheet_description,
+            'hgr_supervisor_sheet_id': self.id,
+        }
+
+    def _sync_analytic_lines(self):
+        analytic_line_model = self.env['account.analytic.line']
+        for sheet in self:
+            for line in sheet.line_ids:
+                values = sheet._get_analytic_line_values(line)
+                if line.timesheet_id:
+                    line.timesheet_id.write(values)
+                else:
+                    line.timesheet_id = analytic_line_model.create(values)
+
+    def write(self, vals):
+        old_attachments = {
+            sheet.id: sheet.attachment_ids for sheet in self
+        } if 'attachment_ids' in vals else {}
+        result = super().write(vals)
+        if {'partner_id', 'project_id', 'date', 'line_ids'} & vals.keys():
+            self._sync_analytic_lines()
+        for sheet in self:
+            removed = old_attachments.get(sheet.id, self.env['ir.attachment']) - sheet.attachment_ids
+            owned = removed.filtered(
+                lambda attachment: attachment.res_model == sheet._name
+                and attachment.res_id == sheet.id
+            )
+            if owned:
+                owned.unlink()
+        return result
+
+    @api.constrains('partner_id', 'project_id', 'line_ids')
+    def _check_entry_consistency(self):
+        for sheet in self:
+            project = sheet.project_id
+            if not project.allow_timesheets or project.is_template:
+                raise ValidationError(_('Please select a project that allows timesheets.'))
+            if (
+                not project.partner_id
+                or project.partner_id.commercial_partner_id
+                != sheet.partner_id.commercial_partner_id
+            ):
+                raise ValidationError(_('The selected project does not belong to this customer.'))
+
+            if not sheet.line_ids:
+                raise ValidationError(_('Add at least one worker line.'))
+
+            allowed_sale_lines = self._get_project_service_sale_lines(project)
+            employee_service_pairs = set()
+            for line in sheet.line_ids:
+                if (
+                    not line.employee_id
+                    or (not line.sale_line_id and not (line.manual_service_name or '').strip())
+                    or not line.work_category_id
+                    or line.unit_amount <= 0
+                    or line.unit_amount > 24
+                ):
+                    raise ValidationError(_(
+                        'Every line needs a worker, service, work category, and positive hours (up to 24).'
+                    ))
+                if line.sale_line_id and line.sale_line_id not in allowed_sale_lines:
+                    raise ValidationError(_(
+                        'The selected service must be a service or time-based item from a sales order linked to this project.'
+                    ))
+                if line.sale_line_id and (line.manual_service_name or '').strip():
+                    raise ValidationError(_('Choose either a sales order service or a manual service.'))
+                if project.company_id and line.employee_id.company_id != project.company_id:
+                    raise ValidationError(_('The worker and project must belong to the same company.'))
+                service_key = line.sale_line_id.id or f'manual:{(line.manual_service_name or "").casefold()}'
+                pair = (line.employee_id.id, service_key)
+                if pair in employee_service_pairs:
+                    raise ValidationError(_('Each worker and service combination can only appear once.'))
+                employee_service_pairs.add(pair)
+
+    @api.constrains('attachment_ids')
+    def _check_work_report_attachments(self):
+        for sheet in self:
+            attachments = sheet.attachment_ids
+            if len(attachments) > _MAX_WORK_REPORT_ATTACHMENTS:
+                raise ValidationError(_(
+                    'You can attach at most %(count)s work reports.',
+                    count=_MAX_WORK_REPORT_ATTACHMENTS,
+                ))
+            total_size = 0
+            for attachment in attachments:
+                mimetype = (attachment.mimetype or '').lower()
+                if mimetype not in _ALLOWED_WORK_REPORT_MIMETYPES:
+                    raise ValidationError(_(
+                        '%(filename)s is not a supported image or PDF file.',
+                        filename=attachment.name,
+                    ))
+                size = attachment.file_size or 0
+                if not size or size > _MAX_WORK_REPORT_ATTACHMENT_BYTES:
+                    raise ValidationError(_(
+                        '%(filename)s is empty or exceeds the 10 MB file limit.',
+                        filename=attachment.name,
+                    ))
+                total_size += size
+            if total_size > _MAX_WORK_REPORT_TOTAL_BYTES:
+                raise ValidationError(_('Work report attachments cannot exceed 25 MB in total.'))
 
     @api.model
     def _check_supervisor_access(self):
@@ -251,26 +378,7 @@ class HgrSupervisorTimesheet(models.Model):
             'description': (payload.get('description') or '').strip(),
             'line_ids': line_commands,
         })
-        for line in sheet.line_ids:
-            timesheet_description = (
-                line.name
-                or line.work_category_id.display_name
-                or line.manual_service_name
-                or line.sale_line_id.display_name
-                or _('Timesheet')
-            )
-            line.timesheet_id = self.env['account.analytic.line'].create({
-                'date': sheet.date,
-                'project_id': sheet.project_id.id,
-                'employee_id': line.employee_id.id,
-                'so_line': line.sale_line_id.id or False,
-                'is_so_line_edited': bool(line.sale_line_id),
-                'hgr_manual_service_name': line.manual_service_name,
-                'hgr_work_category_id': line.work_category_id.id,
-                'unit_amount': line.unit_amount,
-                'name': timesheet_description,
-                'hgr_supervisor_sheet_id': sheet.id,
-            })
+        sheet._sync_analytic_lines()
         if attachment_values:
             attachments = self.env['ir.attachment'].create([
                 {
@@ -307,6 +415,25 @@ class HgrSupervisorTimesheetLine(models.Model):
     unit_amount = fields.Float(string='Time (Hours)', required=True)
     name = fields.Char(string='Work Description')
     timesheet_id = fields.Many2one('account.analytic.line', readonly=True, ondelete='set null')
+
+    @api.onchange('sale_line_id')
+    def _onchange_sale_line_id(self):
+        for line in self:
+            if line.sale_line_id:
+                line.manual_service_name = False
+
+    @api.onchange('manual_service_name')
+    def _onchange_manual_service_name(self):
+        for line in self:
+            if (line.manual_service_name or '').strip():
+                line.sale_line_id = False
+
+    def unlink(self):
+        timesheets = self.mapped('timesheet_id')
+        result = super().unlink()
+        if timesheets:
+            timesheets.unlink()
+        return result
 
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
