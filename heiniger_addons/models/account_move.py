@@ -204,30 +204,112 @@ class AccountMoveLine(models.Model):
 			if account_id in str(key).split(',')
 		]
 
+	@staticmethod
+	def _hgr_key_ids(distribution_key):
+		return frozenset(part for part in str(distribution_key or '').split(',') if part)
+
+	def _hgr_sale_line_rows(self):
+		"""Return the per-row quoted material list, or False for legacy data.
+
+		New format: ``{"rows": [{"key": "12", "percentage": 36.75,
+		"sale_line_id": 5}, ...]}`` -- one entry per row of the analytic
+		distribution popup. Legacy format: ``{"<key>": <sale_line_id>}``.
+		"""
+		self.ensure_one()
+		value = self.hgr_sale_line_distribution
+		if isinstance(value, dict) and isinstance(value.get('rows'), list):
+			return [row for row in value['rows'] if isinstance(row, dict)]
+		return False
+
+	def _hgr_sale_line_splits(self, distribution_key):
+		"""Return ``[(sale_line, fraction, row_index)]`` for one distribution key.
+
+		Several popup rows may use the same analytic account (for example
+		36.75 % and 63.25 % of one bill line on the same project) with a
+		different quoted material each. Odoo merges such rows into a single
+		``analytic_distribution`` key, so the row split is kept in
+		``hgr_sale_line_distribution['rows']`` and re-applied here as fractions
+		of that key. ``row_index`` is None for legacy, key-based data.
+		"""
+		SaleLine = self.env['sale.order.line']
+		if not self:
+			return [(SaleLine, 1.0, None)]
+		self.ensure_one()
+		rows = self._hgr_sale_line_rows()
+		if rows is False:
+			return [(self._hgr_sale_line_for_distribution_key(distribution_key), 1.0, None)]
+		account_ids = self._hgr_key_ids(distribution_key)
+		matching = []
+		for index, row in enumerate(rows):
+			try:
+				percentage = max(float(row.get('percentage') or 0.0), 0.0)
+			except (TypeError, ValueError):
+				percentage = 0.0
+			if percentage and self._hgr_key_ids(row.get('key')) == account_ids:
+				matching.append((index, row, percentage))
+		total = sum(percentage for _index, _row, percentage in matching)
+		if not total:
+			return [(SaleLine, 1.0, None)]
+		splits = []
+		for index, row, percentage in matching:
+			sale_line = SaleLine
+			if row.get('sale_line_id'):
+				sale_line = SaleLine.browse(int(row['sale_line_id'])).exists()
+			splits.append((sale_line, percentage / total, index))
+		return splits
+
 	def _hgr_sale_line_for_distribution_key(self, distribution_key):
 		"""Return the quoted material assigned to one distribution row.
 
 		``hgr_sale_line_id`` was the original, line-wide value. Keep it as a
 		fallback for existing vendor bills while new edits use the per-row JSON
-		mapping.
+		data. When one key is split over several quoted materials, only the
+		first one is returned; use ``_hgr_sale_line_splits`` for the full split.
 		"""
 		if not self:
 			return self.env['sale.order.line']
 		self.ensure_one()
+		if self._hgr_sale_line_rows() is not False:
+			splits = self._hgr_sale_line_splits(distribution_key)
+			return next((line for line, _fraction, _index in splits if line), self.env['sale.order.line'])
 		mapping = self.hgr_sale_line_distribution or {}
 		distribution_key = str(distribution_key or '')
 		sale_line_id = mapping.get(distribution_key)
 		if not sale_line_id and distribution_key:
-			account_ids = set(distribution_key.split(','))
+			account_ids = self._hgr_key_ids(distribution_key)
 			matching_key = next((
 				key for key in mapping
-				if set(str(key).split(',')) == account_ids
+				if self._hgr_key_ids(key) == account_ids
 			), False)
 			if matching_key:
 				sale_line_id = mapping[matching_key]
 		if sale_line_id:
 			return self.env['sale.order.line'].browse(int(sale_line_id)).exists()
 		return self.hgr_sale_line_id if not mapping else self.env['sale.order.line']
+
+	def _hgr_assign_sale_line(self, sale_line, distribution_key=False, row_index=None):
+		"""Assign a quoted material to one row (or key) of this bill line."""
+		self.ensure_one()
+		rows = self._hgr_sale_line_rows()
+		if rows is not False:
+			if row_index is not None and 0 <= row_index < len(rows):
+				targets = [row_index]
+			else:
+				account_ids = self._hgr_key_ids(distribution_key)
+				targets = [
+					index for index, row in enumerate(rows)
+					if not distribution_key or self._hgr_key_ids(row.get('key')) == account_ids
+				]
+			rows = [dict(row) for row in rows]
+			for index in targets:
+				rows[index]['sale_line_id'] = sale_line.id or False
+			self.hgr_sale_line_distribution = {'rows': rows}
+		elif distribution_key:
+			mapping = dict(self.hgr_sale_line_distribution or {})
+			mapping[str(distribution_key)] = sale_line.id
+			self.hgr_sale_line_distribution = mapping
+		else:
+			self.hgr_sale_line_id = sale_line
 
 	@api.model
 	def hgr_quoted_material_options(self, account_ids):

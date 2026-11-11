@@ -19,6 +19,8 @@ _ALLOWED_WORK_REPORT_MIMETYPES = {
 _MAX_WORK_REPORT_ATTACHMENTS = 10
 _MAX_WORK_REPORT_ATTACHMENT_BYTES = 10 * 1024 * 1024
 _MAX_WORK_REPORT_TOTAL_BYTES = 25 * 1024 * 1024
+# Documents tag put on every work report, next to a tag for its year.
+_WORK_REPORT_DOCUMENT_TAG = 'Timesheet'
 
 
 class HgrWorkCategory(models.Model):
@@ -98,6 +100,62 @@ class HgrSupervisorTimesheet(models.Model):
                 else:
                     line.timesheet_id = analytic_line_model.create(values)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        sheets = super().create(vals_list)
+        sheets.filtered('attachment_ids')._hgr_sync_work_report_documents()
+        return sheets
+
+    def _hgr_work_report_tags(self):
+        """Documents tags for this entry's work reports: Timesheet + year."""
+        self.ensure_one()
+        tag_model = self.env['documents.tag'].sudo()
+        year = (self.date or fields.Date.context_today(self)).year
+        tags = tag_model
+        for name in (_WORK_REPORT_DOCUMENT_TAG, str(year)):
+            tag = (
+                tag_model.search([('name', '=ilike', name)], limit=1)
+                or tag_model.with_context(lang='en_US').search([('name', '=ilike', name)], limit=1)
+                or tag_model.create({'name': name})
+            )
+            tags |= tag
+        return tags
+
+    def _hgr_sync_work_report_documents(self):
+        """Store the work reports in the project's Documents folder.
+
+        The existing attachment is reused (no second copy of the file), so
+        the report shows up in the folder opened from the CRM case and stays
+        linked to this timesheet entry. Removing the report from the entry
+        deletes the attachment and, through it, the document.
+        """
+        document_model = self.env['documents.document'].sudo().with_context(active_test=False)
+        for sheet in self:
+            attachments = sheet.attachment_ids.sudo()
+            if not attachments:
+                continue
+            project = sheet.project_id.sudo()
+            if not project.documents_folder_id:
+                project._create_missing_folders()
+            folder = project.documents_folder_id
+            if not folder:
+                continue
+            documents = document_model.search([('attachment_id', 'in', attachments.ids)])
+            moved = documents.filtered(lambda document: document.folder_id != folder)
+            if moved:
+                moved.write({'folder_id': folder.id})
+            missing = attachments - documents.attachment_id
+            if not missing:
+                continue
+            tags = sheet._hgr_work_report_tags()
+            document_model.create([{
+                'attachment_id': attachment.id,
+                'name': attachment.name,
+                'folder_id': folder.id,
+                'tag_ids': [Command.set(tags.ids)],
+                'partner_id': sheet.partner_id.id,
+            } for attachment in missing])
+
     def write(self, vals):
         old_attachments = {
             sheet.id: sheet.attachment_ids for sheet in self
@@ -113,6 +171,8 @@ class HgrSupervisorTimesheet(models.Model):
             )
             if owned:
                 owned.unlink()
+        if {'attachment_ids', 'project_id'} & vals.keys():
+            self._hgr_sync_work_report_documents()
         return result
 
     @api.constrains('partner_id', 'project_id', 'line_ids')

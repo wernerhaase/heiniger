@@ -201,6 +201,88 @@ class TestHgrProfitability(TransactionCase):
         self.assertEqual({detail['allocation_percent'] for detail in details}, {50.0})
         self.assertEqual(summary['vendor_cost_draft'], 200.0)
 
+    def _same_account_split_bill(self, line_a, line_b, post=False):
+        key = str(self.account.id)
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.vendor.id,
+            'invoice_date': '2026-11-11',
+            'invoice_line_ids': [Command.create({
+                'name': 'One bill line split over two quoted materials',
+                'account_id': self.expense_account.id,
+                'quantity': 1,
+                'price_unit': 432.98,
+                # Odoo merges both popup rows of the same account into 100 %
+                'analytic_distribution': {key: 100.0},
+                'hgr_sale_line_distribution': {'rows': [
+                    {'key': key, 'percentage': 36.75, 'sale_line_id': line_a.id},
+                    {'key': key, 'percentage': 63.25, 'sale_line_id': line_b.id},
+                ]},
+            })],
+        })
+        if post:
+            bill.action_post()
+        return bill
+
+    def _two_quoted_materials(self):
+        product_a = self.env['product.product'].create({'name': 'Split Material A', 'type': 'consu'})
+        product_b = self.env['product.product'].create({'name': 'Split Material B', 'type': 'consu'})
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'project_id': self.project.id,
+            'order_line': [
+                Command.create({'product_id': product_a.id, 'price_unit': 200.0}),
+                Command.create({'product_id': product_b.id, 'price_unit': 300.0}),
+            ],
+        })
+        return order.order_line
+
+    def test_same_account_rows_keep_their_own_quoted_material_draft(self):
+        line_a, line_b = self._two_quoted_materials()
+        self._same_account_split_bill(line_a, line_b)
+
+        summary = self.project._hgr_profitability_summary()
+        details = sorted(summary['vendor_details'], key=lambda item: item['allocation_percent'])
+        self.assertEqual(len(details), 2)
+        self.assertEqual([item['sale_line_id'] for item in details], [line_a.id, line_b.id])
+        self.assertAlmostEqual(details[0]['allocation_percent'], 36.75)
+        self.assertAlmostEqual(details[1]['allocation_percent'], 63.25)
+        self.assertAlmostEqual(details[0]['allocated_amount'], 159.12, places=2)
+        self.assertAlmostEqual(details[1]['allocated_amount'], 273.86, places=2)
+        self.assertEqual(len({item['detail_key'] for item in details}), 2)
+        self.assertAlmostEqual(summary['vendor_cost_draft'], 432.98, places=2)
+
+    def test_same_account_rows_keep_their_own_quoted_material_posted(self):
+        line_a, line_b = self._two_quoted_materials()
+        self._same_account_split_bill(line_a, line_b, post=True)
+
+        summary = self.project._hgr_profitability_summary()
+        details = sorted(summary['vendor_details'], key=lambda item: item['allocation_percent'])
+        self.assertEqual([item['sale_line_id'] for item in details], [line_a.id, line_b.id])
+        self.assertTrue(all(item['matched'] for item in details))
+        actual = {
+            item['product']: item['actual_amount']
+            for item in summary['material_comparison']
+        }
+        self.assertAlmostEqual(actual[line_a.product_id.display_name], 159.12, places=2)
+        self.assertAlmostEqual(actual[line_b.product_id.display_name], 273.86, places=2)
+
+    def test_assign_quoted_material_to_one_split_row(self):
+        line_a, line_b = self._two_quoted_materials()
+        bill = self._same_account_split_bill(line_a, line_a, post=True)
+        summary = self.project._hgr_profitability_summary()
+        second = next(item for item in summary['vendor_details'] if item['hgr_row_index'] == 1)
+
+        self.project.hgr_assign_quoted_material(
+            line_b.id,
+            move_line_id=second['move_line_id'],
+            analytic_distribution_key=second['analytic_distribution_key'],
+            row_index=second['hgr_row_index'],
+        )
+
+        rows = bill.invoice_line_ids.hgr_sale_line_distribution['rows']
+        self.assertEqual([row['sale_line_id'] for row in rows], [line_a.id, line_b.id])
+
     def test_posted_vendor_bill_is_reported_as_material(self):
         bill = self.env['account.move'].create({
             'move_type': 'in_invoice',

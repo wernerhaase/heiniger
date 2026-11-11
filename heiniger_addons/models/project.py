@@ -407,58 +407,70 @@ class Project(models.Model):
         ) if account else self.env['account.move.line']
         vendor_cost_posted = -sum(material_lines.mapped('amount'))
         vendor_cost_draft = 0.0
-        vendor_details = [{
-            'id': line.id,
-            'detail_key': f'analytic-{line.id}',
-            'move_id': line.move_line_id.move_id.id or False,
-            'invoice': (
-                line.move_line_id.move_id.name
-                or line.move_line_id.move_id.ref
-                or line.ref
-                or _('Analytic Entry')
-            ),
-            'date': fields.Date.to_string(line.date),
-            'vendor': line.partner_id.display_name or '',
-            'description': line.name or '',
-            'product': line.product_id.display_name or '',
-            'product_id': line.product_id.id or False,
-            'move_line_id': line.move_line_id.id or False,
-            'sale_line_id': line.move_line_id._hgr_sale_line_for_distribution_key(
-                line._get_distribution_key()
-            ).id or False,
-            'analytic_distribution_key': line._get_distribution_key(),
-            'quantity': line.unit_amount or 0.0,
-            'allocation_percent': 100.0,
-            'allocated_amount': currency.round(-line.amount),
-            'state': 'posted',
-            'source': line.category or 'analytic',
-        } for line in material_lines]
-        for line in draft_vendor_lines:
-            for distribution_key in line._hgr_distribution_keys_for_account(account):
-                share = (line.analytic_distribution or {}).get(distribution_key, 0.0) / 100.0
-                allocated_amount = line.balance * share
-                vendor_cost_draft += allocated_amount
+        vendor_details = []
+        for line in material_lines:
+            distribution_key = line._get_distribution_key()
+            splits = line.move_line_id._hgr_sale_line_splits(distribution_key)
+            for split_index, (sale_line, fraction, row_index) in enumerate(splits):
                 vendor_details.append({
                     'id': line.id,
-                    'detail_key': f'draft-vendor-{line.id}-{distribution_key}',
-                    'move_id': line.move_id.id,
-                    'invoice': line.move_id.name or line.move_id.ref or _('Draft'),
+                    'detail_key': (
+                        f'analytic-{line.id}' if len(splits) == 1
+                        else f'analytic-{line.id}-{split_index}'
+                    ),
+                    'move_id': line.move_line_id.move_id.id or False,
+                    'invoice': (
+                        line.move_line_id.move_id.name
+                        or line.move_line_id.move_id.ref
+                        or line.ref
+                        or _('Analytic Entry')
+                    ),
                     'date': fields.Date.to_string(line.date),
                     'vendor': line.partner_id.display_name or '',
                     'description': line.name or '',
                     'product': line.product_id.display_name or '',
                     'product_id': line.product_id.id or False,
-                    'move_line_id': line.id,
-                    'sale_line_id': line._hgr_sale_line_for_distribution_key(
-                        distribution_key
-                    ).id or False,
+                    'move_line_id': line.move_line_id.id or False,
+                    'sale_line_id': sale_line.id or False,
                     'analytic_distribution_key': distribution_key,
-                    'quantity': (line.quantity or 0.0) * share,
-                    'allocation_percent': share * 100.0,
-                    'allocated_amount': currency.round(allocated_amount),
-                    'state': 'draft',
-                    'source': 'vendor_bill',
+                    'hgr_row_index': row_index,
+                    'quantity': (line.unit_amount or 0.0) * fraction,
+                    'allocation_percent': 100.0 * fraction,
+                    'allocated_amount': currency.round(-line.amount * fraction),
+                    'state': 'posted',
+                    'source': line.category or 'analytic',
                 })
+
+        for line in draft_vendor_lines:
+            for distribution_key in line._hgr_distribution_keys_for_account(account):
+                share = (line.analytic_distribution or {}).get(distribution_key, 0.0) / 100.0
+                vendor_cost_draft += line.balance * share
+                splits = line._hgr_sale_line_splits(distribution_key)
+                for split_index, (sale_line, fraction, row_index) in enumerate(splits):
+                    allocated_amount = line.balance * share * fraction
+                    vendor_details.append({
+                        'id': line.id,
+                        'detail_key': (
+                            f'draft-vendor-{line.id}-{distribution_key}' if len(splits) == 1
+                            else f'draft-vendor-{line.id}-{distribution_key}-{split_index}'
+                        ),
+                        'move_id': line.move_id.id,
+                        'invoice': line.move_id.name or line.move_id.ref or _('Draft'),
+                        'date': fields.Date.to_string(line.date),
+                        'vendor': line.partner_id.display_name or '',
+                        'description': line.name or '',
+                        'product': line.product_id.display_name or '',
+                        'product_id': line.product_id.id or False,
+                        'move_line_id': line.id,
+                        'sale_line_id': sale_line.id or False,
+                        'analytic_distribution_key': distribution_key,
+                        'hgr_row_index': row_index,
+                        'quantity': (line.quantity or 0.0) * share * fraction,
+                        'allocation_percent': share * fraction * 100.0,
+                        'allocated_amount': currency.round(allocated_amount),
+                        'state': 'draft',
+                        'source': 'vendor_bill',
+                    })
 
         manual_material_lines = self.env['hgr.profitability.manual.cost'].sudo().search([
             ('project_id', '=', self.id),
@@ -634,16 +646,16 @@ class Project(models.Model):
             )
 
         for line in material_lines:
-            sale_line = line.move_line_id._hgr_sale_line_for_distribution_key(
+            for sale_line, fraction, _row_index in line.move_line_id._hgr_sale_line_splits(
                 line._get_distribution_key()
-            )
-            product = sale_line.product_id or line.product_id
-            key = f'product-{product.id}' if product else 'unmatched-material'
-            label = product.display_name if product else _('Unmatched Material')
-            group = material_group(key, label)
-            group['actual_quantity'] += line.unit_amount or 0.0
-            group['actual_amount'] += -line.amount
-            group['entries'] += 1
+            ):
+                product = sale_line.product_id or line.product_id
+                key = f'product-{product.id}' if product else 'unmatched-material'
+                label = product.display_name if product else _('Unmatched Material')
+                group = material_group(key, label)
+                group['actual_quantity'] += (line.unit_amount or 0.0) * fraction
+                group['actual_amount'] += -line.amount * fraction
+                group['entries'] += 1
 
         for line in manual_material_lines:
             product = line.product_id
@@ -810,7 +822,7 @@ class Project(models.Model):
 
     def hgr_assign_quoted_material(
         self, sale_line_id, move_line_id=False, manual_cost_id=False,
-        analytic_distribution_key=False,
+        analytic_distribution_key=False, row_index=None,
     ):
         """Link an unmatched material cost to a quoted material line."""
         self.ensure_one()
@@ -842,12 +854,11 @@ class Project(models.Model):
             or not self._hgr_analytic_share(move_line.analytic_distribution, self.account_id)
         ):
             raise ValidationError(_('The vendor cost does not belong to this project.'))
-        if analytic_distribution_key:
-            mapping = dict(move_line.hgr_sale_line_distribution or {})
-            mapping[str(analytic_distribution_key)] = sale_line.id
-            move_line.hgr_sale_line_distribution = mapping
-        else:
-            move_line.hgr_sale_line_id = sale_line
+        move_line._hgr_assign_sale_line(
+            sale_line,
+            distribution_key=analytic_distribution_key,
+            row_index=row_index if isinstance(row_index, int) else None,
+        )
         return True
 
     @api.depends('name', 'sale_order_id.name', 'reinvoiced_sale_order_id.name')

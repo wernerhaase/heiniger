@@ -102,6 +102,55 @@ class TestSupervisorTimesheet(TransactionCase):
             b'work report image',
         )
 
+    def test_work_report_is_stored_in_project_documents_with_tags(self):
+        payload = self.payload()
+        payload['date'] = '2026-11-11'
+        payload['attachments'] = [{
+            'name': 'arbeitsrapport.pdf',
+            'mimetype': 'application/pdf',
+            'datas': base64.b64encode(b'%PDF-1.4 work report').decode(),
+        }]
+
+        result = self.env['hgr.supervisor.timesheet'].create_from_ui(payload)
+        sheet = self.env['hgr.supervisor.timesheet'].browse(result['id'])
+        folder = self.project.documents_folder_id
+        document = self.env['documents.document'].search([
+            ('attachment_id', '=', sheet.attachment_ids.id),
+        ])
+
+        self.assertTrue(folder)
+        self.assertEqual(len(document), 1)
+        self.assertEqual(document.folder_id, folder)
+        self.assertEqual(document.name, 'arbeitsrapport.pdf')
+        self.assertEqual(document.partner_id, self.customer)
+        self.assertEqual(set(document.tag_ids.mapped('name')), {'Timesheet', '2026'})
+        # the timesheet entry keeps its own link to the same file
+        self.assertEqual(sheet.attachment_ids.res_model, sheet._name)
+        self.assertEqual(sheet.attachment_ids.res_id, sheet.id)
+
+        # removing the report from the entry removes it from Documents too
+        sheet.attachment_ids = [Command.clear()]
+        self.assertFalse(document.exists())
+
+    def test_work_report_tags_are_reused(self):
+        timesheet_tag = self.env['documents.tag'].search([('name', '=ilike', 'timesheet')], limit=1) \
+            or self.env['documents.tag'].create({'name': 'Timesheet'})
+        payload = self.payload()
+        payload['date'] = '2026-11-11'
+        payload['attachments'] = [{
+            'name': 'report.png',
+            'mimetype': 'image/png',
+            'datas': base64.b64encode(b'png').decode(),
+        }]
+        sheet = self.env['hgr.supervisor.timesheet'].browse(
+            self.env['hgr.supervisor.timesheet'].create_from_ui(payload)['id']
+        )
+        document = self.env['documents.document'].search([
+            ('attachment_id', '=', sheet.attachment_ids.id),
+        ])
+        self.assertIn(timesheet_tag, document.tag_ids)
+        self.assertEqual(self.env['documents.tag'].search_count([('name', '=ilike', 'timesheet')]), 1)
+
     def test_rejects_unsupported_work_report_attachment(self):
         payload = self.payload()
         payload['attachments'] = [{
