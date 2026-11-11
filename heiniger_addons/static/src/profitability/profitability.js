@@ -182,6 +182,7 @@ export class HgrProjectProfitability extends Component {
                 move_line_id: line.source === "manual" ? false : line.move_line_id,
                 manual_cost_id: line.source === "manual" ? line.id : false,
                 analytic_distribution_key: line.analytic_distribution_key || false,
+                row_index: Number.isInteger(line.hgr_row_index) ? line.hgr_row_index : null,
             });
             this.notification.add(_t("Material cost matched to the quotation."), { type: "success" });
             await this.load();
