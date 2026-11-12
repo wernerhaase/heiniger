@@ -6,14 +6,14 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="priority">90</field>
         <field name="arch" type="xml">
-            <!-- Keep product-specific units and allow the single cleaned Lump sum
-                 unit under its English or Swiss German translated name. -->
+            <!-- allowed_uom_ids now contains every active unit (models/uom.py),
+                 so any unit (kg, m2, Stk., Psch., ...) can be chosen per line. -->
             <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_id']" position="attributes">
-                <attribute name="domain">['|', ('id', 'in', allowed_uom_ids), '&amp;', ('active', '=', True), ('name', 'in', ['Lump sum', 'Psch.'])]</attribute>
+                <attribute name="domain">[('id', 'in', allowed_uom_ids)]</attribute>
                 <attribute name="options">{'no_create': True, 'no_create_edit': True, 'no_open': True}</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/list//field[@name='product_uom_id']" position="attributes">
-                <attribute name="domain">['|', ('id', 'in', allowed_uom_ids), '&amp;', ('active', '=', True), ('name', 'in', ['Lump sum', 'Psch.'])]</attribute>
+                <attribute name="domain">[('id', 'in', allowed_uom_ids)]</attribute>
                 <attribute name="options">{'no_create': True, 'no_create_edit': True, 'no_open': True}</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']//div[@name='invoice_lines']" position="attributes">
