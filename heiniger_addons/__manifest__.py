@@ -5,7 +5,7 @@
 {
     'name': 'Heiniger Addons',
     'author': 'Orchid Infosys',
-    'version': '19.0.1.17.17',
+    'version': '19.0.1.17.18',
     'category': 'Customizations',
     'sequence': 6,
     'summary': 'Custom changes for heiniger ',
@@ -39,6 +39,7 @@ This module added for additional fields & custom developments.
         'views/payment_term_views.xml',
         'views/sale_order_view.xml',
         'views/sale_line_units.xml',
+        'views/uom_views.xml',
         'views/print_attachments.xml',
         'views/portal_view_fix.xml',
         'views/portal_pdf_preview.xml',

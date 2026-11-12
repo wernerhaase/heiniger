@@ -59,3 +59,21 @@ class TestFreeUom(AccountTestInvoicingCommon):
     def test_related_units_still_convert(self):
         gram = self.env.ref('uom.product_uom_gram')
         self.assertAlmostEqual(self.kg._compute_price(10.0, gram), 0.01)
+
+    def test_duplicate_units_are_hidden_but_current_unit_stays(self):
+        Uom = self.env['uom.uom']
+        dup_kg = Uom.create({'name': 'kg', 'relative_factor': 1.0})
+        Uom._hgr_dedupe_selectable()
+        # Exactly one "kg" stays selectable, never the fresh unused duplicate.
+        kgs = Uom.with_context(lang='en_US').search([('name', '=', 'kg')])
+        self.assertEqual(len(kgs.filtered('hgr_sale_selectable')), 1)
+        self.assertFalse(dup_kg.hgr_sale_selectable)
+
+        order = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({'product_id': self.paint.id})],
+        })
+        line = order.order_line
+        self.assertNotIn(dup_kg, line.allowed_uom_ids)
+        line.product_uom_id = dup_kg
+        self.assertIn(dup_kg, line.allowed_uom_ids)

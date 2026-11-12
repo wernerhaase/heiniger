@@ -7,11 +7,70 @@ needs to pick any unit per line (kg, m2, Stk., Psch., ...) depending on the
 offer, without changing the product master data.
 """
 
-from odoo import api, models
+from odoo import api, fields, models
+
+# Imperial / unused standard units hidden from quotation lines by default.
+HGR_HIDDEN_UOM_XMLIDS = [
+    'uom.product_uom_lb', 'uom.product_uom_oz', 'uom.product_uom_inch',
+    'uom.product_uom_foot', 'uom.product_uom_yard', 'uom.product_uom_mile',
+    'uom.product_uom_square_foot', 'uom.product_uom_cubic_foot',
+    'uom.product_uom_cubic_inch', 'uom.product_uom_floz', 'uom.product_uom_qt',
+    'uom.product_uom_gal',
+]
 
 
 class UomUom(models.Model):
     _inherit = 'uom.uom'
+
+    hgr_sale_selectable = fields.Boolean(
+        string='Selectable on Quotes/Invoices',
+        default=True,
+        help='Offer this unit on every quotation and invoice line, whatever '
+             'the product unit is. Untick duplicates or units nobody uses.',
+    )
+
+    @api.model
+    def _hgr_selectable_uoms(self):
+        return self.search([('hgr_sale_selectable', '=', True)])
+
+    @api.model
+    def _hgr_dedupe_selectable(self):
+        """Keep one selectable unit per (normalised) name: the most used one.
+
+        The v17 -> v19 migration left one copy of e.g. kg/Psch./Stk. per old
+        UoM category. Offering all of them makes the unit dropdown unusable.
+        """
+        lang = 'de_CH' if self.env['res.lang']._lang_get('de_CH') else 'en_US'
+        uoms = self.with_context(lang=lang, active_test=True).search([])
+        usage = dict.fromkeys(uoms.ids, 0)
+        for model, field in (
+            ('sale.order.line', 'product_uom_id'),
+            ('account.move.line', 'product_uom_id'),
+            ('product.template', 'uom_id'),
+        ):
+            for uom, count in self.env[model].sudo()._read_group(
+                [(field, 'in', uoms.ids)], [field], ['__count'],
+            ):
+                usage[uom.id] = usage.get(uom.id, 0) + count
+
+        def norm(name):
+            name = (name or '').strip().lower().rstrip('.')
+            return name.replace('²', '2').replace('³', '3')
+
+        groups = {}
+        for uom in uoms:
+            groups.setdefault(norm(uom.name), []).append(uom)
+        hidden = self.browse()
+        for members in groups.values():
+            members.sort(key=lambda u: (-usage.get(u.id, 0), u.id))
+            hidden |= self.browse([u.id for u in members[1:]])
+        for xmlid in HGR_HIDDEN_UOM_XMLIDS:
+            uom = self.env.ref(xmlid, raise_if_not_found=False)
+            if uom and not usage.get(uom.id):
+                hidden |= uom
+        hidden.write({'hgr_sale_selectable': False})
+        (uoms - hidden).write({'hgr_sale_selectable': True})
+        return hidden
 
     def _hgr_has_common_reference(self, other):
         if not self or not other or len(self) != 1 or len(other) != 1:
@@ -33,11 +92,14 @@ class UomUom(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    @api.depends('product_id', 'product_id.uom_id', 'product_id.uom_ids')
+    @api.depends('product_id', 'product_id.uom_id', 'product_id.uom_ids', 'product_uom_id')
     def _compute_allowed_uom_ids(self):
-        all_uoms = self.env['uom.uom'].search([])
+        selectable = self.env['uom.uom']._hgr_selectable_uoms()
         for line in self:
-            line.allowed_uom_ids = all_uoms
+            line.allowed_uom_ids = (
+                selectable | line.product_id.uom_id | line.product_id.uom_ids
+                | line.product_uom_id
+            )
 
     def _get_gross_price_unit(self):
         # Standard converts the price into the product unit using absolute
@@ -79,8 +141,11 @@ class SaleOrderLine(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    @api.depends('product_id', 'product_id.uom_id', 'product_id.uom_ids')
+    @api.depends('product_id', 'product_id.uom_id', 'product_id.uom_ids', 'product_uom_id')
     def _compute_allowed_uom_ids(self):
-        all_uoms = self.env['uom.uom'].search([])
+        selectable = self.env['uom.uom']._hgr_selectable_uoms()
         for line in self:
-            line.allowed_uom_ids = all_uoms
+            line.allowed_uom_ids = (
+                selectable | line.product_id.uom_id | line.product_id.uom_ids
+                | line.product_uom_id
+            )
