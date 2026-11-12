@@ -59,3 +59,53 @@ class TestFreeUom(AccountTestInvoicingCommon):
     def test_related_units_still_convert(self):
         gram = self.env.ref('uom.product_uom_gram')
         self.assertAlmostEqual(self.kg._compute_price(10.0, gram), 0.01)
+
+    def test_duplicate_units_are_hidden_but_current_unit_stays(self):
+        Uom = self.env['uom.uom']
+        dup_kg = Uom.create({'name': 'kg', 'relative_factor': 1.0})
+        Uom._hgr_dedupe_selectable()
+        # Exactly one "kg" stays selectable, never the fresh unused duplicate.
+        kgs = Uom.with_context(lang='en_US').search([('name', '=', 'kg')])
+        self.assertEqual(len(kgs.filtered('hgr_sale_selectable')), 1)
+        self.assertFalse(dup_kg.hgr_sale_selectable)
+
+        order = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({'product_id': self.paint.id})],
+        })
+        line = order.order_line
+        self.assertNotIn(dup_kg, line.allowed_uom_ids)
+        line.product_uom_id = dup_kg
+        self.assertIn(dup_kg, line.allowed_uom_ids)
+
+    def test_merge_duplicate_units(self):
+        Uom = self.env['uom.uom']
+        dup_kg = Uom.create({'name': 'kg', 'relative_uom_id': self.unit.id, 'relative_factor': 1.0})
+        dup_std = Uom.create({'name': 'Std', 'relative_uom_id': self.unit.id, 'relative_factor': 1.0})
+        sack = Uom.create({'name': 'Hgr-Sack', 'relative_uom_id': dup_kg.id, 'relative_factor': 25.0})
+        product = self.env['product.product'].create({
+            'name': 'Paint in duplicate kg', 'type': 'consu', 'uom_id': dup_kg.id,
+            'list_price': 10.0,
+        })
+        order = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({'product_id': product.id, 'product_uom_qty': 3})],
+        })
+        hour = self.env.ref('uom.product_uom_hour')
+
+        Uom._hgr_merge_duplicate_uoms()
+
+        self.assertFalse(dup_kg.active)
+        self.assertFalse(dup_std.active)
+        self.assertEqual(product.uom_id, self.kg)
+        self.assertEqual(order.order_line.product_uom_id, self.kg)
+        self.assertEqual(sack.relative_uom_id, self.kg)
+        self.assertAlmostEqual(sack.factor, 25.0 * self.kg.factor)
+        self.assertTrue(hour.active)
+        kgs = Uom.with_context(lang='en_US').search([('name', '=', 'kg')])
+        self.assertEqual(kgs, self.kg)
+
+    def test_unrelated_units_keep_quantity(self):
+        day = self.env.ref('uom.product_uom_day')
+        self.assertEqual(day._compute_quantity(3.0, self.unit), 3.0)
+        self.assertEqual(day._compute_quantity(1.0, self.env.ref('uom.product_uom_hour')), 8.0)

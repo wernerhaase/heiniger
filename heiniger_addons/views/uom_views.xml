@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hgr_uom_list_selectable" model="ir.ui.view">
+        <field name="name">uom.uom.list.hgr.selectable</field>
+        <field name="model">uom.uom</field>
+        <field name="inherit_id" ref="uom.product_uom_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="relative_uom_id" position="after">
+                <field name="hgr_sale_selectable" optional="show"/>
+            </field>
+        </field>
+    </record>
+    <record id="hgr_uom_form_selectable" model="ir.ui.view">
+        <field name="name">uom.uom.form.hgr.selectable</field>
+        <field name="model">uom.uom</field>
+        <field name="inherit_id" ref="uom.product_uom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='relative_factor']" position="after">
+                <field name="hgr_sale_selectable"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
