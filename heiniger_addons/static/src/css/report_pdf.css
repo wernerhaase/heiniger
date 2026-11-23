@@ -159,3 +159,33 @@
 .din_page.footer.hgr_pagination_footer {
     padding-top: 4mm;
 }
+
+/* Tall line rows are split into slices (see report_pagination.py) so a page
+   can break between bullets. Slices print as one continuous row. */
+.hgr_paginated_lines table.hgr_row_start td,
+.hgr_paginated_lines table.hgr_row_middle td {
+    padding-bottom: 0 !important;
+    border-bottom-width: 0 !important;
+}
+.hgr_paginated_lines table.hgr_row_middle td,
+.hgr_paginated_lines table.hgr_row_end td {
+    padding-top: 0 !important;
+    border-top-width: 0 !important;
+}
+.hgr_paginated_lines table.hgr_row_start td ul,
+.hgr_paginated_lines table.hgr_row_start td ol,
+.hgr_paginated_lines table.hgr_row_middle td ul,
+.hgr_paginated_lines table.hgr_row_middle td ol {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+.hgr_paginated_lines table.hgr_row_middle td ul,
+.hgr_paginated_lines table.hgr_row_middle td ol,
+.hgr_paginated_lines table.hgr_row_end td ul,
+.hgr_paginated_lines table.hgr_row_end td ol {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+.hgr_paginated_lines li.hgr_list_continuation {
+    list-style-type: none;
+}

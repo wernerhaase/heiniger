@@ -42,6 +42,34 @@ class TestReportPagination(BaseCase):
         self.assertEqual(widths[0], widths[1])
         self.assertEqual(sum(float(w.split(':')[1].strip(' %')) for w in widths[0]), 100)
 
+    def test_tall_rows_are_sliced_between_bullets(self):
+        bullets = ''.join('<li>Arbeitsschritt %d mit einer ausfuehrlichen Beschreibung der Leistung</li>' % i
+                          for i in range(14))
+        source = self.report('''<tr class="o_line_section"><td colspan="2">Pos. 4.2</td><td>CHF 9</td></tr>
+            <tr><td name="td_product_name"><span><ul><li><div><strong>Nasszelle:</strong> Arbeiten</div>
+            <ul>''' + bullets + '''</ul></li></ul></span></td><td>1.00</td><td>CHF 6'755.05</td></tr>
+            <tr><td name="td_product_name"><span><ul><li>Kehrichtsaecke/Behaeltnisse</li></ul></span></td>
+            <td>1</td><td>CHF 2</td></tr>''')
+        result = paginate_line_tables(source)
+        updated = html.fromstring(result)
+        slices = updated.xpath('//table[contains(@class,"hgr_row_start") or contains(@class,"hgr_row_middle")'
+                               ' or contains(@class,"hgr_row_end")]')
+        self.assertGreater(len(slices), 2)
+        # Prices only on the first slice, which stays with the section heading.
+        self.assertEqual(len(updated.xpath('//td[contains(text(),"6\'755.05")]')), 1)
+        first_group = updated.xpath('//div[contains(concat(" ", @class, " "), " hgr_keep ")]')[0]
+        self.assertTrue(first_group.xpath('.//table[contains(@class,"hgr_row_start")]'))
+        self.assertTrue(first_group.xpath('.//tr[contains(@class,"o_line_section")]'))
+        # Every bullet is printed exactly once, in order, without the head being repeated.
+        texts = [t for t in updated.xpath('//li/text()') if t.startswith('Arbeitsschritt')]
+        self.assertEqual(texts, ['Arbeitsschritt %d mit einer ausfuehrlichen Beschreibung der Leistung' % i
+                                 for i in range(14)])
+        self.assertEqual(len(updated.xpath('//strong[text()="Nasszelle:"]')), 1)
+        self.assertFalse(updated.xpath('//*[@data-hgr-unit or @data-hgr-head]'))
+        # Short rows stay whole; long slash words get a break opportunity.
+        self.assertIn('Kehrichtsaecke/\u200bBehaeltnisse', result.decode())
+        self.assertEqual(paginate_line_tables(result), result)
+
     def test_unknown_and_non_din_layouts_remain_unchanged(self):
         source = self.report('<tr><td>A</td></tr>', '<th name="custom">Custom</th>')
         self.assertEqual(paginate_line_tables(source), source)
