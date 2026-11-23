@@ -9,6 +9,12 @@ from odoo.tools import html2plaintext
 class Saleorder(models.Model):
 	_inherit = "sale.order"
 
+	# Duplicating an order must not carry over its footer: confirmed orders
+	# get "Besten Dank ..." instead of the terms. Not copying the field lets
+	# the copy recompute the company's standard terms (Bauseitige Leistungen
+	# ...), which must be on every quotation for legal reasons.
+	note = fields.Html(copy=False)
+
 	@api.model_create_multi
 	def create(self, vals_list):
 		orders = super().create(vals_list)
