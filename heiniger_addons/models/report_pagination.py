@@ -8,7 +8,7 @@ from lxml import etree, html as html_parser
 # A4 body with DIN margins holds roughly 40 text lines. Rows estimated above
 # this many lines are split into consecutive slices so the page can break
 # between bullets instead of moving the whole row (leaving a half-empty page).
-TALL_ROW_LINES = 12
+TALL_ROW_LINES = 6
 # The first slice stays with the prices (and with a preceding section heading).
 FIRST_SLICE_LINES = 3
 LIST_TAGS = ('ul', 'ol')
