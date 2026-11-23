@@ -110,6 +110,26 @@ class TestReportPagination(BaseCase):
         lead = updated.xpath('//strong[text()="Sanitaere Installationen:"]')[0]
         self.assertTrue(lead.xpath('ancestor::table[1]//li'), 'lead-in must share its slice with a bullet')
 
+    def test_odoo_nested_list_heading_stays_with_its_bullets(self):
+        nested = ''.join('<li>Liefern, zuschneiden und neu erstellen, Schritt %d mit ausfuehrlicher Beschreibung '
+                         'der Arbeiten gemaess Plan und Vorbestand</li>' % i for i in range(5))
+        groups = ''.join('<li><strong>Bereich %d gem. Plaene:</strong></li><li class="oe-nested"><ul>%s</ul></li>'
+                         % (n, nested) for n in range(3))
+        source = self.report('<tr class="o_line_note"><td colspan="3"><span><ul>' + groups + '</ul></span></td></tr>')
+        result = paginate_line_tables(source)
+        updated = html.fromstring(result)
+        pieces = updated.xpath('//div[contains(@class,"hgr_note_content")]')
+        self.assertGreater(len(pieces), 3)
+        for heading in updated.xpath('//strong[starts-with(text(),"Bereich")]'):
+            piece = heading.xpath('ancestor::div[contains(@class,"hgr_note_content")][1]')[0]
+            self.assertTrue(piece.xpath('.//li[starts-with(text(),"Liefern")]'),
+                            'bold bullet must share its slice with a nested bullet')
+        texts = [t for t in updated.xpath('//li/text()') if t.startswith('Liefern')]
+        self.assertEqual(len(texts), 15)
+        # No empty bullets are left behind by slicing.
+        self.assertFalse([li for li in updated.xpath('//li') if not ''.join(li.itertext()).strip()])
+        self.assertEqual(paginate_line_tables(result), result)
+
     def test_terms_heading_stays_with_first_bullets(self):
         source = self.report('<tr><td>A</td><td>1</td><td>CHF 1</td></tr>').replace(
             b'</div></div>', b'''<span name="order_note"><h6><u><strong>Bauseitige Leistungen</strong></u></h6>

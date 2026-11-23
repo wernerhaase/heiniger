@@ -66,12 +66,19 @@ def _is_heading_like(element):
         return False
     if element.tag in HEADING_TAGS:
         return True
-    if element.tag not in ('p', 'div') or len(text) > 120 or element.xpath('.//ul|.//ol|.//li'):
+    if element.tag not in ('p', 'div', 'li') or len(text) > 120 or element.xpath('.//ul|.//ol|.//li'):
         return False
     emphasised = ' '.join(''.join(
         _text(e) for e in element.xpath('.//strong|.//b|.//u')
         if not e.xpath('ancestor::strong|ancestor::b|ancestor::u')).split())
     return emphasised == text or (len(text) <= 80 and text.endswith(':'))
+
+
+def _introduces_nested_list(item):
+    """A bullet directly followed by Odoo's text-less nested-list item."""
+    following = item.getnext()
+    return (item.tag == 'li' and following is not None and following.tag == 'li'
+            and bool(following.xpath('./ul|./ol')) and not _own_text(following).strip())
 
 
 def _mark_units(cell, chars_per_line):
@@ -90,8 +97,12 @@ def _mark_units(cell, chars_per_line):
             if child.tag in LIST_TAGS:
                 visit(child, depth + 1)
             elif child.tag == 'li' and child.xpath('./ul|./ol'):
-                child.set(HEAD, str(len(heights)))
-                heights.append((_text_lines(_own_text(child), chars_per_line - 3 * depth), True))
+                # Odoo's editor nests bullets in a separate text-less
+                # <li class="oe-nested"><ul>..</ul></li>; only a bullet with
+                # its own text is a "head".
+                if _own_text(child).strip():
+                    child.set(HEAD, str(len(heights)))
+                    heights.append((_text_lines(_own_text(child), chars_per_line - 3 * depth), True))
                 for nested in child.xpath('./ul|./ol'):
                     visit(nested, depth + 1)
             elif child.tag == 'li' or child.tag in BLOCK_TAGS:
@@ -100,7 +111,7 @@ def _mark_units(cell, chars_per_line):
                 else:
                     child.set(UNIT, str(len(heights)))
                     heights.append((_text_lines(_text(child), chars_per_line - 3 * depth),
-                                    _is_heading_like(child)))
+                                    _is_heading_like(child) or _introduces_nested_list(child)))
             else:
                 visit(child, depth)
 
@@ -134,10 +145,16 @@ def _prune(cell, keep):
             else:
                 element.remove(child)
         element.set('class', (element.get('class', '') + ' hgr_list_continuation').strip())
-    # Remove lists and continuation items left without any real bullet.
+    # Remove lists, continuation items and Odoo nested-list wrappers left
+    # without any real bullet.
+    def real(item):
+        if item.tag != 'li' or 'hgr_list_continuation' in (item.get('class') or ''):
+            return False
+        return not item.xpath('./ul|./ol') or bool(_own_text(item).strip())
+
     while True:
-        empty = [e for e in cell.xpath('.//ul|.//ol|.//li[contains(@class,"hgr_list_continuation")]')
-                 if not e.xpath('.//li[not(contains(@class,"hgr_list_continuation"))]')]
+        empty = [e for e in cell.xpath('.//ul|.//ol|.//li')
+                 if not real(e) and not any(real(li) for li in e.xpath('.//li'))]
         if not empty:
             break
         empty[0].drop_tree()
