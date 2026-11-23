@@ -160,32 +160,56 @@
     padding-top: 4mm;
 }
 
-/* Tall line rows are split into slices (see report_pagination.py) so a page
-   can break between bullets. Slices print as one continuous row. */
-.hgr_paginated_lines table.hgr_row_start td,
-.hgr_paginated_lines table.hgr_row_middle td {
+/* Tall line rows and long notes are split into slices (report_pagination.py)
+   so a page can break between bullets. Slices print as one continuous block. */
+.hgr_paginated_lines table.hgr_slice_start td,
+.hgr_paginated_lines table.hgr_slice_middle td {
     padding-bottom: 0 !important;
     border-bottom-width: 0 !important;
 }
-.hgr_paginated_lines table.hgr_row_middle td,
-.hgr_paginated_lines table.hgr_row_end td {
+.hgr_paginated_lines table.hgr_slice_middle td,
+.hgr_paginated_lines table.hgr_slice_end td {
     padding-top: 0 !important;
     border-top-width: 0 !important;
 }
-.hgr_paginated_lines table.hgr_row_start td ul,
-.hgr_paginated_lines table.hgr_row_start td ol,
-.hgr_paginated_lines table.hgr_row_middle td ul,
-.hgr_paginated_lines table.hgr_row_middle td ol {
+.hgr_paginated_lines .hgr_note_content.hgr_slice_start,
+.hgr_paginated_lines .hgr_note_content.hgr_slice_middle {
+    padding-bottom: 0 !important;
+}
+.hgr_paginated_lines .hgr_note_content.hgr_slice_middle,
+.hgr_paginated_lines .hgr_note_content.hgr_slice_end {
+    padding-top: 0 !important;
+}
+.hgr_paginated_lines .hgr_slice_start ul,
+.hgr_paginated_lines .hgr_slice_start ol,
+.hgr_paginated_lines .hgr_slice_middle ul,
+.hgr_paginated_lines .hgr_slice_middle ol {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
-.hgr_paginated_lines table.hgr_row_middle td ul,
-.hgr_paginated_lines table.hgr_row_middle td ol,
-.hgr_paginated_lines table.hgr_row_end td ul,
-.hgr_paginated_lines table.hgr_row_end td ol {
+.hgr_paginated_lines .hgr_slice_middle ul,
+.hgr_paginated_lines .hgr_slice_middle ol,
+.hgr_paginated_lines .hgr_slice_end ul,
+.hgr_paginated_lines .hgr_slice_end ol {
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
 .hgr_paginated_lines li.hgr_list_continuation {
     list-style-type: none;
+}
+
+/* Headings in free text (terms below the lines) stay with their first bullets. */
+.din_page .page .hgr_heading_group {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+.din_page .page ul.hgr_list_start,
+.din_page .page ol.hgr_list_start {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+.din_page .page ul.hgr_list_rest,
+.din_page .page ol.hgr_list_rest {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
